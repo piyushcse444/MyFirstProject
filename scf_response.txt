@@ -1,0 +1,58 @@
+POST /api/login HTTP/1.1
+Host: globalscflink.statebank
+Cookie: JSESSIONID=C41E0B442A0DF583B43AD75E20B77D9C; x-tenant-id=US; vascopath=MjI1YzAzMTE2OWQwNGFkYw==; mle=false; mlePhrase=J2ac0uAC6ghHMfG9uOCvmV0iDuP2v8F7HCG9U83wikrqBALu5Q0heHJlAZhmBHE0; captchaSiteKey=6LeRbuwpAAAAAJ1q98W2VRdRGkaBypBHOZdOblcI; captchaEnabled=false; chatBotHash=82c6b86cc14bd38d7122fe7dcdb73f6843881471; digioEnvironment=sandbox; _ga=GA1.2.1211735765.1782107826; _gid=GA1.2.1814469913.1782107826; joe-chnlcustid=8d3fc662-4a3e-445c-a811-1a1b38c3dacc; _ga_WGRCWFVMMQ=GS2.2.s1782107837$o1$g1$t1782108073$j60$l0$h0; TS01fbd3ab=0137799b19a7bd48847faef3a6cbc53e56e7ec7fcd96587664add3e288ea38b83be62bc18bdb6f012decdcec1eadf6beeeecc56b238d0d07b38a7d0d647e5cbaedf950400c; TS0d7d1705027=08b90ded0cab2000846a2319bed1b0f3807f32afa47bf1ce775a84f7b3961cfe22f223f1bafda71b087ec052ae113000ccb27012e2b9b90652716d8428dd4c23c8f939e3f911fbe200b11676fd8a39160b9b4ed2596cecd1b771f446d005eafb
+Content-Length: 2
+Sec-Ch-Ua-Platform: "Linux"
+Authorization: Basic xxNf5uzUy0fm+b1QyafSXUTQnXAJR5u1rF0HaV389HM=
+Accept-Language: en-GB,en;q=0.9
+Sec-Ch-Ua: "Not-A.Brand";v="24", "Chromium";v="146"
+X-Aguuid: undefined
+X-Captcha: undefined
+Sec-Ch-Ua-Mobile: ?0
+X-Requested-With: XMLHttpRequest
+User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36
+Accept: application/json, text/javascript, */*; q=0.01
+Content-Type: application/json
+Origin: https://globalscflink.statebank
+Sec-Fetch-Site: same-origin
+Sec-Fetch-Mode: cors
+Sec-Fetch-Dest: empty
+Referer: https://globalscflink.statebank/
+Accept-Encoding: gzip, deflate, br
+Priority: u=1, i
+Connection: keep-alive
+
+{}
+
+
+
+HTTP/1.1 200 
+Server: nginx/1.20.1
+Date: Mon, 22 Jun 2026 06:05:48 GMT
+Content-Type: application/json
+Content-Length: 1221
+Connection: keep-alive
+Access-Control-Allow-Credentials: true
+Access-Control-Allow-Origin: https://globalscflink.statebank
+Access-Control-Allow-Methods: GET, POST, OPTIONS
+Access-Control-Max-Age: 3600
+Access-Control-Allow-Headers: Content-Type, Accept, X-Requested-With, remember-me,X-Uuid,Authorization,responseType,observ, a, b, c, v, j, k, X-TENANT-ID
+Access-Control-Expose-Headers: Content-Disposition, a, b, c, v, j, k, X-Captcha
+Expires: Wed, 31 Dec 1969 23:59:59 GMT
+X-Forwarded-Proto: https
+X-Forwarded-For: 127.0.0.0
+X-Forwarded-Port: 443
+X-FRAME-OPTIONS: DENY
+X-XSS-Protection: 1; mode=block;
+x-content-type-options: nosniff
+strict-transport-security: max-age=15552000; includeSubDomains; preload
+Content-Security-Policy: default-src * data: blob:;script-src 65.2.78.18 127.0.0.1:* localhost:* 'self' *.google-analytics.com *.in-freshbots.ai *.pusher.com nr.tn *.nr-data.net * *.sbi *.statebank *.norton.com *.newrelic.com *.digio.in 'unsafe-inline' 'unsafe-eval';style-src data: blob: 'unsafe-inline' *;connect-src localhost:* 127.0.0.1:* *.in-freshbots.ai *.credable.dev *.sbi *.statebank *.pusher.com * *.credable.in 65.2.78.18*.credable.test* *.digio.in a2ad1f15346f04aeeaf7c75e9dfc63d9-1861875484.ap-southeast-1.elb.amazonaws.com:* *.axisb.com:* *.axisbank.com:* abacc00481a954042b7b0c2b1b1312fa-1472345887.ap-south-1.elb.amazonaws.com ;
+X-Content-Security-Policy: default-src * data: blob:;script-src 65.2.78.18 127.0.0.1:* localhost:* 'self' *.google-analytics.com *.in-freshbots.ai *.pusher.com nr.tn *.nr-data.net * *.sbi *.statebank *.norton.com *.newrelic.com *.digio.in 'unsafe-inline' 'unsafe-eval';style-src data: blob: 'unsafe-inline' *;connect-src localhost:* 127.0.0.1:* *.in-freshbots.ai *.credable.dev *.sbi *.statebank *.pusher.com * *.credable.in 65.2.78.18*.credable.test* *.digio.in a2ad1f15346f04aeeaf7c75e9dfc63d9-1861875484.ap-southeast-1.elb.amazonaws.com:* *.axisb.com:* *.axisbank.com:* abacc00481a954042b7b0c2b1b1312fa-1472345887.ap-south-1.elb.amazonaws.com ;
+Referrer-Policy: origin
+Permissions-Policy: fullscreen=(self), sync-xhr=(self), clipboard-read=(self  'https://scfqa.credable.dev' 'https://ddrxqa-lloyds.credable.dev' 'https://ddrxdev-lloyds.credable.dev' ), clipboard-write=(self  'https://scfqa.credable.dev' 'https://ddrxqa-lloyds.credable.dev' 'https://ddrxdev-lloyds.credable.dev' )
+Cache-Control: no-cache, no-store, must-revalidate;
+Set-Cookie: JSESSIONID=; Expires=Thu, 01 Jan 1970 00:00:10 GMT; Path=/; Secure; HttpOnly; SameSite=None
+Set-Cookie: TS01fbd3ab=0137799b19292f0080dea6a46c36545943e74a3f1296587664add3e288ea38b83be62bc18bdb6f012decdcec1eadf6beeeecc56b23a60253b9a7210157cdfa89f402440d6b; Path=/; Secure; HttpOnly
+Set-Cookie: TS0d7d1705027=08b90ded0cab2000d1968d2844c28547eee7e5265b6f46f151184ffa0d554cb77018d8ee1a10c7a108842094301130005d8e9a4e62df3b0c953b3a6dc456d7e3d50c6e0d9c0111627567e1e533e04ba08c8806b74c69291b2fc3e8b09319f5b0; Secure; Path=/
+
+{"userInfo":{"userId":null,"userName":"1084670","password":null,"userType":null,"isUserValidated":null,"uuid":"81bf78a7-45e4-4ed1-93f9-7791712010cb","permissions":null,"lastAccessTime":null,"status":null,"loggedInUserType":null,"agentId":null,"agentUuid":null,"appId":"06","applicationPlatform":null,"bankerSession":null,"buyerListForSupplier":null,"buyerSession":null,"buyers":null,"campaigns":null,"chatbotFlag":null,"clientCode":null,"country":null,"fileDuplicate":false,"firstName":null,"ipAddress":null,"isAddFundOtpRequired":null,"isAdmin2faVerified":false,"isKycRequired":null,"isLoginOtpRequired":null,"isOtpVerified":null,"isPasswordActive":null,"isTokenUser":null,"isTwoFAEnabled":true,"key":null,"lang":null,"lastName":null,"locale":null,"loginHistory":null,"loginType":null,"passwordChangedOn":null,"phoneNumber":null,"privateKeyServ":null,"publicKeyServ":null,"refId":null,"sftpUser":false,"supplierSession":null,"suppliers":null,"tncUrl":null,"userAgent":null,"userKycStatus":null,"userLevel":null,"userSessionId":null},"actionDocuments":[],"body":null,"description":"User authentication success","digioDocId":null,"forcedDocumentSigning":false,"identifier":null,"signVia":null,"status":"OK","tncDocs":null}
