@@ -1,0 +1,62 @@
+import csv
+import requests
+import time
+
+INPUT_CSV = "SBOM_6.3.0.1.json_libraries.csv"
+OUTPUT_CSV = "libraries_updated.csv"
+
+headers = {
+  "User-Agent": "Mozilla/5.0"
+}
+
+proxies ={
+  "http":"http://swglbdomdc:9090",
+  "https":"https://swglbdomdc:9090"
+}
+
+def get_latest_version(group, artifact):
+  try:
+    url = (
+      "https://search.maven.org/solrsearch/select"
+      f"?q=g:%22{group}%22+AND+a:%22{artifact}%22"
+      "&rows=1&wt=json"
+    )
+    print(url)
+    response = requests.get(url, headers=headers, timeout=20, proxies=proxies)
+    print("response" , "->", response.json())
+    response.raise_for_status()
+
+    docs = response.json().get("response", {}).get("docs", [])
+
+    if docs:
+      return docs[0].get("latestVersion", "Not Found")
+
+    return "Not Found"
+
+  except Exception:
+    return "Error"
+
+with open(INPUT_CSV, newline="", encoding="utf-8") as infile, \
+  open(OUTPUT_CSV, "w", newline="", encoding="utf-8") as outfile:
+
+  reader = csv.DictReader(infile)
+
+  fieldnames = reader.fieldnames + ["Current Latest Version"]
+
+  writer = csv.DictWriter(outfile, fieldnames=fieldnames)
+  writer.writeheader()
+
+  for row in reader:
+
+    latest = get_latest_version(row["Name"].split(":")[0],row["Name"].split(":")[1])
+    
+    row["Current Latest Version"] = latest
+
+    print(f'latest_version : {latest}')
+
+    writer.writerow(row)
+
+    time.sleep(0.2)
+    break
+
+print("Done!")
