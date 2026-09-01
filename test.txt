@@ -1,8 +1,1121 @@
-tchUpdateException: ORA-16000: database or pluggable database open for read-only access
-Aug 29 17:26:47 RITFOITESBAP008 kc.sh[2513447]: https://docs.oracle.com/error-help/db/ora-16000/
-Aug 29 17:26:47 RITFOITESBAP008 kc.sh[2513447]: Caused by: org.hibernate.exception.GenericJDBCException: could not execute batch [ORA-16000: database or pluggable database open for read-only access
-Aug 29 17:26:47 RITFOITESBAP008 kc.sh[2513447]: https://docs.oracle.com/error-help/db/ora-16000/] [update SERVER_CONFIG set VALUE=?,VERSION=? where SERVER_CONFIG_KEY=? and VERSION=?]
-Aug 29 17:26:47 RITFOITESBAP008 kc.sh[2513447]: Caused by: java.sql.BatchUpdateException: ORA-16000: database or pluggable database open for read-only access
-Aug 29 17:26:47 RITFOITESBAP008 kc.sh[2513447]: https://docs.oracle.com/error-help/db/ora-16000/
-Aug 29 17:26:47 RITFOITESBAP008 kc.sh[2513447]: 2026-08-29 17:26:47,407 WARN  [org.hibernate.orm.jdbc.error] (main) ORA-16000: database or pluggable database open for read-only access
-Aug 29 17:26:47 RITFOITESBAP008 kc.sh[2513447]: https://docs.oracle.com/error-help/db/ora-16000/
+[scf-uat@GITFOSCFJUMP001 ~]$ awk '/<[0-9]+\.[0-9]+>/{print}' /tmp/sqlplus_trace.log
+212233 12:35:10.711337 execve("/opt/oracle/instantclient/instantclient_21_12/sqlplus", ["sqlplus", "-L", "-S", "ddrx/DDRX@//10.177.179.106:1600/"...], 0x7ffd1ab646b0 /* 36 vars */) = 0 <0.000243>
+212233 12:35:10.711718 brk(NULL)        = 0x24b9000 <0.000015>
+212233 12:35:10.711866 arch_prctl(0x3001 /* ARCH_??? */, 0x7ffe6cad9470) = -1 EINVAL (Invalid argument) <0.000012>
+212233 12:35:10.711965 mmap(NULL, 8192, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_ANONYMOUS, -1, 0) = 0x7f547759a000 <0.000019>
+212233 12:35:10.712115 access("/etc/ld.so.preload", R_OK) = -1 ENOENT (No such file or directory) <0.000020>
+212233 12:35:10.712171 openat(AT_FDCWD, "/opt/oracle/instantclient/instantclient_21_12/glibc-hwcaps/x86-64-v4/libsqlplus.so", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory) <0.000024>
+212233 12:35:10.712263 newfstatat(AT_FDCWD, "/opt/oracle/instantclient/instantclient_21_12/glibc-hwcaps/x86-64-v4", 0x7ffe6cad86a0, 0) = -1 ENOENT (No such file or directory) <0.000014>
+212233 12:35:10.712320 openat(AT_FDCWD, "/opt/oracle/instantclient/instantclient_21_12/glibc-hwcaps/x86-64-v3/libsqlplus.so", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory) <0.000076>
+212233 12:35:10.712423 newfstatat(AT_FDCWD, "/opt/oracle/instantclient/instantclient_21_12/glibc-hwcaps/x86-64-v3", 0x7ffe6cad86a0, 0) = -1 ENOENT (No such file or directory) <0.000014>
+212233 12:35:10.712506 openat(AT_FDCWD, "/opt/oracle/instantclient/instantclient_21_12/glibc-hwcaps/x86-64-v2/libsqlplus.so", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory) <0.000018>
+212233 12:35:10.712549 newfstatat(AT_FDCWD, "/opt/oracle/instantclient/instantclient_21_12/glibc-hwcaps/x86-64-v2", 0x7ffe6cad86a0, 0) = -1 ENOENT (No such file or directory) <0.000052>
+212233 12:35:10.712634 openat(AT_FDCWD, "/opt/oracle/instantclient/instantclient_21_12/tls/haswell/avx512_1/x86_64/libsqlplus.so", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory) <0.000018>
+212233 12:35:10.712682 newfstatat(AT_FDCWD, "/opt/oracle/instantclient/instantclient_21_12/tls/haswell/avx512_1/x86_64", 0x7ffe6cad86a0, 0) = -1 ENOENT (No such file or directory) <0.000014>
+212233 12:35:10.712722 openat(AT_FDCWD, "/opt/oracle/instantclient/instantclient_21_12/tls/haswell/avx512_1/libsqlplus.so", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory) <0.000017>
+212233 12:35:10.712765 newfstatat(AT_FDCWD, "/opt/oracle/instantclient/instantclient_21_12/tls/haswell/avx512_1", 0x7ffe6cad86a0, 0) = -1 ENOENT (No such file or directory) <0.000014>
+212233 12:35:10.712804 openat(AT_FDCWD, "/opt/oracle/instantclient/instantclient_21_12/tls/haswell/x86_64/libsqlplus.so", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory) <0.000052>
+212233 12:35:10.712881 newfstatat(AT_FDCWD, "/opt/oracle/instantclient/instantclient_21_12/tls/haswell/x86_64", 0x7ffe6cad86a0, 0) = -1 ENOENT (No such file or directory) <0.000014>
+212233 12:35:10.712921 openat(AT_FDCWD, "/opt/oracle/instantclient/instantclient_21_12/tls/haswell/libsqlplus.so", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory) <0.000042>
+212233 12:35:10.713027 newfstatat(AT_FDCWD, "/opt/oracle/instantclient/instantclient_21_12/tls/haswell", 0x7ffe6cad86a0, 0) = -1 ENOENT (No such file or directory) <0.000014>
+212233 12:35:10.713070 openat(AT_FDCWD, "/opt/oracle/instantclient/instantclient_21_12/tls/avx512_1/x86_64/libsqlplus.so", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory) <0.000017>
+212233 12:35:10.713142 newfstatat(AT_FDCWD, "/opt/oracle/instantclient/instantclient_21_12/tls/avx512_1/x86_64", 0x7ffe6cad86a0, 0) = -1 ENOENT (No such file or directory) <0.000014>
+212233 12:35:10.713182 openat(AT_FDCWD, "/opt/oracle/instantclient/instantclient_21_12/tls/avx512_1/libsqlplus.so", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory) <0.000019>
+212233 12:35:10.713248 newfstatat(AT_FDCWD, "/opt/oracle/instantclient/instantclient_21_12/tls/avx512_1", 0x7ffe6cad86a0, 0) = -1 ENOENT (No such file or directory) <0.000026>
+212233 12:35:10.713327 openat(AT_FDCWD, "/opt/oracle/instantclient/instantclient_21_12/tls/x86_64/libsqlplus.so", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory) <0.000021>
+212233 12:35:10.713384 newfstatat(AT_FDCWD, "/opt/oracle/instantclient/instantclient_21_12/tls/x86_64", 0x7ffe6cad86a0, 0) = -1 ENOENT (No such file or directory) <0.000034>
+212233 12:35:10.713461 openat(AT_FDCWD, "/opt/oracle/instantclient/instantclient_21_12/tls/libsqlplus.so", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory) <0.000028>
+212233 12:35:10.713529 newfstatat(AT_FDCWD, "/opt/oracle/instantclient/instantclient_21_12/tls", 0x7ffe6cad86a0, 0) = -1 ENOENT (No such file or directory) <0.000025>
+212233 12:35:10.713594 openat(AT_FDCWD, "/opt/oracle/instantclient/instantclient_21_12/haswell/avx512_1/x86_64/libsqlplus.so", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory) <0.000025>
+212233 12:35:10.713666 newfstatat(AT_FDCWD, "/opt/oracle/instantclient/instantclient_21_12/haswell/avx512_1/x86_64", 0x7ffe6cad86a0, 0) = -1 ENOENT (No such file or directory) <0.000016>
+212233 12:35:10.713709 openat(AT_FDCWD, "/opt/oracle/instantclient/instantclient_21_12/haswell/avx512_1/libsqlplus.so", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory) <0.000018>
+212233 12:35:10.713752 newfstatat(AT_FDCWD, "/opt/oracle/instantclient/instantclient_21_12/haswell/avx512_1", 0x7ffe6cad86a0, 0) = -1 ENOENT (No such file or directory) <0.000012>
+212233 12:35:10.713789 openat(AT_FDCWD, "/opt/oracle/instantclient/instantclient_21_12/haswell/x86_64/libsqlplus.so", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory) <0.000014>
+212233 12:35:10.713827 newfstatat(AT_FDCWD, "/opt/oracle/instantclient/instantclient_21_12/haswell/x86_64", 0x7ffe6cad86a0, 0) = -1 ENOENT (No such file or directory) <0.000012>
+212233 12:35:10.713863 openat(AT_FDCWD, "/opt/oracle/instantclient/instantclient_21_12/haswell/libsqlplus.so", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory) <0.000014>
+212233 12:35:10.713901 newfstatat(AT_FDCWD, "/opt/oracle/instantclient/instantclient_21_12/haswell", 0x7ffe6cad86a0, 0) = -1 ENOENT (No such file or directory) <0.000012>
+212233 12:35:10.713937 openat(AT_FDCWD, "/opt/oracle/instantclient/instantclient_21_12/avx512_1/x86_64/libsqlplus.so", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory) <0.000014>
+212233 12:35:10.713974 newfstatat(AT_FDCWD, "/opt/oracle/instantclient/instantclient_21_12/avx512_1/x86_64", 0x7ffe6cad86a0, 0) = -1 ENOENT (No such file or directory) <0.000011>
+212233 12:35:10.714015 openat(AT_FDCWD, "/opt/oracle/instantclient/instantclient_21_12/avx512_1/libsqlplus.so", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory) <0.000014>
+212233 12:35:10.714052 newfstatat(AT_FDCWD, "/opt/oracle/instantclient/instantclient_21_12/avx512_1", 0x7ffe6cad86a0, 0) = -1 ENOENT (No such file or directory) <0.000012>
+212233 12:35:10.714087 openat(AT_FDCWD, "/opt/oracle/instantclient/instantclient_21_12/x86_64/libsqlplus.so", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory) <0.000013>
+212233 12:35:10.714124 newfstatat(AT_FDCWD, "/opt/oracle/instantclient/instantclient_21_12/x86_64", 0x7ffe6cad86a0, 0) = -1 ENOENT (No such file or directory) <0.000012>
+212233 12:35:10.714159 openat(AT_FDCWD, "/opt/oracle/instantclient/instantclient_21_12/libsqlplus.so", O_RDONLY|O_CLOEXEC) = 3 <0.000182>
+212233 12:35:10.714370 read(3, "\177ELF\2\1\1\0\0\0\0\0\0\0\0\0\3\0>\0\1\0\0\0@\321\0\0\0\0\0\0"..., 832) = 832 <0.000043>
+212233 12:35:10.714450 pread64(3, "\4\0\0\0\20\0\0\0\5\0\0\0GNU\0\2\0\0\300\4\0\0\0\3\0\0\0\0\0\0\0"..., 64, 963256) = 64 <0.000017>
+212233 12:35:10.714523 fstat(3, {st_mode=S_IFREG|0755, st_size=1613888, ...}) = 0 <0.000012>
+212233 12:35:10.714564 mmap(NULL, 3095560, PROT_READ|PROT_EXEC, MAP_PRIVATE|MAP_DENYWRITE, 3, 0) = 0x7f5477200000 <0.000387>
+212233 12:35:10.714975 mprotect(0x7f54772ec000, 2093056, PROT_NONE) = 0 <0.000017>
+212233 12:35:10.715028 mmap(0x7f54774eb000, 36864, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0xeb000) = 0x7f54774eb000 <0.000027>
+212233 12:35:10.715096 close(3)         = 0 <0.000013>
+212233 12:35:10.715132 openat(AT_FDCWD, "/opt/oracle/instantclient/instantclient_21_12/libclntsh.so.21.1", O_RDONLY|O_CLOEXEC) = 3 <0.000175>
+212233 12:35:10.715369 read(3, "\177ELF\2\1\1\0\0\0\0\0\0\0\0\0\3\0>\0\1\0\0\0\2008A\0\0\0\0\0"..., 832) = 832 <0.000029>
+212233 12:35:10.715434 pread64(3, "\4\0\0\0\20\0\0\0\5\0\0\0GNU\0\2\0\0\300\4\0\0\0\3\0\0\0\0\0\0\0"..., 1472, 67433840) = 1472 <0.000017>
+212233 12:35:10.715481 fstat(3, {st_mode=S_IFREG|0755, st_size=84191392, ...}) = 0 <0.000015>
+212233 12:35:10.715549 mmap(NULL, 71577288, PROT_READ|PROT_EXEC, MAP_PRIVATE|MAP_DENYWRITE, 3, 0) = 0x7f5472c00000 <0.000405>
+212233 12:35:10.715975 mprotect(0x7f5476c50000, 2097152, PROT_NONE) = 0 <0.000016>
+212233 12:35:10.716012 mmap(0x7f5476e50000, 1859584, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0x4050000) = 0x7f5476e50000 <0.000020>
+212233 12:35:10.716059 mmap(0x7f5477016000, 184008, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_FIXED|MAP_ANONYMOUS, -1, 0) = 0x7f5477016000 <0.000014>
+212233 12:35:10.716109 close(3)         = 0 <0.000013>
+212233 12:35:10.716148 openat(AT_FDCWD, "/opt/oracle/instantclient/instantclient_21_12/libclntshcore.so.21.1", O_RDONLY|O_CLOEXEC) = 3 <0.000139>
+212233 12:35:10.716340 read(3, "\177ELF\2\1\1\0\0\0\0\0\0\0\0\0\3\0>\0\1\0\0\0\200m\4\0\0\0\0\0"..., 832) = 832 <0.000016>
+212233 12:35:10.716414 pread64(3, "\4\0\0\0\20\0\0\0\5\0\0\0GNU\0\2\0\0\300\4\0\0\0\3\0\0\0\0\0\0\0"..., 960, 3751224) = 960 <0.000013>
+212233 12:35:10.716455 fstat(3, {st_mode=S_IFREG|0755, st_size=8108592, ...}) = 0 <0.000012>
+212233 12:35:10.716492 mmap(NULL, 5962952, PROT_READ|PROT_EXEC, MAP_PRIVATE|MAP_DENYWRITE, 3, 0) = 0x7f5472600000 <0.000352>
+212233 12:35:10.716870 mprotect(0x7f5472995000, 2093056, PROT_NONE) = 0 <0.000015>
+212233 12:35:10.716911 mmap(0x7f5472b94000, 49152, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0x394000) = 0x7f5472b94000 <0.000046>
+212233 12:35:10.716989 mmap(0x7f5472ba0000, 64712, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_FIXED|MAP_ANONYMOUS, -1, 0) = 0x7f5472ba0000 <0.000019>
+212233 12:35:10.717063 close(3)         = 0 <0.000014>
+212233 12:35:10.717103 openat(AT_FDCWD, "/opt/oracle/instantclient/instantclient_21_12/libnnz21.so", O_RDONLY|O_CLOEXEC) = 3 <0.000164>
+212233 12:35:10.717309 read(3, "\177ELF\2\1\1\0\0\0\0\0\0\0\0\0\3\0>\0\1\0\0\0\0&\7\0\0\0\0\0"..., 832) = 832 <0.000019>
+212233 12:35:10.717360 pread64(3, "\4\0\0\0\20\0\0\0\5\0\0\0GNU\0\2\0\0\300\4\0\0\0\3\0\0\0\0\0\0\0"..., 96, 4332744) = 96 <0.000018>
+212233 12:35:10.717408 fstat(3, {st_mode=S_IFREG|0755, st_size=5844176, ...}) = 0 <0.000028>
+212233 12:35:10.717468 mmap(NULL, 6766824, PROT_READ|PROT_EXEC, MAP_PRIVATE|MAP_DENYWRITE, 3, 0) = 0x7f5471e00000 <0.000475>
+212233 12:35:10.717968 mprotect(0x7f5472222000, 2093056, PROT_NONE) = 0 <0.000016>
+212233 12:35:10.718007 mmap(0x7f5472421000, 335872, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0x421000) = 0x7f5472421000 <0.000128>
+212233 12:35:10.718165 mmap(0x7f5472473000, 4328, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_FIXED|MAP_ANONYMOUS, -1, 0) = 0x7f5472473000 <0.000086>
+212233 12:35:10.718360 close(3)         = 0 <0.000018>
+212233 12:35:10.718410 openat(AT_FDCWD, "/opt/oracle/instantclient/instantclient_21_12/libdl.so.2", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory) <0.000024>
+212233 12:35:10.718476 openat(AT_FDCWD, "glibc-hwcaps/x86-64-v4/libdl.so.2", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory) <0.000014>
+212233 12:35:10.718516 openat(AT_FDCWD, "glibc-hwcaps/x86-64-v3/libdl.so.2", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory) <0.000013>
+212233 12:35:10.718553 openat(AT_FDCWD, "glibc-hwcaps/x86-64-v2/libdl.so.2", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory) <0.000013>
+212233 12:35:10.718590 openat(AT_FDCWD, "tls/haswell/avx512_1/x86_64/libdl.so.2", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory) <0.000013>
+212233 12:35:10.718627 openat(AT_FDCWD, "tls/haswell/avx512_1/libdl.so.2", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory) <0.000018>
+212233 12:35:10.718701 openat(AT_FDCWD, "tls/haswell/x86_64/libdl.so.2", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory) <0.000020>
+212233 12:35:10.718752 openat(AT_FDCWD, "tls/haswell/libdl.so.2", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory) <0.000013>
+212233 12:35:10.718789 openat(AT_FDCWD, "tls/avx512_1/x86_64/libdl.so.2", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory) <0.000013>
+212233 12:35:10.718826 openat(AT_FDCWD, "tls/avx512_1/libdl.so.2", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory) <0.000013>
+212233 12:35:10.718864 openat(AT_FDCWD, "tls/x86_64/libdl.so.2", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory) <0.000013>
+212233 12:35:10.718900 openat(AT_FDCWD, "tls/libdl.so.2", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory) <0.000013>
+212233 12:35:10.718937 openat(AT_FDCWD, "haswell/avx512_1/x86_64/libdl.so.2", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory) <0.000016>
+212233 12:35:10.718979 openat(AT_FDCWD, "haswell/avx512_1/libdl.so.2", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory) <0.000051>
+212233 12:35:10.719059 openat(AT_FDCWD, "haswell/x86_64/libdl.so.2", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory) <0.000093>
+212233 12:35:10.719177 openat(AT_FDCWD, "haswell/libdl.so.2", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory) <0.000017>
+212233 12:35:10.719264 openat(AT_FDCWD, "avx512_1/x86_64/libdl.so.2", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory) <0.000018>
+212233 12:35:10.719377 openat(AT_FDCWD, "avx512_1/libdl.so.2", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory) <0.000016>
+212233 12:35:10.719418 openat(AT_FDCWD, "x86_64/libdl.so.2", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory) <0.000013>
+212233 12:35:10.719455 openat(AT_FDCWD, "libdl.so.2", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory) <0.000014>
+212233 12:35:10.719493 openat(AT_FDCWD, "/etc/ld.so.cache", O_RDONLY|O_CLOEXEC) = 3 <0.000031>
+212233 12:35:10.719549 fstat(3, {st_mode=S_IFREG|0644, st_size=42843, ...}) = 0 <0.000012>
+212233 12:35:10.719588 mmap(NULL, 42843, PROT_READ, MAP_PRIVATE, 3, 0) = 0x7f547758f000 <0.000018>
+212233 12:35:10.719651 close(3)         = 0 <0.000025>
+212233 12:35:10.719721 openat(AT_FDCWD, "/lib64/libdl.so.2", O_RDONLY|O_CLOEXEC) = 3 <0.000044>
+212233 12:35:10.719795 read(3, "\177ELF\2\1\1\0\0\0\0\0\0\0\0\0\3\0>\0\1\0\0\0P\20\0\0\0\0\0\0"..., 832) = 832 <0.000042>
+212233 12:35:10.719868 fstat(3, {st_mode=S_IFREG|0755, st_size=15464, ...}) = 0 <0.000013>
+212233 12:35:10.719906 mmap(NULL, 8192, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_ANONYMOUS, -1, 0) = 0x7f547758d000 <0.000019>
+212233 12:35:10.719951 mmap(NULL, 16424, PROT_READ, MAP_PRIVATE|MAP_DENYWRITE, 3, 0) = 0x7f5477588000 <0.000019>
+212233 12:35:10.719991 mmap(0x7f5477589000, 4096, PROT_READ|PROT_EXEC, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0x1000) = 0x7f5477589000 <0.000641>
+212233 12:35:10.720664 mmap(0x7f547758a000, 4096, PROT_READ, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0x2000) = 0x7f547758a000 <0.000025>
+212233 12:35:10.720715 mmap(0x7f547758b000, 8192, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0x2000) = 0x7f547758b000 <0.000015>
+212233 12:35:10.720764 close(3)         = 0 <0.000016>
+212233 12:35:10.720850 openat(AT_FDCWD, "/opt/oracle/instantclient/instantclient_21_12/libm.so.6", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory) <0.000044>
+212233 12:35:10.720925 openat(AT_FDCWD, "glibc-hwcaps/x86-64-v4/libm.so.6", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory) <0.000014>
+212233 12:35:10.720965 openat(AT_FDCWD, "glibc-hwcaps/x86-64-v3/libm.so.6", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory) <0.000013>
+212233 12:35:10.721009 openat(AT_FDCWD, "glibc-hwcaps/x86-64-v2/libm.so.6", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory) <0.000020>
+212233 12:35:10.721058 openat(AT_FDCWD, "tls/haswell/avx512_1/x86_64/libm.so.6", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory) <0.000014>
+212233 12:35:10.721096 openat(AT_FDCWD, "tls/haswell/avx512_1/libm.so.6", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory) <0.000015>
+212233 12:35:10.721143 openat(AT_FDCWD, "tls/haswell/x86_64/libm.so.6", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory) <0.000013>
+212233 12:35:10.721180 openat(AT_FDCWD, "tls/haswell/libm.so.6", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory) <0.000014>
+212233 12:35:10.721222 openat(AT_FDCWD, "tls/avx512_1/x86_64/libm.so.6", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory) <0.000014>
+212233 12:35:10.721262 openat(AT_FDCWD, "tls/avx512_1/libm.so.6", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory) <0.000018>
+212233 12:35:10.721320 openat(AT_FDCWD, "tls/x86_64/libm.so.6", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory) <0.000012>
+212233 12:35:10.721357 openat(AT_FDCWD, "tls/libm.so.6", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory) <0.000014>
+212233 12:35:10.721432 openat(AT_FDCWD, "haswell/avx512_1/x86_64/libm.so.6", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory) <0.000015>
+212233 12:35:10.721472 openat(AT_FDCWD, "haswell/avx512_1/libm.so.6", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory) <0.000014>
+212233 12:35:10.721514 openat(AT_FDCWD, "haswell/x86_64/libm.so.6", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory) <0.000013>
+212233 12:35:10.721552 openat(AT_FDCWD, "haswell/libm.so.6", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory) <0.000013>
+212233 12:35:10.721589 openat(AT_FDCWD, "avx512_1/x86_64/libm.so.6", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory) <0.000013>
+212233 12:35:10.721626 openat(AT_FDCWD, "avx512_1/libm.so.6", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory) <0.000013>
+212233 12:35:10.721692 openat(AT_FDCWD, "x86_64/libm.so.6", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory) <0.000014>
+212233 12:35:10.721730 openat(AT_FDCWD, "libm.so.6", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory) <0.000013>
+212233 12:35:10.721769 openat(AT_FDCWD, "/lib64/libm.so.6", O_RDONLY|O_CLOEXEC) = 3 <0.000038>
+212233 12:35:10.721837 read(3, "\177ELF\2\1\1\3\0\0\0\0\0\0\0\0\3\0>\0\1\0\0\0P\324\0\0\0\0\0\0"..., 832) = 832 <0.000030>
+212233 12:35:10.721894 fstat(3, {st_mode=S_IFREG|0755, st_size=912968, ...}) = 0 <0.000012>
+212233 12:35:10.721934 mmap(NULL, 901424, PROT_READ, MAP_PRIVATE|MAP_DENYWRITE, 3, 0) = 0x7f5477123000 <0.000022>
+212233 12:35:10.721982 mmap(0x7f5477130000, 466944, PROT_READ|PROT_EXEC, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0xd000) = 0x7f5477130000 <0.000558>
+212233 12:35:10.722569 mmap(0x7f54771a2000, 376832, PROT_READ, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0x7f000) = 0x7f54771a2000 <0.000018>
+212233 12:35:10.722624 mmap(0x7f54771fe000, 8192, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0xda000) = 0x7f54771fe000 <0.000057>
+212233 12:35:10.722720 close(3)         = 0 <0.000013>
+212233 12:35:10.722757 openat(AT_FDCWD, "/opt/oracle/instantclient/instantclient_21_12/libpthread.so.0", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory) <0.000020>
+212233 12:35:10.722806 openat(AT_FDCWD, "glibc-hwcaps/x86-64-v4/libpthread.so.0", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory) <0.000014>
+212233 12:35:10.722913 openat(AT_FDCWD, "glibc-hwcaps/x86-64-v3/libpthread.so.0", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory) <0.000019>
+212233 12:35:10.722957 openat(AT_FDCWD, "glibc-hwcaps/x86-64-v2/libpthread.so.0", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory) <0.000015>
+212233 12:35:10.723005 openat(AT_FDCWD, "tls/haswell/avx512_1/x86_64/libpthread.so.0", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory) <0.000028>
+212233 12:35:10.723108 openat(AT_FDCWD, "tls/haswell/avx512_1/libpthread.so.0", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory) <0.000014>
+212233 12:35:10.723147 openat(AT_FDCWD, "tls/haswell/x86_64/libpthread.so.0", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory) <0.000012>
+212233 12:35:10.723184 openat(AT_FDCWD, "tls/haswell/libpthread.so.0", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory) <0.000014>
+212233 12:35:10.723241 openat(AT_FDCWD, "tls/avx512_1/x86_64/libpthread.so.0", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory) <0.000013>
+212233 12:35:10.723292 openat(AT_FDCWD, "tls/avx512_1/libpthread.so.0", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory) <0.000013>
+212233 12:35:10.723330 openat(AT_FDCWD, "tls/x86_64/libpthread.so.0", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory) <0.000013>
+212233 12:35:10.723367 openat(AT_FDCWD, "tls/libpthread.so.0", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory) <0.000019>
+212233 12:35:10.723409 openat(AT_FDCWD, "haswell/avx512_1/x86_64/libpthread.so.0", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory) <0.000016>
+212233 12:35:10.723499 openat(AT_FDCWD, "haswell/avx512_1/libpthread.so.0", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory) <0.000050>
+212233 12:35:10.723574 openat(AT_FDCWD, "haswell/x86_64/libpthread.so.0", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory) <0.000014>
+212233 12:35:10.723611 openat(AT_FDCWD, "haswell/libpthread.so.0", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory) <0.000016>
+212233 12:35:10.723652 openat(AT_FDCWD, "avx512_1/x86_64/libpthread.so.0", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory) <0.000013>
+212233 12:35:10.723690 openat(AT_FDCWD, "avx512_1/libpthread.so.0", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory) <0.000013>
+212233 12:35:10.723728 openat(AT_FDCWD, "x86_64/libpthread.so.0", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory) <0.000013>
+212233 12:35:10.723765 openat(AT_FDCWD, "libpthread.so.0", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory) <0.000013>
+212233 12:35:10.723804 openat(AT_FDCWD, "/lib64/libpthread.so.0", O_RDONLY|O_CLOEXEC) = 3 <0.000032>
+212233 12:35:10.723860 read(3, "\177ELF\2\1\1\0\0\0\0\0\0\0\0\0\3\0>\0\1\0\0\0P\20\0\0\0\0\0\0"..., 832) = 832 <0.000014>
+212233 12:35:10.723936 fstat(3, {st_mode=S_IFREG|0755, st_size=15480, ...}) = 0 <0.000013>
+212233 12:35:10.723985 mmap(NULL, 16424, PROT_READ, MAP_PRIVATE|MAP_DENYWRITE, 3, 0) = 0x7f5477583000 <0.000023>
+212233 12:35:10.724031 mmap(0x7f5477584000, 4096, PROT_READ|PROT_EXEC, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0x1000) = 0x7f5477584000 <0.000538>
+212233 12:35:10.724592 mmap(0x7f5477585000, 4096, PROT_READ, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0x2000) = 0x7f5477585000 <0.000015>
+212233 12:35:10.724628 mmap(0x7f5477586000, 8192, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0x2000) = 0x7f5477586000 <0.000014>
+212233 12:35:10.724675 close(3)         = 0 <0.000014>
+212233 12:35:10.724713 openat(AT_FDCWD, "/opt/oracle/instantclient/instantclient_21_12/librt.so.1", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory) <0.000016>
+212233 12:35:10.724755 openat(AT_FDCWD, "glibc-hwcaps/x86-64-v4/librt.so.1", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory) <0.000013>
+212233 12:35:10.724793 openat(AT_FDCWD, "glibc-hwcaps/x86-64-v3/librt.so.1", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory) <0.000013>
+212233 12:35:10.724830 openat(AT_FDCWD, "glibc-hwcaps/x86-64-v2/librt.so.1", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory) <0.000014>
+212233 12:35:10.724868 openat(AT_FDCWD, "tls/haswell/avx512_1/x86_64/librt.so.1", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory) <0.000013>
+212233 12:35:10.724905 openat(AT_FDCWD, "tls/haswell/avx512_1/librt.so.1", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory) <0.000014>
+212233 12:35:10.724943 openat(AT_FDCWD, "tls/haswell/x86_64/librt.so.1", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory) <0.000013>
+212233 12:35:10.724980 openat(AT_FDCWD, "tls/haswell/librt.so.1", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory) <0.000014>
+212233 12:35:10.725022 openat(AT_FDCWD, "tls/avx512_1/x86_64/librt.so.1", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory) <0.000015>
+212233 12:35:10.725067 openat(AT_FDCWD, "tls/avx512_1/librt.so.1", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory) <0.000071>
+212233 12:35:10.725204 openat(AT_FDCWD, "tls/x86_64/librt.so.1", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory) <0.000016>
+212233 12:35:10.725253 openat(AT_FDCWD, "tls/librt.so.1", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory) <0.000027>
+212233 12:35:10.725310 openat(AT_FDCWD, "haswell/avx512_1/x86_64/librt.so.1", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory) <0.000026>
+212233 12:35:10.725366 openat(AT_FDCWD, "haswell/avx512_1/librt.so.1", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory) <0.000014>
+212233 12:35:10.725410 openat(AT_FDCWD, "haswell/x86_64/librt.so.1", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory) <0.000014>
+212233 12:35:10.725453 openat(AT_FDCWD, "haswell/librt.so.1", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory) <0.000015>
+212233 12:35:10.725498 openat(AT_FDCWD, "avx512_1/x86_64/librt.so.1", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory) <0.000015>
+212233 12:35:10.725544 openat(AT_FDCWD, "avx512_1/librt.so.1", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory) <0.000013>
+212233 12:35:10.725583 openat(AT_FDCWD, "x86_64/librt.so.1", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory) <0.000014>
+212233 12:35:10.725622 openat(AT_FDCWD, "librt.so.1", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory) <0.000013>
+212233 12:35:10.725662 openat(AT_FDCWD, "/lib64/librt.so.1", O_RDONLY|O_CLOEXEC) = 3 <0.000029>
+212233 12:35:10.725716 read(3, "\177ELF\2\1\1\0\0\0\0\0\0\0\0\0\3\0>\0\1\0\0\0\220\20\0\0\0\0\0\0"..., 832) = 832 <0.000014>
+212233 12:35:10.725756 fstat(3, {st_mode=S_IFREG|0755, st_size=15640, ...}) = 0 <0.000012>
+212233 12:35:10.725797 mmap(NULL, 16440, PROT_READ, MAP_PRIVATE|MAP_DENYWRITE, 3, 0) = 0x7f547757e000 <0.000016>
+212233 12:35:10.725836 mmap(0x7f547757f000, 4096, PROT_READ|PROT_EXEC, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0x1000) = 0x7f547757f000 <0.000695>
+212233 12:35:10.726568 mmap(0x7f5477580000, 4096, PROT_READ, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0x2000) = 0x7f5477580000 <0.000074>
+212233 12:35:10.726679 mmap(0x7f5477581000, 8192, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0x2000) = 0x7f5477581000 <0.000025>
+212233 12:35:10.726749 close(3)         = 0 <0.000014>
+212233 12:35:10.726846 openat(AT_FDCWD, "/opt/oracle/instantclient/instantclient_21_12/libaio.so.1", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory) <0.000020>
+212233 12:35:10.726902 openat(AT_FDCWD, "glibc-hwcaps/x86-64-v4/libaio.so.1", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory) <0.000015>
+212233 12:35:10.726949 openat(AT_FDCWD, "glibc-hwcaps/x86-64-v3/libaio.so.1", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory) <0.000017>
+212233 12:35:10.727053 openat(AT_FDCWD, "glibc-hwcaps/x86-64-v2/libaio.so.1", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory) <0.000015>
+212233 12:35:10.727094 openat(AT_FDCWD, "tls/haswell/avx512_1/x86_64/libaio.so.1", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory) <0.000015>
+212233 12:35:10.727134 openat(AT_FDCWD, "tls/haswell/avx512_1/libaio.so.1", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory) <0.000013>
+212233 12:35:10.727173 openat(AT_FDCWD, "tls/haswell/x86_64/libaio.so.1", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory) <0.000016>
+212233 12:35:10.727217 openat(AT_FDCWD, "tls/haswell/libaio.so.1", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory) <0.000023>
+212233 12:35:10.727271 openat(AT_FDCWD, "tls/avx512_1/x86_64/libaio.so.1", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory) <0.000014>
+212233 12:35:10.727318 openat(AT_FDCWD, "tls/avx512_1/libaio.so.1", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory) <0.000014>
+212233 12:35:10.727358 openat(AT_FDCWD, "tls/x86_64/libaio.so.1", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory) <0.000017>
+212233 12:35:10.727406 openat(AT_FDCWD, "tls/libaio.so.1", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory) <0.000016>
+212233 12:35:10.727452 openat(AT_FDCWD, "haswell/avx512_1/x86_64/libaio.so.1", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory) <0.000014>
+212233 12:35:10.727495 openat(AT_FDCWD, "haswell/avx512_1/libaio.so.1", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory) <0.000013>
+212233 12:35:10.727534 openat(AT_FDCWD, "haswell/x86_64/libaio.so.1", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory) <0.000017>
+212233 12:35:10.727581 openat(AT_FDCWD, "haswell/libaio.so.1", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory) <0.000025>
+212233 12:35:10.727683 openat(AT_FDCWD, "avx512_1/x86_64/libaio.so.1", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory) <0.000023>
+212233 12:35:10.727741 openat(AT_FDCWD, "avx512_1/libaio.so.1", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory) <0.000015>
+212233 12:35:10.727787 openat(AT_FDCWD, "x86_64/libaio.so.1", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory) <0.000016>
+212233 12:35:10.727867 openat(AT_FDCWD, "libaio.so.1", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory) <0.000015>
+212233 12:35:10.727913 openat(AT_FDCWD, "/lib64/libaio.so.1", O_RDONLY|O_CLOEXEC) = 3 <0.000232>
+212233 12:35:10.728169 read(3, "\177ELF\2\1\1\0\0\0\0\0\0\0\0\0\3\0>\0\1\0\0\0000\21\0\0\0\0\0\0"..., 832) = 832 <0.000015>
+212233 12:35:10.728217 fstat(3, {st_mode=S_IFREG|0755, st_size=16448, ...}) = 0 <0.000021>
+212233 12:35:10.728280 mmap(NULL, 16416, PROT_READ, MAP_PRIVATE|MAP_DENYWRITE, 3, 0) = 0x7f5477579000 <0.000027>
+212233 12:35:10.728336 mmap(0x7f547757a000, 4096, PROT_READ|PROT_EXEC, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0x1000) = 0x7f547757a000 <0.000398>
+212233 12:35:10.728769 mmap(0x7f547757b000, 4096, PROT_READ, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0x2000) = 0x7f547757b000 <0.000023>
+212233 12:35:10.728821 mmap(0x7f547757c000, 4096, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0x2000) = 0x7f547757c000 <0.000015>
+212233 12:35:10.728858 mmap(0x7f547757d000, 32, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_FIXED|MAP_ANONYMOUS, -1, 0) = 0x7f547757d000 <0.000013>
+212233 12:35:10.728902 close(3)         = 0 <0.000012>
+212233 12:35:10.728938 openat(AT_FDCWD, "/opt/oracle/instantclient/instantclient_21_12/libresolv.so.2", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory) <0.000019>
+212233 12:35:10.728989 openat(AT_FDCWD, "glibc-hwcaps/x86-64-v4/libresolv.so.2", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory) <0.000013>
+212233 12:35:10.729030 openat(AT_FDCWD, "glibc-hwcaps/x86-64-v3/libresolv.so.2", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory) <0.000013>
+212233 12:35:10.729066 openat(AT_FDCWD, "glibc-hwcaps/x86-64-v2/libresolv.so.2", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory) <0.000012>
+212233 12:35:10.729102 openat(AT_FDCWD, "tls/haswell/avx512_1/x86_64/libresolv.so.2", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory) <0.000014>
+212233 12:35:10.729147 openat(AT_FDCWD, "tls/haswell/avx512_1/libresolv.so.2", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory) <0.000013>
+212233 12:35:10.729183 openat(AT_FDCWD, "tls/haswell/x86_64/libresolv.so.2", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory) <0.000013>
+212233 12:35:10.729220 openat(AT_FDCWD, "tls/haswell/libresolv.so.2", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory) <0.000013>
+212233 12:35:10.729257 openat(AT_FDCWD, "tls/avx512_1/x86_64/libresolv.so.2", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory) <0.000018>
+212233 12:35:10.729305 openat(AT_FDCWD, "tls/avx512_1/libresolv.so.2", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory) <0.000014>
+212233 12:35:10.729349 openat(AT_FDCWD, "tls/x86_64/libresolv.so.2", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory) <0.000014>
+212233 12:35:10.729393 openat(AT_FDCWD, "tls/libresolv.so.2", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory) <0.000019>
+212233 12:35:10.729441 openat(AT_FDCWD, "haswell/avx512_1/x86_64/libresolv.so.2", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory) <0.000013>
+212233 12:35:10.729481 openat(AT_FDCWD, "haswell/avx512_1/libresolv.so.2", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory) <0.000013>
+212233 12:35:10.729525 openat(AT_FDCWD, "haswell/x86_64/libresolv.so.2", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory) <0.000013>
+212233 12:35:10.729562 openat(AT_FDCWD, "haswell/libresolv.so.2", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory) <0.000013>
+212233 12:35:10.729599 openat(AT_FDCWD, "avx512_1/x86_64/libresolv.so.2", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory) <0.000013>
+212233 12:35:10.729637 openat(AT_FDCWD, "avx512_1/libresolv.so.2", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory) <0.000014>
+212233 12:35:10.729693 openat(AT_FDCWD, "x86_64/libresolv.so.2", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory) <0.000023>
+212233 12:35:10.729745 openat(AT_FDCWD, "libresolv.so.2", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory) <0.000015>
+212233 12:35:10.729792 openat(AT_FDCWD, "/lib64/libresolv.so.2", O_RDONLY|O_CLOEXEC) = 3 <0.000067>
+212233 12:35:10.729888 read(3, "\177ELF\2\1\1\0\0\0\0\0\0\0\0\0\3\0>\0\1\0\0\0\320F\0\0\0\0\0\0"..., 832) = 832 <0.000014>
+212233 12:35:10.729930 fstat(3, {st_mode=S_IFREG|0755, st_size=70520, ...}) = 0 <0.000012>
+212233 12:35:10.729970 mmap(NULL, 80456, PROT_READ, MAP_PRIVATE|MAP_DENYWRITE, 3, 0) = 0x7f5477565000 <0.000027>
+212233 12:35:10.730032 mmap(0x7f5477569000, 36864, PROT_READ|PROT_EXEC, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0x4000) = 0x7f5477569000 <0.000583>
+212233 12:35:10.730647 mmap(0x7f5477572000, 12288, PROT_READ, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0xd000) = 0x7f5477572000 <0.000023>
+212233 12:35:10.730697 mmap(0x7f5477575000, 8192, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0xf000) = 0x7f5477575000 <0.000018>
+212233 12:35:10.730747 mmap(0x7f5477577000, 6728, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_FIXED|MAP_ANONYMOUS, -1, 0) = 0x7f5477577000 <0.000017>
+212233 12:35:10.730798 close(3)         = 0 <0.000016>
+212233 12:35:10.730878 openat(AT_FDCWD, "/opt/oracle/instantclient/instantclient_21_12/libc.so.6", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory) <0.000029>
+212233 12:35:10.730974 openat(AT_FDCWD, "glibc-hwcaps/x86-64-v4/libc.so.6", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory) <0.000016>
+212233 12:35:10.731025 openat(AT_FDCWD, "glibc-hwcaps/x86-64-v3/libc.so.6", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory) <0.000047>
+212233 12:35:10.731099 openat(AT_FDCWD, "glibc-hwcaps/x86-64-v2/libc.so.6", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory) <0.000013>
+212233 12:35:10.731137 openat(AT_FDCWD, "tls/haswell/avx512_1/x86_64/libc.so.6", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory) <0.000013>
+212233 12:35:10.731209 openat(AT_FDCWD, "tls/haswell/avx512_1/libc.so.6", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory) <0.000014>
+212233 12:35:10.731251 openat(AT_FDCWD, "tls/haswell/x86_64/libc.so.6", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory) <0.000024>
+212233 12:35:10.731313 openat(AT_FDCWD, "tls/haswell/libc.so.6", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory) <0.000017>
+212233 12:35:10.731361 openat(AT_FDCWD, "tls/avx512_1/x86_64/libc.so.6", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory) <0.000031>
+212233 12:35:10.731424 openat(AT_FDCWD, "tls/avx512_1/libc.so.6", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory) <0.000018>
+212233 12:35:10.731474 openat(AT_FDCWD, "tls/x86_64/libc.so.6", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory) <0.000017>
+212233 12:35:10.731524 openat(AT_FDCWD, "tls/libc.so.6", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory) <0.000017>
+212233 12:35:10.731574 openat(AT_FDCWD, "haswell/avx512_1/x86_64/libc.so.6", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory) <0.000017>
+212233 12:35:10.731621 openat(AT_FDCWD, "haswell/avx512_1/libc.so.6", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory) <0.000014>
+212233 12:35:10.731666 openat(AT_FDCWD, "haswell/x86_64/libc.so.6", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory) <0.000047>
+212233 12:35:10.731754 openat(AT_FDCWD, "haswell/libc.so.6", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory) <0.000020>
+212233 12:35:10.731807 openat(AT_FDCWD, "avx512_1/x86_64/libc.so.6", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory) <0.000018>
+212233 12:35:10.731857 openat(AT_FDCWD, "avx512_1/libc.so.6", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory) <0.000017>
+212233 12:35:10.731908 openat(AT_FDCWD, "x86_64/libc.so.6", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory) <0.000018>
+212233 12:35:10.731959 openat(AT_FDCWD, "libc.so.6", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory) <0.000018>
+212233 12:35:10.732012 openat(AT_FDCWD, "/lib64/libc.so.6", O_RDONLY|O_CLOEXEC) = 3 <0.000067>
+212233 12:35:10.732127 read(3, "\177ELF\2\1\1\3\0\0\0\0\0\0\0\0\3\0>\0\1\0\0\0\320\247\2\0\0\0\0\0"..., 832) = 832 <0.000014>
+212233 12:35:10.732255 pread64(3, "\6\0\0\0\4\0\0\0@\0\0\0\0\0\0\0@\0\0\0\0\0\0\0@\0\0\0\0\0\0\0"..., 784, 64) = 784 <0.000055>
+212233 12:35:10.732408 pread64(3, "\4\0\0\0 \0\0\0\5\0\0\0GNU\0\2\0\0\300\4\0\0\0\3\0\0\0\0\0\0\0"..., 48, 848) = 48 <0.000018>
+212233 12:35:10.732468 pread64(3, "\4\0\0\0\24\0\0\0\3\0\0\0GNU\0\7\330\222\20w\233\212\20\213@\301\365\214\260\240\341"..., 68, 896) = 68 <0.000014>
+212233 12:35:10.732510 fstat(3, {st_mode=S_IFREG|0755, st_size=2549360, ...}) = 0 <0.000014>
+212233 12:35:10.732550 mmap(NULL, 8192, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_ANONYMOUS, -1, 0) = 0x7f5477563000 <0.000018>
+212233 12:35:10.732596 pread64(3, "\6\0\0\0\4\0\0\0@\0\0\0\0\0\0\0@\0\0\0\0\0\0\0@\0\0\0\0\0\0\0"..., 784, 64) = 784 <0.000012>
+212233 12:35:10.732660 mmap(NULL, 2138064, PROT_READ, MAP_PRIVATE|MAP_DENYWRITE, 3, 0) = 0x7f5471a00000 <0.000033>
+212233 12:35:10.732727 mmap(0x7f5471a29000, 1527808, PROT_READ|PROT_EXEC, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0x29000) = 0x7f5471a29000 <0.000681>
+212233 12:35:10.733442 mmap(0x7f5471b9e000, 364544, PROT_READ, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0x19e000) = 0x7f5471b9e000 <0.000024>
+212233 12:35:10.733495 mmap(0x7f5471bf7000, 24576, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0x1f6000) = 0x7f5471bf7000 <0.000029>
+212233 12:35:10.733560 mmap(0x7f5471bfd000, 53200, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_FIXED|MAP_ANONYMOUS, -1, 0) = 0x7f5471bfd000 <0.000025>
+212233 12:35:10.733678 close(3)         = 0 <0.000015>
+212233 12:35:10.733772 mmap(NULL, 57344, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_ANONYMOUS, -1, 0) = 0x7f5477555000 <0.000078>
+212233 12:35:10.733878 arch_prctl(ARCH_SET_FS, 0x7f5477560a40) = 0 <0.000013>
+212233 12:35:10.733914 set_tid_address(0x7f5477560d10) = 212233 <0.000054>
+212233 12:35:10.733993 set_robust_list(0x7f5477560d20, 24) = 0 <0.000014>
+212233 12:35:10.734031 rseq(0x7f54775613e0, 0x20, 0, 0x53053053) = 0 <0.000013>
+212233 12:35:10.734159 mprotect(0x7f5471bf7000, 16384, PROT_READ) = 0 <0.000022>
+212233 12:35:10.734231 mprotect(0x7f5477575000, 4096, PROT_READ) = 0 <0.000020>
+212233 12:35:10.734283 mprotect(0x7f547757c000, 4096, PROT_READ) = 0 <0.000016>
+212233 12:35:10.734326 mprotect(0x7f5477581000, 4096, PROT_READ) = 0 <0.000018>
+212233 12:35:10.734368 mprotect(0x7f5477586000, 4096, PROT_READ) = 0 <0.000019>
+212233 12:35:10.734522 mprotect(0x7f54771fe000, 4096, PROT_READ) = 0 <0.000028>
+212233 12:35:10.734585 mprotect(0x7f547758b000, 4096, PROT_READ) = 0 <0.000016>
+212233 12:35:10.734788 mprotect(0x7f5472b94000, 28672, PROT_READ) = 0 <0.000072>
+212233 12:35:10.735086 mprotect(0x7f5472421000, 221184, PROT_READ) = 0 <0.000016>
+212233 12:35:10.737505 mprotect(0x7f5476e50000, 1585152, PROT_READ) = 0 <0.000031>
+212233 12:35:10.737697 mprotect(0x7f54774eb000, 24576, PROT_READ) = 0 <0.000052>
+212233 12:35:10.737779 mprotect(0x603000, 4096, PROT_READ) = 0 <0.000019>
+212233 12:35:10.737849 mprotect(0x7f54775d3000, 8192, PROT_READ) = 0 <0.000022>
+212233 12:35:10.737905 prlimit64(0, RLIMIT_STACK, NULL, {rlim_cur=8192*1024, rlim_max=RLIM64_INFINITY}) = 0 <0.000013>
+212233 12:35:10.737964 munmap(0x7f547758f000, 42843) = 0 <0.000021>
+212233 12:35:10.738116 getrandom("\x8d\x99\x2d\x86\x88\xbb\xd6\x60", 8, GRND_NONBLOCK) = 8 <0.000013>
+212233 12:35:10.738158 brk(NULL)        = 0x24b9000 <0.000011>
+212233 12:35:10.738190 brk(0x24da000)   = 0x24da000 <0.000013>
+212233 12:35:10.738245 rt_sigaction(SIGQUIT, {sa_handler=0x7f54772b4bd0, sa_mask=[QUIT], sa_flags=SA_RESTORER|SA_RESTART, sa_restorer=0x7f5471a3fb30}, {sa_handler=SIG_DFL, sa_mask=[], sa_flags=0}, 8) = 0 <0.000023>
+212233 12:35:10.738305 rt_sigaction(SIGABRT, {sa_handler=0x7f54772b4bd0, sa_mask=[ABRT], sa_flags=SA_RESTORER|SA_RESTART, sa_restorer=0x7f5471a3fb30}, {sa_handler=SIG_DFL, sa_mask=[], sa_flags=0}, 8) = 0 <0.000012>
+212233 12:35:10.738596 mmap(NULL, 143360, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_ANONYMOUS, -1, 0) = 0x7f5477532000 <0.000018>
+212233 12:35:10.738752 openat(AT_FDCWD, "/opt/oracle/instantclient/instantclient_21_12/libsqlplusic.so", O_RDONLY|O_CLOEXEC) = 3 <0.000261>
+212233 12:35:10.739054 read(3, "\177ELF\2\1\1\0\0\0\0\0\0\0\0\0\3\0>\0\1\0\0\0`\6\0\0\0\0\0\0"..., 832) = 832 <0.000017>
+212233 12:35:10.739106 pread64(3, "\4\0\0\0\20\0\0\0\5\0\0\0GNU\0\2\0\0\300\4\0\0\0\3\0\0\0\0\0\0\0"..., 64, 1701240) = 64 <0.000013>
+212233 12:35:10.739145 fstat(3, {st_mode=S_IFREG|0755, st_size=1710024, ...}) = 0 <0.000013>
+212233 12:35:10.739189 mmap(NULL, 3801320, PROT_READ|PROT_EXEC, MAP_PRIVATE|MAP_DENYWRITE, 3, 0) = 0x7f5471600000 <0.000437>
+212233 12:35:10.739835 mprotect(0x7f54717a0000, 2093056, PROT_NONE) = 0 <0.000024>
+212233 12:35:10.739881 mmap(0x7f547199f000, 8192, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0x19f000) = 0x7f547199f000 <0.000020>
+212233 12:35:10.739944 close(3)         = 0 <0.000015>
+212233 12:35:10.740003 mprotect(0x7f547199f000, 4096, PROT_READ) = 0 <0.000016>
+212233 12:35:10.740152 openat(AT_FDCWD, "/opt/oracle/instantclient/instantclient_21_12/libociei.so", O_RDONLY|O_CLOEXEC) = 3 <0.000177>
+212233 12:35:10.740365 read(3, "\177ELF\2\1\1\0\0\0\0\0\0\0\0\0\3\0>\0\1\0\0\0\200\10\0\0\0\0\0\0"..., 832) = 832 <0.000018>
+212233 12:35:10.740419 pread64(3, "\4\0\0\0\20\0\0\0\5\0\0\0GNU\0\2\0\0\300\4\0\0\0\3\0\0\0\0\0\0\0"..., 64, 142705944) = 64 <0.000016>
+212233 12:35:10.740463 fstat(3, {st_mode=S_IFREG|0755, st_size=142717504, ...}) = 0 <0.000014>
+212233 12:35:10.740533 mmap(NULL, 144806128, PROT_READ|PROT_EXEC, MAP_PRIVATE|MAP_DENYWRITE, 3, 0) = 0x7f5468a00000 <0.000182>
+212233 12:35:10.740757 mprotect(0x7f5471219000, 2093056, PROT_NONE) = 0 <0.000017>
+212233 12:35:10.740811 mmap(0x7f5471418000, 8192, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0x8818000) = 0x7f5471418000 <0.000019>
+212233 12:35:10.740915 close(3)         = 0 <0.000021>
+212233 12:35:10.740985 mprotect(0x7f5471418000, 4096, PROT_READ) = 0 <0.000047>
+212233 12:35:10.741108 lstat("/opt/oracle/instantclient/instantclient_21_12/env.ora", 0x7ffe6cad56a0) = -1 ENOENT (No such file or directory) <0.000016>
+212233 12:35:10.741197 openat(AT_FDCWD, "/opt/oracle/instantclient/instantclient_21_12/env.ora", O_RDONLY) = -1 ENOENT (No such file or directory) <0.000019>
+212233 12:35:10.741268 brk(0x24fe000)   = 0x24fe000 <0.000017>
+212233 12:35:10.741545 brk(0x2521000)   = 0x2521000 <0.000030>
+212233 12:35:10.741741 lstat("/etc/orabasetab", 0x7ffe6cad2500) = -1 ENOENT (No such file or directory) <0.000019>
+212233 12:35:10.741793 openat(AT_FDCWD, "/etc/orabasetab", O_RDONLY) = -1 ENOENT (No such file or directory) <0.000020>
+212233 12:35:10.741842 lstat("/opt/oracle/instantclient/instantclient_21_12/install/orabasetab", 0x7ffe6cad2500) = -1 ENOENT (No such file or directory) <0.000016>
+212233 12:35:10.741885 openat(AT_FDCWD, "/opt/oracle/instantclient/instantclient_21_12/install/orabasetab", O_RDONLY) = -1 ENOENT (No such file or directory) <0.000016>
+212233 12:35:10.741938 openat(AT_FDCWD, "/opt/oracle/instantclient/instantclient_21_12/network/admin/oraaccess.xml", O_RDONLY) = -1 ENOENT (No such file or directory) <0.000018>
+212233 12:35:10.741988 access("/opt/oracle/instantclient/instantclient_21_12/network/admin/oraaccess.xml", F_OK) = -1 ENOENT (No such file or directory) <0.000035>
+212233 12:35:10.742100 access("/opt/oracle/instantclient/instantclient_21_12/network/admin/oraaccess.xml", F_OK) = -1 ENOENT (No such file or directory) <0.000030>
+212233 12:35:10.742197 openat(AT_FDCWD, "/opt/oracle/instantclient/instantclient_21_12/network/admin/oraaccess.xml", O_RDONLY) = -1 ENOENT (No such file or directory) <0.000040>
+212233 12:35:10.742335 getcwd("/home/scf-uat", 256) = 14 <0.000056>
+212233 12:35:10.742503 socket(AF_INET6, SOCK_DGRAM, IPPROTO_IP) = 3 <0.000027>
+212233 12:35:10.742564 bind(3, {sa_family=AF_INET6, sin6_port=htons(0), sin6_flowinfo=htonl(0), inet_pton(AF_INET6, "::1", &sin6_addr), sin6_scope_id=0}, 28) = 0 <0.000038>
+212233 12:35:10.742646 close(3)         = 0 <0.000021>
+212233 12:35:10.742721 access("/opt/oracle/instantclient/instantclient_21_12/network/admin/sqlnet.ora", F_OK) = -1 ENOENT (No such file or directory) <0.000018>
+212233 12:35:10.742768 access("/opt/oracle/instantclient/instantclient_21_12/network/admin/sqlnet.ora", F_OK) = -1 ENOENT (No such file or directory) <0.000014>
+212233 12:35:10.742811 access("/home/scf-uat/.sqlnet.ora", F_OK) = -1 ENOENT (No such file or directory) <0.000015>
+212233 12:35:10.742908 stat("/opt/oracle/instantclient/instantclient_21_12/log", 0x7ffe6cad4e60) = -1 ENOENT (No such file or directory) <0.000016>
+212233 12:35:10.742957 stat("/home/scf-uat", {st_mode=S_IFDIR|0755, st_size=4096, ...}) = 0 <0.000016>
+212233 12:35:10.743006 geteuid()        = 1006 <0.000014>
+212233 12:35:10.743049 getuid()         = 1006 <0.000014>
+212233 12:35:10.743089 socket(AF_UNIX, SOCK_STREAM|SOCK_CLOEXEC|SOCK_NONBLOCK, 0) = 3 <0.000017>
+212233 12:35:10.743170 connect(3, {sa_family=AF_UNIX, sun_path="/var/run/nscd/socket"}, 110) = -1 ENOENT (No such file or directory) <0.000879>
+212233 12:35:10.744101 close(3)         = 0 <0.000020>
+212233 12:35:10.744212 socket(AF_UNIX, SOCK_STREAM|SOCK_CLOEXEC|SOCK_NONBLOCK, 0) = 3 <0.000062>
+212233 12:35:10.744368 connect(3, {sa_family=AF_UNIX, sun_path="/var/run/nscd/socket"}, 110) = -1 ENOENT (No such file or directory) <0.000057>
+212233 12:35:10.744513 close(3)         = 0 <0.000019>
+212233 12:35:10.744571 newfstatat(AT_FDCWD, "/etc/nsswitch.conf", {st_mode=S_IFREG|0644, st_size=3012, ...}, 0) = 0 <0.000022>
+212233 12:35:10.744638 newfstatat(AT_FDCWD, "/", {st_mode=S_IFDIR|0555, st_size=270, ...}, 0) = 0 <0.000019>
+212233 12:35:10.744700 openat(AT_FDCWD, "/etc/nsswitch.conf", O_RDONLY|O_CLOEXEC) = 3 <0.000040>
+212233 12:35:10.744776 fstat(3, {st_mode=S_IFREG|0644, st_size=3012, ...}) = 0 <0.000013>
+212233 12:35:10.744827 read(3, "# Generated by authselect on Tue"..., 4096) = 3012 <0.000015>
+212233 12:35:10.744886 read(3, "", 4096) = 0 <0.000015>
+212233 12:35:10.744931 fstat(3, {st_mode=S_IFREG|0644, st_size=3012, ...}) = 0 <0.000018>
+212233 12:35:10.744979 close(3)         = 0 <0.000016>
+212233 12:35:10.745027 openat(AT_FDCWD, "/etc/passwd", O_RDONLY|O_CLOEXEC) = 3 <0.000026>
+212233 12:35:10.745086 fstat(3, {st_mode=S_IFREG|0644, st_size=2346, ...}) = 0 <0.000014>
+212233 12:35:10.745134 lseek(3, 0, SEEK_SET) = 0 <0.000014>
+212233 12:35:10.745180 read(3, "root:x:0:0:root:/root:/bin/bash\n"..., 4096) = 2346 <0.000021>
+212233 12:35:10.745255 close(3)         = 0 <0.000022>
+212233 12:35:10.745370 uname({sysname="Linux", nodename="GITFOSCFJUMP001", ...}) = 0 <0.000011>
+212233 12:35:10.745479 times(NULL)      = 439201443 <0.000009>
+212233 12:35:10.745540 getpid()         = 212233 <0.000014>
+212233 12:35:10.745792 brk(0x2545000)   = 0x2545000 <0.000018>
+212233 12:35:10.745856 getpid()         = 212233 <0.000010>
+212233 12:35:10.746010 stat("/home/scf-uat/oradiag_scf-uat/diag/clients/user_scf-uat/host_1962130331_110", {st_mode=S_IFDIR|0750, st_size=179, ...}) = 0 <0.000026>
+212233 12:35:10.746092 gettid()         = 212233 <0.000010>
+212233 12:35:10.746131 prlimit64(0, RLIMIT_NOFILE, NULL, {rlim_cur=1024, rlim_max=512*1024}) = 0 <0.000014>
+212233 12:35:10.746184 openat(AT_FDCWD, "/proc/self/fd/", O_RDONLY|O_NONBLOCK|O_CLOEXEC|O_DIRECTORY) = 3 <0.000054>
+212233 12:35:10.746284 fstat(3, {st_mode=S_IFDIR|0500, st_size=4, ...}) = 0 <0.000011>
+212233 12:35:10.746439 brk(0x2569000)   = 0x2569000 <0.000205>
+212233 12:35:10.746685 prlimit64(0, RLIMIT_FSIZE, NULL, {rlim_cur=RLIM64_INFINITY, rlim_max=RLIM64_INFINITY}) = 0 <0.000010>
+212233 12:35:10.746825 openat(AT_FDCWD, "/proc/meminfo", O_RDONLY) = 4 <0.000027>
+212233 12:35:10.746898 fstat(4, {st_mode=S_IFREG|0444, st_size=0, ...}) = 0 <0.000051>
+212233 12:35:10.746984 read(4, "MemTotal:       16108952 kB\nMemF"..., 1024) = 1024 <0.000056>
+212233 12:35:10.747114 read(4, "      99236 kB\nVmallocChunk:    "..., 1024) = 563 <0.000034>
+212233 12:35:10.747216 lseek(4, 0, SEEK_CUR) = 1587 <0.000070>
+212233 12:35:10.747323 lseek(4, 1475, SEEK_SET) = 1475 <0.000023>
+212233 12:35:10.747374 close(4)         = 0 <0.000021>
+212233 12:35:10.747435 openat(AT_FDCWD, "/usr/lib64/libndctl.so", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory) <0.000025>
+212233 12:35:10.747566 stat("/opt/oracle/instantclient/instantclient_21_12/log", 0x7ffe6cad5d90) = -1 ENOENT (No such file or directory) <0.000053>
+212233 12:35:10.747686 stat("/home/scf-uat", {st_mode=S_IFDIR|0755, st_size=4096, ...}) = 0 <0.000086>
+212233 12:35:10.747818 geteuid()        = 1006 <0.000010>
+212233 12:35:10.747861 uname({sysname="Linux", nodename="GITFOSCFJUMP001", ...}) = 0 <0.000019>
+212233 12:35:10.747990 access("/opt/oracle/instantclient/instantclient_21_12/network/admin/sqlnet.ora", F_OK) = -1 ENOENT (No such file or directory) <0.000022>
+212233 12:35:10.748054 access("/opt/oracle/instantclient/instantclient_21_12/network/admin/sqlnet.ora", F_OK) = -1 ENOENT (No such file or directory) <0.000020>
+212233 12:35:10.748139 access("/etc/intchg.ora", F_OK) = -1 ENOENT (No such file or directory) <0.000018>
+212233 12:35:10.748193 access("/opt/oracle/instantclient/instantclient_21_12/network/admin/intchg.ora", F_OK) = -1 ENOENT (No such file or directory) <0.000017>
+212233 12:35:10.748246 access("/opt/oracle/instantclient/instantclient_21_12/network/admin/intchg.ora", F_OK) = -1 ENOENT (No such file or directory) <0.000023>
+212233 12:35:10.748308 access("/etc/tnsnav.ora", F_OK) = -1 ENOENT (No such file or directory) <0.000016>
+212233 12:35:10.748356 access("/opt/oracle/instantclient/instantclient_21_12/network/admin/tnsnav.ora", F_OK) = -1 ENOENT (No such file or directory) <0.000013>
+212233 12:35:10.748399 access("/opt/oracle/instantclient/instantclient_21_12/network/admin/tnsnav.ora", F_OK) = -1 ENOENT (No such file or directory) <0.000013>
+212233 12:35:10.748483 rt_sigaction(SIGQUIT, NULL, NULL, 8) = 0 <0.000015>
+212233 12:35:10.748524 rt_sigaction(SIGQUIT, NULL, {sa_handler=0x7f54772b4bd0, sa_mask=[QUIT], sa_flags=SA_RESTORER|SA_RESTART, sa_restorer=0x7f5471a3fb30}, 8) = 0 <0.000015>
+212233 12:35:10.748746 rt_sigaction(SIGILL, NULL, NULL, 8) = 0 <0.000024>
+212233 12:35:10.748803 rt_sigaction(SIGILL, NULL, {sa_handler=SIG_DFL, sa_mask=[], sa_flags=0}, 8) = 0 <0.000013>
+212233 12:35:10.748873 rt_sigaction(SIGILL, {sa_handler=0x7f54755073a0, sa_mask=[], sa_flags=SA_RESTORER|SA_SIGINFO, sa_restorer=0x7f5471a3fb30}, {sa_handler=SIG_DFL, sa_mask=[], sa_flags=0}, 8) = 0 <0.000014>
+212233 12:35:10.749014 rt_sigaction(SIGABRT, NULL, NULL, 8) = 0 <0.000062>
+212233 12:35:10.749102 rt_sigaction(SIGABRT, NULL, {sa_handler=0x7f54772b4bd0, sa_mask=[ABRT], sa_flags=SA_RESTORER|SA_RESTART, sa_restorer=0x7f5471a3fb30}, 8) = 0 <0.000017>
+212233 12:35:10.749193 rt_sigaction(SIGFPE, NULL, NULL, 8) = 0 <0.000014>
+212233 12:35:10.749265 rt_sigaction(SIGFPE, NULL, {sa_handler=SIG_DFL, sa_mask=[], sa_flags=0}, 8) = 0 <0.000017>
+212233 12:35:10.749335 rt_sigaction(SIGFPE, {sa_handler=0x7f54755073a0, sa_mask=[], sa_flags=SA_RESTORER|SA_SIGINFO, sa_restorer=0x7f5471a3fb30}, {sa_handler=SIG_DFL, sa_mask=[], sa_flags=0}, 8) = 0 <0.000026>
+212233 12:35:10.749410 rt_sigaction(SIGSEGV, NULL, NULL, 8) = 0 <0.000041>
+212233 12:35:10.749489 rt_sigaction(SIGSEGV, NULL, {sa_handler=SIG_DFL, sa_mask=[], sa_flags=0}, 8) = 0 <0.000012>
+212233 12:35:10.749553 rt_sigaction(SIGSEGV, {sa_handler=0x7f54755073a0, sa_mask=[], sa_flags=SA_RESTORER|SA_SIGINFO, sa_restorer=0x7f5471a3fb30}, {sa_handler=SIG_DFL, sa_mask=[], sa_flags=0}, 8) = 0 <0.000013>
+212233 12:35:10.749602 rt_sigaction(SIGBUS, NULL, NULL, 8) = 0 <0.000009>
+212233 12:35:10.749634 rt_sigaction(SIGBUS, NULL, {sa_handler=SIG_DFL, sa_mask=[], sa_flags=0}, 8) = 0 <0.000009>
+212233 12:35:10.749673 rt_sigaction(SIGBUS, {sa_handler=0x7f54755073a0, sa_mask=[], sa_flags=SA_RESTORER|SA_SIGINFO, sa_restorer=0x7f5471a3fb30}, {sa_handler=SIG_DFL, sa_mask=[], sa_flags=0}, 8) = 0 <0.000014>
+212233 12:35:10.749716 rt_sigaction(SIGSYS, NULL, NULL, 8) = 0 <0.000012>
+212233 12:35:10.749757 rt_sigaction(SIGSYS, NULL, {sa_handler=SIG_DFL, sa_mask=[], sa_flags=0}, 8) = 0 <0.000016>
+212233 12:35:10.749799 rt_sigaction(SIGSYS, {sa_handler=0x7f54755073a0, sa_mask=[], sa_flags=SA_RESTORER|SA_SIGINFO, sa_restorer=0x7f5471a3fb30}, {sa_handler=SIG_DFL, sa_mask=[], sa_flags=0}, 8) = 0 <0.000156>
+212233 12:35:10.749989 rt_sigaction(SIGTRAP, NULL, NULL, 8) = 0 <0.000017>
+212233 12:35:10.750042 rt_sigaction(SIGTRAP, NULL, {sa_handler=SIG_DFL, sa_mask=[], sa_flags=0}, 8) = 0 <0.000015>
+212233 12:35:10.750084 rt_sigaction(SIGTRAP, {sa_handler=0x7f54755073a0, sa_mask=[], sa_flags=SA_RESTORER|SA_SIGINFO, sa_restorer=0x7f5471a3fb30}, {sa_handler=SIG_DFL, sa_mask=[], sa_flags=0}, 8) = 0 <0.000015>
+212233 12:35:10.750129 rt_sigaction(SIGXCPU, NULL, NULL, 8) = 0 <0.000012>
+212233 12:35:10.750167 rt_sigaction(SIGXCPU, NULL, {sa_handler=SIG_DFL, sa_mask=[], sa_flags=0}, 8) = 0 <0.000012>
+212233 12:35:10.750209 rt_sigaction(SIGXCPU, {sa_handler=0x7f54755073a0, sa_mask=[], sa_flags=SA_RESTORER|SA_SIGINFO, sa_restorer=0x7f5471a3fb30}, {sa_handler=SIG_DFL, sa_mask=[], sa_flags=0}, 8) = 0 <0.000010>
+212233 12:35:10.750248 rt_sigaction(SIGXFSZ, NULL, NULL, 8) = 0 <0.000125>
+212233 12:35:10.750433 rt_sigaction(SIGXFSZ, NULL, {sa_handler=SIG_DFL, sa_mask=[], sa_flags=0}, 8) = 0 <0.000013>
+212233 12:35:10.750511 rt_sigaction(SIGXFSZ, {sa_handler=0x7f54755073a0, sa_mask=[], sa_flags=SA_RESTORER|SA_SIGINFO, sa_restorer=0x7f5471a3fb30}, {sa_handler=SIG_DFL, sa_mask=[], sa_flags=0}, 8) = 0 <0.000013>
+212233 12:35:10.750715 openat(AT_FDCWD, "/usr/lib64/libnuma.so", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory) <0.000028>
+212233 12:35:10.750810 openat(AT_FDCWD, "/usr/lib64/libnuma.so.1", O_RDONLY|O_CLOEXEC) = 4 <0.000227>
+212233 12:35:10.751152 read(4, "\177ELF\2\1\1\0\0\0\0\0\0\0\0\0\3\0>\0\1\0\0\0000L\0\0\0\0\0\0"..., 832) = 832 <0.000039>
+212233 12:35:10.751271 fstat(4, {st_mode=S_IFREG|0755, st_size=62064, ...}) = 0 <0.000016>
+212233 12:35:10.751342 mmap(NULL, 58784, PROT_READ, MAP_PRIVATE|MAP_DENYWRITE, 4, 0) = 0x7f5477523000 <0.000025>
+212233 12:35:10.751400 mmap(0x7f5477527000, 28672, PROT_READ|PROT_EXEC, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 4, 0x4000) = 0x7f5477527000 <0.000659>
+212233 12:35:10.752104 mmap(0x7f547752e000, 8192, PROT_READ, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 4, 0xb000) = 0x7f547752e000 <0.000027>
+212233 12:35:10.752174 mmap(0x7f5477530000, 8192, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 4, 0xd000) = 0x7f5477530000 <0.000020>
+212233 12:35:10.752241 close(4)         = 0 <0.000019>
+212233 12:35:10.752360 mprotect(0x7f5477530000, 4096, PROT_READ) = 0 <0.000025>
+212233 12:35:10.752426 openat(AT_FDCWD, "/proc/self/status", O_RDONLY) = 4 <0.000038>
+212233 12:35:10.752513 fstat(4, {st_mode=S_IFREG|0444, st_size=0, ...}) = 0 <0.000014>
+212233 12:35:10.752558 read(4, "Name:\tsqlplus\nUmask:\t0027\nState:"..., 1024) = 1024 <0.000025>
+212233 12:35:10.752678 read(4, "ditional enabled\nCpus_allowed:\tf"..., 1024) = 490 <0.000018>
+212233 12:35:10.752736 read(4, "", 1024) = 0 <0.000044>
+212233 12:35:10.752810 close(4)         = 0 <0.000018>
+212233 12:35:10.752894 openat(AT_FDCWD, "/sys/devices/system/node", O_RDONLY|O_NONBLOCK|O_CLOEXEC|O_DIRECTORY) = 4 <0.000057>
+212233 12:35:10.752996 fstat(4, {st_mode=S_IFDIR|0755, st_size=0, ...}) = 0 <0.000014>
+212233 12:35:10.753065 getdents64(4, 0x255efb0 /* 11 entries */, 32768) = 360 <0.000018>
+212233 12:35:10.753117 getdents64(4, 0x255efb0 /* 0 entries */, 32768) = 0 <0.000014>
+212233 12:35:10.753152 close(4)         = 0 <0.000020>
+212233 12:35:10.753218 sched_getaffinity(0, 512, [0 1 2 3 4 5 6 7]) = 8 <0.000017>
+212233 12:35:10.753281 openat(AT_FDCWD, "/sys/devices/system/cpu", O_RDONLY|O_NONBLOCK|O_CLOEXEC|O_DIRECTORY) = 4 <0.000049>
+212233 12:35:10.753379 fstat(4, {st_mode=S_IFDIR|0755, st_size=0, ...}) = 0 <0.000013>
+212233 12:35:10.753421 getdents64(4, 0x255f1c0 /* 27 entries */, 32768) = 792 <0.000020>
+212233 12:35:10.753472 getdents64(4, 0x255f1c0 /* 0 entries */, 32768) = 0 <0.000039>
+212233 12:35:10.753548 close(4)         = 0 <0.000015>
+212233 12:35:10.753597 openat(AT_FDCWD, "/proc/self/status", O_RDONLY) = 4 <0.000059>
+212233 12:35:10.753721 fstat(4, {st_mode=S_IFREG|0444, st_size=0, ...}) = 0 <0.000016>
+212233 12:35:10.753822 read(4, "Name:\tsqlplus\nUmask:\t0027\nState:"..., 1024) = 1024 <0.000029>
+212233 12:35:10.753884 read(4, "ditional enabled\nCpus_allowed:\tf"..., 1024) = 490 <0.000013>
+212233 12:35:10.753926 read(4, "", 1024) = 0 <0.000013>
+212233 12:35:10.753961 close(4)         = 0 <0.000018>
+212233 12:35:10.754057 get_mempolicy(NULL, NULL, 0, NULL, 0) = 0 <0.000018>
+212233 12:35:10.754108 prlimit64(0, RLIMIT_STACK, NULL, {rlim_cur=8192*1024, rlim_max=RLIM64_INFINITY}) = 0 <0.000014>
+212233 12:35:10.754154 openat(AT_FDCWD, "/proc/sys/kernel/shmmax", O_RDONLY) = 4 <0.000034>
+212233 12:35:10.754232 fstat(4, {st_mode=S_IFREG|0644, st_size=0, ...}) = 0 <0.000017>
+212233 12:35:10.754296 read(4, "18446744073692774399\n", 1024) = 21 <0.000016>
+212233 12:35:10.754350 close(4)         = 0 <0.000015>
+212233 12:35:10.754408 get_mempolicy(NULL, NULL, 0, NULL, 0) = 0 <0.000014>
+212233 12:35:10.754448 openat(AT_FDCWD, "/proc/meminfo", O_RDONLY) = 4 <0.000023>
+212233 12:35:10.754500 fstat(4, {st_mode=S_IFREG|0444, st_size=0, ...}) = 0 <0.000028>
+212233 12:35:10.754554 read(4, "MemTotal:       16108952 kB\nMemF"..., 1024) = 1024 <0.000026>
+212233 12:35:10.754609 read(4, "      99236 kB\nVmallocChunk:    "..., 1024) = 563 <0.000014>
+212233 12:35:10.754659 lseek(4, 0, SEEK_CUR) = 1587 <0.000016>
+212233 12:35:10.754703 lseek(4, 1475, SEEK_SET) = 1475 <0.000016>
+212233 12:35:10.754742 close(4)         = 0 <0.000015>
+212233 12:35:10.754798 times(NULL)      = 439201444 <0.000013>
+212233 12:35:10.754844 getpid()         = 212233 <0.000013>
+212233 12:35:10.754928 openat(AT_FDCWD, "/etc/localtime", O_RDONLY|O_CLOEXEC) = 4 <0.000034>
+212233 12:35:10.754990 fstat(4, {st_mode=S_IFREG|0644, st_size=285, ...}) = 0 <0.000013>
+212233 12:35:10.755035 fstat(4, {st_mode=S_IFREG|0644, st_size=285, ...}) = 0 <0.000071>
+212233 12:35:10.755177 read(4, "TZif2\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0"..., 4096) = 285 <0.000053>
+212233 12:35:10.755283 lseek(4, -169, SEEK_CUR) = 116 <0.000015>
+212233 12:35:10.755327 read(4, "TZif2\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0"..., 4096) = 169 <0.000014>
+212233 12:35:10.755368 lseek(4, 284, SEEK_SET) = 284 <0.000063>
+212233 12:35:10.755454 close(4)         = 0 <0.000063>
+212233 12:35:10.755689 mmap(NULL, 180224, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_ANONYMOUS, -1, 0) = 0x7f54774f7000 <0.000031>
+212233 12:35:10.755864 brk(0x258c000)   = 0x258c000 <0.000021>
+212233 12:35:10.756115 mmap(NULL, 135168, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_ANONYMOUS, -1, 0) = 0x7f5477102000 <0.000045>
+212233 12:35:10.756358 brk(0x25ad000)   = 0x25ad000 <0.000019>
+212233 12:35:10.756534 rt_sigprocmask(SIG_BLOCK, [INT], NULL, 8) = 0 <0.000032>
+212233 12:35:10.756654 rt_sigaction(SIGINT, {sa_handler=0x7f54727f1c70, sa_mask=~[ILL TRAP ABRT BUS FPE SEGV USR2 TERM XCPU XFSZ SYS RTMIN RT_1], sa_flags=SA_RESTORER|SA_RESTART|SA_SIGINFO, sa_restorer=0x7f5471a3fb30}, {sa_handler=SIG_DFL, sa_mask=[], sa_flags=0}, 8) = 0 <0.000017>
+212233 12:35:10.756738 rt_sigprocmask(SIG_UNBLOCK, [INT], NULL, 8) = 0 <0.000014>
+212233 12:35:10.756890 brk(0x25ce000)   = 0x25ce000 <0.000017>
+212233 12:35:10.756996 getcwd("/home/scf-uat", 256) = 14 <0.000016>
+212233 12:35:10.757104 access("/home/scf-uat/.tnsnames.ora", F_OK) = -1 ENOENT (No such file or directory) <0.000022>
+212233 12:35:10.757236 access("/etc/tnsnames.ora", F_OK) = -1 ENOENT (No such file or directory) <0.000033>
+212233 12:35:10.757330 access("/opt/oracle/instantclient/instantclient_21_12/network/admin/tnsnames.ora", F_OK) = -1 ENOENT (No such file or directory) <0.000017>
+212233 12:35:10.757397 access("/opt/oracle/instantclient/instantclient_21_12/network/admin/tnsnames.ora", F_OK) = -1 ENOENT (No such file or directory) <0.000015>
+212233 12:35:10.757535 uname({sysname="Linux", nodename="GITFOSCFJUMP001", ...}) = 0 <0.000015>
+212233 12:35:10.757692 openat(AT_FDCWD, "/proc/self/cmdline", O_RDONLY) = 4 <0.000045>
+212233 12:35:10.757821 read(4, "sqlplus\0-L\0-S\0                  "..., 255) = 56 <0.000056>
+212233 12:35:10.757958 close(4)         = 0 <0.000016>
+212233 12:35:10.758000 uname({sysname="Linux", nodename="GITFOSCFJUMP001", ...}) = 0 <0.000013>
+212233 12:35:10.758075 getcwd("/home/scf-uat", 256) = 14 <0.000014>
+212233 12:35:10.758169 uname({sysname="Linux", nodename="GITFOSCFJUMP001", ...}) = 0 <0.000018>
+212233 12:35:10.758306 uname({sysname="Linux", nodename="GITFOSCFJUMP001", ...}) = 0 <0.000012>
+212233 12:35:10.758387 getcwd("/home/scf-uat", 256) = 14 <0.000016>
+212233 12:35:10.758460 uname({sysname="Linux", nodename="GITFOSCFJUMP001", ...}) = 0 <0.000013>
+212233 12:35:10.758504 uname({sysname="Linux", nodename="GITFOSCFJUMP001", ...}) = 0 <0.000014>
+212233 12:35:10.758579 getcwd("/home/scf-uat", 256) = 14 <0.000013>
+212233 12:35:10.758631 uname({sysname="Linux", nodename="GITFOSCFJUMP001", ...}) = 0 <0.000014>
+212233 12:35:10.758692 uname({sysname="Linux", nodename="GITFOSCFJUMP001", ...}) = 0 <0.000013>
+212233 12:35:10.758750 getcwd("/home/scf-uat", 256) = 14 <0.000013>
+212233 12:35:10.758792 uname({sysname="Linux", nodename="GITFOSCFJUMP001", ...}) = 0 <0.000013>
+212233 12:35:10.758832 uname({sysname="Linux", nodename="GITFOSCFJUMP001", ...}) = 0 <0.000013>
+212233 12:35:10.758887 prlimit64(0, RLIMIT_NOFILE, NULL, {rlim_cur=1024, rlim_max=512*1024}) = 0 <0.000014>
+212233 12:35:10.758951 prlimit64(0, RLIMIT_NOFILE, {rlim_cur=100000, rlim_max=512*1024}, NULL) = 0 <0.000015>
+212233 12:35:10.759016 openat(AT_FDCWD, "/opt/oracle/instantclient/instantclient_21_12/lib/libnque.so", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory) <0.000062>
+212233 12:35:10.759232 openat(AT_FDCWD, "/etc/hostid", O_RDONLY) = -1 ENOENT (No such file or directory) <0.000016>
+212233 12:35:10.759285 uname({sysname="Linux", nodename="GITFOSCFJUMP001", ...}) = 0 <0.000013>
+212233 12:35:10.759331 newfstatat(AT_FDCWD, "/etc/resolv.conf", {st_mode=S_IFREG|0644, st_size=146, ...}, 0) = 0 <0.000018>
+212233 12:35:10.759389 openat(AT_FDCWD, "/etc/host.conf", O_RDONLY|O_CLOEXEC) = 4 <0.000031>
+212233 12:35:10.759449 fstat(4, {st_mode=S_IFREG|0644, st_size=9, ...}) = 0 <0.000013>
+212233 12:35:10.759495 brk(0x25ef000)   = 0x25ef000 <0.000015>
+212233 12:35:10.759537 read(4, "multi on\n", 4096) = 9 <0.000014>
+212233 12:35:10.759579 read(4, "", 4096) = 0 <0.000013>
+212233 12:35:10.759618 close(4)         = 0 <0.000048>
+212233 12:35:10.759693 brk(0x25ee000)   = 0x25ee000 <0.000018>
+212233 12:35:10.759736 futex(0x7f5471c044ac, FUTEX_WAKE_PRIVATE, 2147483647) = 0 <0.000013>
+212233 12:35:10.759774 openat(AT_FDCWD, "/etc/resolv.conf", O_RDONLY|O_CLOEXEC) = 4 <0.000028>
+212233 12:35:10.759872 fstat(4, {st_mode=S_IFREG|0644, st_size=146, ...}) = 0 <0.000014>
+212233 12:35:10.759920 read(4, "# Generated by NetworkManager\nna"..., 4096) = 146 <0.000017>
+212233 12:35:10.759970 read(4, "", 4096) = 0 <0.000021>
+212233 12:35:10.760014 fstat(4, {st_mode=S_IFREG|0644, st_size=146, ...}) = 0 <0.000033>
+212233 12:35:10.760082 close(4)         = 0 <0.000017>
+212233 12:35:10.760130 socket(AF_UNIX, SOCK_STREAM|SOCK_CLOEXEC|SOCK_NONBLOCK, 0) = 4 <0.000043>
+212233 12:35:10.760282 connect(4, {sa_family=AF_UNIX, sun_path="/var/run/nscd/socket"}, 110) = -1 ENOENT (No such file or directory) <0.000032>
+212233 12:35:10.760357 close(4)         = 0 <0.000018>
+212233 12:35:10.760400 socket(AF_UNIX, SOCK_STREAM|SOCK_CLOEXEC|SOCK_NONBLOCK, 0) = 4 <0.000023>
+212233 12:35:10.760450 connect(4, {sa_family=AF_UNIX, sun_path="/var/run/nscd/socket"}, 110) = -1 ENOENT (No such file or directory) <0.000019>
+212233 12:35:10.760510 close(4)         = 0 <0.000014>
+212233 12:35:10.760547 newfstatat(AT_FDCWD, "/etc/nsswitch.conf", {st_mode=S_IFREG|0644, st_size=3012, ...}, 0) = 0 <0.000016>
+212233 12:35:10.760599 openat(AT_FDCWD, "/etc/hosts", O_RDONLY|O_CLOEXEC) = 4 <0.000027>
+212233 12:35:10.760654 fstat(4, {st_mode=S_IFREG|0644, st_size=3136, ...}) = 0 <0.000058>
+212233 12:35:10.760771 lseek(4, 0, SEEK_SET) = 0 <0.000018>
+212233 12:35:10.760822 read(4, "127.0.0.1   localhost localhost."..., 4096) = 3136 <0.000055>
+212233 12:35:10.760925 read(4, "", 4096) = 0 <0.000055>
+212233 12:35:10.761011 close(4)         = 0 <0.000052>
+212233 12:35:10.761104 socket(AF_INET, SOCK_DGRAM|SOCK_CLOEXEC|SOCK_NONBLOCK, IPPROTO_IP) = 4 <0.000061>
+212233 12:35:10.761205 setsockopt(4, SOL_IP, IP_RECVERR, [1], 4) = 0 <0.000046>
+212233 12:35:10.761303 connect(4, {sa_family=AF_INET, sin_port=htons(53), sin_addr=inet_addr("10.18.7.16")}, 16) = 0 <0.000047>
+212233 12:35:10.761395 poll([{fd=4, events=POLLOUT}], 1, 0) = 1 ([{fd=4, revents=POLLOUT}]) <0.000014>
+212233 12:35:10.761442 sendto(4, "\263/\1\0\0\1\0\0\0\0\0\0\17GITFOSCFJUMP001\4cor"..., 45, MSG_NOSIGNAL, NULL, 0) = 45 <0.000101>
+212233 12:35:10.761642 poll([{fd=4, events=POLLIN}], 1, 5000) = 0 (Timeout) <5.005112>
+212233 12:35:15.766857 socket(AF_INET, SOCK_DGRAM|SOCK_CLOEXEC|SOCK_NONBLOCK, IPPROTO_IP) = 5 <0.000044>
+212233 12:35:15.766965 setsockopt(5, SOL_IP, IP_RECVERR, [1], 4) = 0 <0.000053>
+212233 12:35:15.767097 connect(5, {sa_family=AF_INET, sin_port=htons(53), sin_addr=inet_addr("10.18.5.150")}, 16) = 0 <0.000061>
+212233 12:35:15.767223 poll([{fd=5, events=POLLOUT}], 1, 0) = 1 ([{fd=5, revents=POLLOUT}]) <0.000030>
+212233 12:35:15.767369 sendto(5, "\263/\1\0\0\1\0\0\0\0\0\0\17GITFOSCFJUMP001\4cor"..., 45, MSG_NOSIGNAL, NULL, 0) = 45 <0.000086>
+212233 12:35:15.767574 poll([{fd=5, events=POLLIN}], 1, 3000) = 0 (Timeout) <3.003109>
+212233 12:35:18.770786 socket(AF_INET, SOCK_DGRAM|SOCK_CLOEXEC|SOCK_NONBLOCK, IPPROTO_IP) = 6 <0.000067>
+212233 12:35:18.770931 setsockopt(6, SOL_IP, IP_RECVERR, [1], 4) = 0 <0.000040>
+212233 12:35:18.771050 connect(6, {sa_family=AF_INET, sin_port=htons(53), sin_addr=inet_addr("10.176.126.200")}, 16) = 0 <0.000068>
+212233 12:35:18.771197 poll([{fd=6, events=POLLOUT}], 1, 0) = 1 ([{fd=6, revents=POLLOUT}]) <0.000035>
+212233 12:35:18.771330 sendto(6, "\263/\1\0\0\1\0\0\0\0\0\0\17GITFOSCFJUMP001\4cor"..., 45, MSG_NOSIGNAL, NULL, 0) = 45 <0.000106>
+212233 12:35:18.771502 poll([{fd=6, events=POLLIN}], 1, 6000) = 1 ([{fd=6, revents=POLLIN}]) <0.002653>
+212233 12:35:18.774219 ioctl(6, FIONREAD, [114]) = 0 <0.000021>
+212233 12:35:18.774301 recvfrom(6, "\263/\201\203\0\1\0\0\0\1\0\0\17GITFOSCFJUMP001\4cor"..., 1024, 0, {sa_family=AF_INET, sin_port=htons(53), sin_addr=inet_addr("10.176.126.200")}, [28 => 16]) = 114 <0.000018>
+212233 12:35:18.774391 close(4)         = 0 <0.000032>
+212233 12:35:18.774471 close(5)         = 0 <0.000033>
+212233 12:35:18.774562 close(6)         = 0 <0.000108>
+212233 12:35:18.774711 socket(AF_INET, SOCK_DGRAM|SOCK_CLOEXEC|SOCK_NONBLOCK, IPPROTO_IP) = 4 <0.000025>
+212233 12:35:18.774781 setsockopt(4, SOL_IP, IP_RECVERR, [1], 4) = 0 <0.000023>
+212233 12:35:18.774847 connect(4, {sa_family=AF_INET, sin_port=htons(53), sin_addr=inet_addr("10.18.7.16")}, 16) = 0 <0.000034>
+212233 12:35:18.774912 poll([{fd=4, events=POLLOUT}], 1, 0) = 1 ([{fd=4, revents=POLLOUT}]) <0.000014>
+212233 12:35:18.774958 sendto(4, "\217\345\1\0\0\1\0\0\0\0\0\0\17GITFOSCFJUMP001\0\0\1\0"..., 33, MSG_NOSIGNAL, NULL, 0) = 33 <0.000059>
+212233 12:35:18.775059 poll([{fd=4, events=POLLIN}], 1, 5000) = 0 (Timeout) <5.005082>
+212233 12:35:23.780259 socket(AF_INET, SOCK_DGRAM|SOCK_CLOEXEC|SOCK_NONBLOCK, IPPROTO_IP) = 5 <0.000059>
+212233 12:35:23.780409 setsockopt(5, SOL_IP, IP_RECVERR, [1], 4) = 0 <0.000036>
+212233 12:35:23.780528 connect(5, {sa_family=AF_INET, sin_port=htons(53), sin_addr=inet_addr("10.18.5.150")}, 16) = 0 <0.000058>
+212233 12:35:23.780639 poll([{fd=5, events=POLLOUT}], 1, 0) = 1 ([{fd=5, revents=POLLOUT}]) <0.000046>
+212233 12:35:23.780747 sendto(5, "\217\345\1\0\0\1\0\0\0\0\0\0\17GITFOSCFJUMP001\0\0\1\0"..., 33, MSG_NOSIGNAL, NULL, 0) = 33 <0.000126>
+212233 12:35:23.780924 poll([{fd=5, events=POLLIN}], 1, 3000) = 0 (Timeout) <3.003114>
+212233 12:35:26.784164 socket(AF_INET, SOCK_DGRAM|SOCK_CLOEXEC|SOCK_NONBLOCK, IPPROTO_IP) = 6 <0.000053>
+212233 12:35:26.784293 setsockopt(6, SOL_IP, IP_RECVERR, [1], 4) = 0 <0.000037>
+212233 12:35:26.784403 connect(6, {sa_family=AF_INET, sin_port=htons(53), sin_addr=inet_addr("10.176.126.200")}, 16) = 0 <0.000086>
+212233 12:35:26.784621 poll([{fd=6, events=POLLOUT}], 1, 0) = 1 ([{fd=6, revents=POLLOUT}]) <0.000065>
+212233 12:35:26.784786 sendto(6, "\217\345\1\0\0\1\0\0\0\0\0\0\17GITFOSCFJUMP001\0\0\1\0"..., 33, MSG_NOSIGNAL, NULL, 0) = 33 <0.000080>
+212233 12:35:26.784935 poll([{fd=6, events=POLLIN}], 1, 6000) = 1 ([{fd=6, revents=POLLIN}]) <0.003461>
+212233 12:35:26.788503 ioctl(6, FIONREAD, [33]) = 0 <0.000037>
+212233 12:35:26.788666 recvfrom(6, "\217\345\201\205\0\1\0\0\0\0\0\0\17GITFOSCFJUMP001\0\0\1\0"..., 1024, 0, {sa_family=AF_INET, sin_port=htons(53), sin_addr=inet_addr("10.176.126.200")}, [28 => 16]) = 33 <0.000024>
+212233 12:35:26.788775 close(4)         = 0 <0.000028>
+212233 12:35:26.788827 close(5)         = 0 <0.000013>
+212233 12:35:26.788861 close(6)         = 0 <0.000014>
+212233 12:35:26.788895 socket(AF_INET, SOCK_DGRAM|SOCK_CLOEXEC|SOCK_NONBLOCK, IPPROTO_IP) = 4 <0.000020>
+212233 12:35:26.788957 setsockopt(4, SOL_IP, IP_RECVERR, [1], 4) = 0 <0.000028>
+212233 12:35:26.789035 connect(4, {sa_family=AF_INET, sin_port=htons(53), sin_addr=inet_addr("10.18.7.16")}, 16) = 0 <0.000044>
+212233 12:35:26.789123 poll([{fd=4, events=POLLOUT}], 1, 0) = 1 ([{fd=4, revents=POLLOUT}]) <0.000023>
+212233 12:35:26.789197 sendto(4, "\217\345\1\0\0\1\0\0\0\0\0\0\17GITFOSCFJUMP001\0\0\1\0"..., 33, MSG_NOSIGNAL, NULL, 0) = 33 <0.000099>
+212233 12:35:26.789355 poll([{fd=4, events=POLLIN}], 1, 5000) = 0 (Timeout) <5.005130>
+212233 12:35:31.794669 socket(AF_INET, SOCK_DGRAM|SOCK_CLOEXEC|SOCK_NONBLOCK, IPPROTO_IP) = 5 <0.000055>
+212233 12:35:31.794826 setsockopt(5, SOL_IP, IP_RECVERR, [1], 4) = 0 <0.000042>
+212233 12:35:31.794951 connect(5, {sa_family=AF_INET, sin_port=htons(53), sin_addr=inet_addr("10.18.5.150")}, 16) = 0 <0.000072>
+212233 12:35:31.795082 poll([{fd=5, events=POLLOUT}], 1, 0) = 1 ([{fd=5, revents=POLLOUT}]) <0.000022>
+212233 12:35:31.795180 sendto(5, "\217\345\1\0\0\1\0\0\0\0\0\0\17GITFOSCFJUMP001\0\0\1\0"..., 33, MSG_NOSIGNAL, NULL, 0) = 33 <0.000140>
+212233 12:35:31.795407 poll([{fd=5, events=POLLIN}], 1, 3000) = 0 (Timeout) <3.003125>
+212233 12:35:34.798644 socket(AF_INET, SOCK_DGRAM|SOCK_CLOEXEC|SOCK_NONBLOCK, IPPROTO_IP) = 6 <0.000064>
+212233 12:35:34.798775 setsockopt(6, SOL_IP, IP_RECVERR, [1], 4) = 0 <0.000023>
+212233 12:35:34.798860 connect(6, {sa_family=AF_INET, sin_port=htons(53), sin_addr=inet_addr("10.176.126.200")}, 16) = 0 <0.000071>
+212233 12:35:34.798975 poll([{fd=6, events=POLLOUT}], 1, 0) = 1 ([{fd=6, revents=POLLOUT}]) <0.000018>
+212233 12:35:34.799033 sendto(6, "\217\345\1\0\0\1\0\0\0\0\0\0\17GITFOSCFJUMP001\0\0\1\0"..., 33, MSG_NOSIGNAL, NULL, 0) = 33 <0.000112>
+212233 12:35:34.799195 poll([{fd=6, events=POLLIN}], 1, 6000) = 1 ([{fd=6, revents=POLLIN}]) <0.005498>
+212233 12:35:34.804783 ioctl(6, FIONREAD, [33]) = 0 <0.000024>
+212233 12:35:34.804859 recvfrom(6, "\217\345\201\205\0\1\0\0\0\0\0\0\17GITFOSCFJUMP001\0\0\1\0"..., 1024, 0, {sa_family=AF_INET, sin_port=htons(53), sin_addr=inet_addr("10.176.126.200")}, [28 => 16]) = 33 <0.000032>
+212233 12:35:34.804946 close(4)         = 0 <0.000033>
+212233 12:35:34.805046 close(5)         = 0 <0.000075>
+212233 12:35:34.805188 close(6)         = 0 <0.000017>
+212233 12:35:34.805262 openat(AT_FDCWD, "/opt/oracle/instantclient/instantclient_21_12/libnss_myhostname.so.2", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory) <0.000036>
+212233 12:35:34.805367 openat(AT_FDCWD, "glibc-hwcaps/x86-64-v4/libnss_myhostname.so.2", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory) <0.000020>
+212233 12:35:34.805417 openat(AT_FDCWD, "glibc-hwcaps/x86-64-v3/libnss_myhostname.so.2", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory) <0.000016>
+212233 12:35:34.805469 openat(AT_FDCWD, "glibc-hwcaps/x86-64-v2/libnss_myhostname.so.2", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory) <0.000017>
+212233 12:35:34.805512 openat(AT_FDCWD, "tls/haswell/avx512_1/x86_64/libnss_myhostname.so.2", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory) <0.000039>
+212233 12:35:34.805596 openat(AT_FDCWD, "tls/haswell/avx512_1/libnss_myhostname.so.2", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory) <0.000017>
+212233 12:35:34.805663 openat(AT_FDCWD, "tls/haswell/x86_64/libnss_myhostname.so.2", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory) <0.000016>
+212233 12:35:34.805707 openat(AT_FDCWD, "tls/haswell/libnss_myhostname.so.2", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory) <0.000016>
+212233 12:35:34.805748 openat(AT_FDCWD, "tls/avx512_1/x86_64/libnss_myhostname.so.2", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory) <0.000016>
+212233 12:35:34.805791 openat(AT_FDCWD, "tls/avx512_1/libnss_myhostname.so.2", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory) <0.000016>
+212233 12:35:34.805832 openat(AT_FDCWD, "tls/x86_64/libnss_myhostname.so.2", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory) <0.000016>
+212233 12:35:34.805874 openat(AT_FDCWD, "tls/libnss_myhostname.so.2", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory) <0.000016>
+212233 12:35:34.805916 openat(AT_FDCWD, "haswell/avx512_1/x86_64/libnss_myhostname.so.2", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory) <0.000017>
+212233 12:35:34.805959 openat(AT_FDCWD, "haswell/avx512_1/libnss_myhostname.so.2", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory) <0.000022>
+212233 12:35:34.806061 openat(AT_FDCWD, "haswell/x86_64/libnss_myhostname.so.2", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory) <0.000025>
+212233 12:35:34.806116 openat(AT_FDCWD, "haswell/libnss_myhostname.so.2", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory) <0.000017>
+212233 12:35:34.806160 openat(AT_FDCWD, "avx512_1/x86_64/libnss_myhostname.so.2", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory) <0.000015>
+212233 12:35:34.806203 openat(AT_FDCWD, "avx512_1/libnss_myhostname.so.2", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory) <0.000024>
+212233 12:35:34.806256 openat(AT_FDCWD, "x86_64/libnss_myhostname.so.2", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory) <0.000017>
+212233 12:35:34.806307 openat(AT_FDCWD, "libnss_myhostname.so.2", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory) <0.000015>
+212233 12:35:34.806348 openat(AT_FDCWD, "/etc/ld.so.cache", O_RDONLY|O_CLOEXEC) = 4 <0.000043>
+212233 12:35:34.806417 fstat(4, {st_mode=S_IFREG|0644, st_size=42843, ...}) = 0 <0.000013>
+212233 12:35:34.806457 mmap(NULL, 42843, PROT_READ, MAP_PRIVATE, 4, 0) = 0x7f547758f000 <0.000023>
+212233 12:35:34.806504 close(4)         = 0 <0.000014>
+212233 12:35:34.806553 openat(AT_FDCWD, "/lib64/libnss_myhostname.so.2", O_RDONLY|O_CLOEXEC) = 4 <0.000027>
+212233 12:35:34.806616 read(4, "\177ELF\2\1\1\0\0\0\0\0\0\0\0\0\3\0>\0\1\0\0\0\260]\0\0\0\0\0\0"..., 832) = 832 <0.000059>
+212233 12:35:34.806721 fstat(4, {st_mode=S_IFREG|0755, st_size=157104, ...}) = 0 <0.000013>
+212233 12:35:34.806769 mmap(NULL, 153832, PROT_READ, MAP_PRIVATE|MAP_DENYWRITE, 4, 0) = 0x7f54770dc000 <0.000034>
+212233 12:35:34.806859 mmap(0x7f54770e1000, 69632, PROT_READ|PROT_EXEC, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 4, 0x5000) = 0x7f54770e1000 <0.000844>
+212233 12:35:34.807766 mmap(0x7f54770f2000, 45056, PROT_READ, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 4, 0x16000) = 0x7f54770f2000 <0.000042>
+212233 12:35:34.807855 mmap(0x7f54770fd000, 20480, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 4, 0x21000) = 0x7f54770fd000 <0.000029>
+212233 12:35:34.807955 close(4)         = 0 <0.000067>
+212233 12:35:34.808100 openat(AT_FDCWD, "/opt/oracle/instantclient/instantclient_21_12/libgcc_s.so.1", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory) <0.000022>
+212233 12:35:34.808169 openat(AT_FDCWD, "glibc-hwcaps/x86-64-v4/libgcc_s.so.1", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory) <0.000015>
+212233 12:35:34.808318 openat(AT_FDCWD, "glibc-hwcaps/x86-64-v3/libgcc_s.so.1", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory) <0.000012>
+212233 12:35:34.808364 openat(AT_FDCWD, "glibc-hwcaps/x86-64-v2/libgcc_s.so.1", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory) <0.000014>
+212233 12:35:34.808404 openat(AT_FDCWD, "tls/haswell/avx512_1/x86_64/libgcc_s.so.1", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory) <0.000014>
+212233 12:35:34.808443 openat(AT_FDCWD, "tls/haswell/avx512_1/libgcc_s.so.1", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory) <0.000014>
+212233 12:35:34.808482 openat(AT_FDCWD, "tls/haswell/x86_64/libgcc_s.so.1", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory) <0.000014>
+212233 12:35:34.808520 openat(AT_FDCWD, "tls/haswell/libgcc_s.so.1", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory) <0.000014>
+212233 12:35:34.808564 openat(AT_FDCWD, "tls/avx512_1/x86_64/libgcc_s.so.1", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory) <0.000014>
+212233 12:35:34.808602 openat(AT_FDCWD, "tls/avx512_1/libgcc_s.so.1", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory) <0.000014>
+212233 12:35:34.808639 openat(AT_FDCWD, "tls/x86_64/libgcc_s.so.1", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory) <0.000076>
+212233 12:35:34.808743 openat(AT_FDCWD, "tls/libgcc_s.so.1", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory) <0.000016>
+212233 12:35:34.808787 openat(AT_FDCWD, "haswell/avx512_1/x86_64/libgcc_s.so.1", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory) <0.000014>
+212233 12:35:34.808826 openat(AT_FDCWD, "haswell/avx512_1/libgcc_s.so.1", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory) <0.000018>
+212233 12:35:34.808870 openat(AT_FDCWD, "haswell/x86_64/libgcc_s.so.1", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory) <0.000015>
+212233 12:35:34.808909 openat(AT_FDCWD, "haswell/libgcc_s.so.1", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory) <0.000014>
+212233 12:35:34.808948 openat(AT_FDCWD, "avx512_1/x86_64/libgcc_s.so.1", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory) <0.000015>
+212233 12:35:34.808987 openat(AT_FDCWD, "avx512_1/libgcc_s.so.1", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory) <0.000014>
+212233 12:35:34.809046 openat(AT_FDCWD, "x86_64/libgcc_s.so.1", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory) <0.000024>
+212233 12:35:34.809096 openat(AT_FDCWD, "libgcc_s.so.1", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory) <0.000017>
+212233 12:35:34.809141 openat(AT_FDCWD, "/lib64/libgcc_s.so.1", O_RDONLY|O_CLOEXEC) = 4 <0.000039>
+212233 12:35:34.809206 read(4, "\177ELF\2\1\1\0\0\0\0\0\0\0\0\0\3\0>\0\1\0\0\0P6\0\0\0\0\0\0"..., 832) = 832 <0.000015>
+212233 12:35:34.809248 fstat(4, {st_mode=S_IFREG|0755, st_size=116408, ...}) = 0 <0.000013>
+212233 12:35:34.809307 mmap(NULL, 115144, PROT_READ, MAP_PRIVATE|MAP_DENYWRITE, 4, 0) = 0x7f54770bf000 <0.000039>
+212233 12:35:34.809378 mmap(0x7f54770c2000, 81920, PROT_READ|PROT_EXEC, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 4, 0x3000) = 0x7f54770c2000 <0.000524>
+212233 12:35:34.809935 mmap(0x7f54770d6000, 16384, PROT_READ, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 4, 0x17000) = 0x7f54770d6000 <0.000041>
+212233 12:35:34.810010 mmap(0x7f54770da000, 4096, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 4, 0x1a000) = 0x7f54770da000 <0.000074>
+212233 12:35:34.810165 mmap(0x7f54770db000, 456, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_FIXED|MAP_ANONYMOUS, -1, 0) = 0x7f54770db000 <0.000018>
+212233 12:35:34.810266 close(4)         = 0 <0.000030>
+212233 12:35:34.810418 mprotect(0x7f54770da000, 4096, PROT_READ) = 0 <0.000031>
+212233 12:35:34.810544 mprotect(0x7f54770fd000, 16384, PROT_READ) = 0 <0.000048>
+212233 12:35:34.810675 munmap(0x7f547758f000, 42843) = 0 <0.000024>
+212233 12:35:34.810755 rt_sigprocmask(SIG_BLOCK, [HUP USR1 USR2 PIPE ALRM CHLD TSTP URG VTALRM PROF WINCH IO], [], 8) = 0 <0.000011>
+212233 12:35:34.810814 uname({sysname="Linux", nodename="GITFOSCFJUMP001", ...}) = 0 <0.000013>
+212233 12:35:34.810868 socket(AF_NETLINK, SOCK_RAW|SOCK_CLOEXEC|SOCK_NONBLOCK, NETLINK_ROUTE) = 4 <0.000035>
+212233 12:35:34.810947 getpid()         = 212233 <0.000030>
+212233 12:35:34.811011 getsockopt(4, SOL_SOCKET, SO_PROTOCOL, [0], [4]) = 0 <0.000027>
+212233 12:35:34.811075 setsockopt(4, SOL_NETLINK, NETLINK_EXT_ACK, [1], 4) = 0 <0.000019>
+212233 12:35:34.811156 setsockopt(4, SOL_NETLINK, NETLINK_GET_STRICT_CHK, [1], 4) = 0 <0.000031>
+212233 12:35:34.811256 setsockopt(4, SOL_NETLINK, NETLINK_PKTINFO, [1], 4) = 0 <0.000011>
+212233 12:35:34.811328 bind(4, {sa_family=AF_NETLINK, nl_pid=0, nl_groups=00000000}, 16) = 0 <0.000017>
+212233 12:35:34.811374 getsockname(4, {sa_family=AF_NETLINK, nl_pid=212233, nl_groups=00000000}, [16 => 12]) = 0 <0.000024>
+212233 12:35:34.811426 getsockopt(4, SOL_NETLINK, NETLINK_LIST_MEMBERSHIPS, NULL, [0]) = 0 <0.000014>
+212233 12:35:34.811468 sendto(4, [{nlmsg_len=24, nlmsg_type=RTM_GETADDR, nlmsg_flags=NLM_F_REQUEST|NLM_F_ACK|NLM_F_DUMP, nlmsg_seq=2882178171, nlmsg_pid=0}, {ifa_family=AF_INET, ifa_prefixlen=0, ifa_flags=0, ifa_scope=RT_SCOPE_UNIVERSE, ifa_index=0}], 24, 0, {sa_family=AF_NETLINK, nl_pid=0, nl_groups=00000000}, 128) = 24 <0.000022>
+212233 12:35:34.811636 recvmsg(4, {msg_name={sa_family=AF_NETLINK, nl_pid=0, nl_groups=00000000}, msg_namelen=128 => 12, msg_iov=[{iov_base=NULL, iov_len=0}], msg_iovlen=1, msg_control=[{cmsg_len=20, cmsg_level=SOL_NETLINK, cmsg_type=0x3, cmsg_data="\x00\x00\x00\x00"}], msg_controllen=24, msg_flags=MSG_TRUNC}, MSG_PEEK|MSG_TRUNC) = 252 <0.000027>
+212233 12:35:34.811779 recvmsg(4, {msg_name={sa_family=AF_NETLINK, nl_pid=0, nl_groups=00000000}, msg_namelen=128 => 12, msg_iov=[{iov_base=[[{nlmsg_len=76, nlmsg_type=RTM_NEWADDR, nlmsg_flags=NLM_F_MULTI, nlmsg_seq=2882178171, nlmsg_pid=212233}, {ifa_family=AF_INET, ifa_prefixlen=8, ifa_flags=IFA_F_PERMANENT, ifa_scope=RT_SCOPE_HOST, ifa_index=if_nametoindex("lo")}, [[{nla_len=8, nla_type=IFA_ADDRESS}, inet_addr("127.0.0.1")], [{nla_len=8, nla_type=IFA_LOCAL}, inet_addr("127.0.0.1")], [{nla_len=7, nla_type=IFA_LABEL}, "lo"], [{nla_len=8, nla_type=IFA_FLAGS}, IFA_F_PERMANENT], [{nla_len=20, nla_type=IFA_CACHEINFO}, {ifa_prefered=4294967295, ifa_valid=4294967295, cstamp=128, tstamp=128}]]], [{nlmsg_len=88, nlmsg_type=RTM_NEWADDR, nlmsg_flags=NLM_F_MULTI, nlmsg_seq=2882178171, nlmsg_pid=212233}, {ifa_family=AF_INET, ifa_prefixlen=23, ifa_flags=IFA_F_PERMANENT, ifa_scope=RT_SCOPE_UNIVERSE, ifa_index=if_nametoindex("ens192")}, [[{nla_len=8, nla_type=IFA_ADDRESS}, inet_addr("10.177.177.114")], [{nla_len=8, nla_type=IFA_LOCAL}, inet_addr("10.177.177.114")], [{nla_len=8, nla_type=IFA_BROADCAST}, inet_addr("10.177.177.255")], [{nla_len=11, nla_type=IFA_LABEL}, "ens192"], [{nla_len=8, nla_type=IFA_FLAGS}, IFA_F_PERMANENT|IFA_F_NOPREFIXROUTE], [{nla_len=20, nla_type=IFA_CACHEINFO}, {ifa_prefered=4294967295, ifa_valid=4294967295, cstamp=725, tstamp=725}]]], [{nlmsg_len=88, nlmsg_type=RTM_NEWADDR, nlmsg_flags=NLM_F_MULTI, nlmsg_seq=2882178171, nlmsg_pid=212233}, {ifa_family=AF_INET, ifa_prefixlen=16, ifa_flags=IFA_F_PERMANENT, ifa_scope=RT_SCOPE_UNIVERSE, ifa_index=if_nametoindex("docker0")}, [[{nla_len=8, nla_type=IFA_ADDRESS}, inet_addr("172.17.0.1")], [{nla_len=8, nla_type=IFA_LOCAL}, inet_addr("172.17.0.1")], [{nla_len=8, nla_type=IFA_BROADCAST}, inet_addr("172.17.255.255")], [{nla_len=12, nla_type=IFA_LABEL}, "docker0"], [{nla_len=8, nla_type=IFA_FLAGS}, IFA_F_PERMANENT], [{nla_len=20, nla_type=IFA_CACHEINFO}, {ifa_prefered=4294967295, ifa_valid=4294967295, cstamp=1189, tstamp=1189}]]]], iov_len=504}], msg_iovlen=1, msg_control=[{cmsg_len=20, cmsg_level=SOL_NETLINK, cmsg_type=0x3, cmsg_data="\x00\x00\x00\x00"}], msg_controllen=24, msg_flags=0}, MSG_TRUNC) = 252 <0.000033>
+212233 12:35:34.811885 ppoll([{fd=4, events=POLLIN}], 1, {tv_sec=24, tv_nsec=999752000}, NULL, 8) = 1 ([{fd=4, revents=POLLIN}], left {tv_sec=24, tv_nsec=999750695}) <0.000029>
+212233 12:35:34.811949 recvmsg(4, {msg_name={sa_family=AF_NETLINK, nl_pid=0, nl_groups=00000000}, msg_namelen=128 => 12, msg_iov=[{iov_base=NULL, iov_len=0}], msg_iovlen=1, msg_control=[{cmsg_len=20, cmsg_level=SOL_NETLINK, cmsg_type=0x3, cmsg_data="\x00\x00\x00\x00"}], msg_controllen=24, msg_flags=MSG_TRUNC}, MSG_PEEK|MSG_TRUNC) = 20 <0.000014>
+212233 12:35:34.811994 recvmsg(4, {msg_name={sa_family=AF_NETLINK, nl_pid=0, nl_groups=00000000}, msg_namelen=128 => 12, msg_iov=[{iov_base=[{nlmsg_len=20, nlmsg_type=NLMSG_DONE, nlmsg_flags=NLM_F_MULTI, nlmsg_seq=2882178171, nlmsg_pid=212233}, 0], iov_len=504}], msg_iovlen=1, msg_control=[{cmsg_len=20, cmsg_level=SOL_NETLINK, cmsg_type=0x3, cmsg_data="\x00\x00\x00\x00"}], msg_controllen=24, msg_flags=0}, MSG_TRUNC) = 20 <0.000016>
+212233 12:35:34.812057 close(4)         = 0 <0.000018>
+212233 12:35:34.812099 rt_sigprocmask(SIG_SETMASK, [], NULL, 8) = 0 <0.000013>
+212233 12:35:34.812181 getpid()         = 212233 <0.000036>
+212233 12:35:34.812304 getpid()         = 212233 <0.000013>
+212233 12:35:34.812343 uname({sysname="Linux", nodename="GITFOSCFJUMP001", ...}) = 0 <0.000012>
+212233 12:35:34.812384 socket(AF_NETLINK, SOCK_RAW|SOCK_CLOEXEC, NETLINK_ROUTE) = 4 <0.000018>
+212233 12:35:34.812424 bind(4, {sa_family=AF_NETLINK, nl_pid=0, nl_groups=00000000}, 12) = 0 <0.000015>
+212233 12:35:34.812465 getsockname(4, {sa_family=AF_NETLINK, nl_pid=212233, nl_groups=00000000}, [12]) = 0 <0.000012>
+212233 12:35:34.812503 sendto(4, [{nlmsg_len=20, nlmsg_type=RTM_GETADDR, nlmsg_flags=NLM_F_REQUEST|NLM_F_DUMP, nlmsg_seq=1788246334, nlmsg_pid=0}, {ifa_family=AF_UNSPEC, ...}], 20, 0, {sa_family=AF_NETLINK, nl_pid=0, nl_groups=00000000}, 12) = 20 <0.000023>
+212233 12:35:34.812597 recvmsg(4, {msg_name={sa_family=AF_NETLINK, nl_pid=0, nl_groups=00000000}, msg_namelen=12, msg_iov=[{iov_base=[[{nlmsg_len=76, nlmsg_type=RTM_NEWADDR, nlmsg_flags=NLM_F_MULTI, nlmsg_seq=1788246334, nlmsg_pid=212233}, {ifa_family=AF_INET, ifa_prefixlen=8, ifa_flags=IFA_F_PERMANENT, ifa_scope=RT_SCOPE_HOST, ifa_index=if_nametoindex("lo")}, [[{nla_len=8, nla_type=IFA_ADDRESS}, inet_addr("127.0.0.1")], [{nla_len=8, nla_type=IFA_LOCAL}, inet_addr("127.0.0.1")], [{nla_len=7, nla_type=IFA_LABEL}, "lo"], [{nla_len=8, nla_type=IFA_FLAGS}, IFA_F_PERMANENT], [{nla_len=20, nla_type=IFA_CACHEINFO}, {ifa_prefered=4294967295, ifa_valid=4294967295, cstamp=128, tstamp=128}]]], [{nlmsg_len=88, nlmsg_type=RTM_NEWADDR, nlmsg_flags=NLM_F_MULTI, nlmsg_seq=1788246334, nlmsg_pid=212233}, {ifa_family=AF_INET, ifa_prefixlen=23, ifa_flags=IFA_F_PERMANENT, ifa_scope=RT_SCOPE_UNIVERSE, ifa_index=if_nametoindex("ens192")}, [[{nla_len=8, nla_type=IFA_ADDRESS}, inet_addr("10.177.177.114")], [{nla_len=8, nla_type=IFA_LOCAL}, inet_addr("10.177.177.114")], [{nla_len=8, nla_type=IFA_BROADCAST}, inet_addr("10.177.177.255")], [{nla_len=11, nla_type=IFA_LABEL}, "ens192"], [{nla_len=8, nla_type=IFA_FLAGS}, IFA_F_PERMANENT|IFA_F_NOPREFIXROUTE], [{nla_len=20, nla_type=IFA_CACHEINFO}, {ifa_prefered=4294967295, ifa_valid=4294967295, cstamp=725, tstamp=725}]]], [{nlmsg_len=88, nlmsg_type=RTM_NEWADDR, nlmsg_flags=NLM_F_MULTI, nlmsg_seq=1788246334, nlmsg_pid=212233}, {ifa_family=AF_INET, ifa_prefixlen=16, ifa_flags=IFA_F_PERMANENT, ifa_scope=RT_SCOPE_UNIVERSE, ifa_index=if_nametoindex("docker0")}, [[{nla_len=8, nla_type=IFA_ADDRESS}, inet_addr("172.17.0.1")], [{nla_len=8, nla_type=IFA_LOCAL}, inet_addr("172.17.0.1")], [{nla_len=8, nla_type=IFA_BROADCAST}, inet_addr("172.17.255.255")], [{nla_len=12, nla_type=IFA_LABEL}, "docker0"], [{nla_len=8, nla_type=IFA_FLAGS}, IFA_F_PERMANENT], [{nla_len=20, nla_type=IFA_CACHEINFO}, {ifa_prefered=4294967295, ifa_valid=4294967295, cstamp=1189, tstamp=1189}]]], [{nlmsg_len=72, nlmsg_type=RTM_NEWADDR, nlmsg_flags=NLM_F_MULTI, nlmsg_seq=1788246334, nlmsg_pid=212233}, {ifa_family=AF_INET6, ifa_prefixlen=128, ifa_flags=IFA_F_PERMANENT, ifa_scope=RT_SCOPE_HOST, ifa_index=if_nametoindex("lo")}, [[{nla_len=20, nla_type=IFA_ADDRESS}, inet_pton(AF_INET6, "::1")], [{nla_len=20, nla_type=IFA_CACHEINFO}, {ifa_prefered=4294967295, ifa_valid=4294967295, cstamp=128, tstamp=128}], [{nla_len=8, nla_type=IFA_FLAGS}, IFA_F_PERMANENT]]], [{nlmsg_len=72, nlmsg_type=RTM_NEWADDR, nlmsg_flags=NLM_F_MULTI, nlmsg_seq=1788246334, nlmsg_pid=212233}, {ifa_family=AF_INET6, ifa_prefixlen=64, ifa_flags=IFA_F_PERMANENT, ifa_scope=RT_SCOPE_LINK, ifa_index=if_nametoindex("ens192")}, [[{nla_len=20, nla_type=IFA_ADDRESS}, inet_pton(AF_INET6, "fe80::111a:70ed:70ee:1580")], [{nla_len=20, nla_type=IFA_CACHEINFO}, {ifa_prefered=4294967295, ifa_valid=4294967295, cstamp=726, tstamp=726}], [{nla_len=8, nla_type=IFA_FLAGS}, IFA_F_PERMANENT|IFA_F_NOPREFIXROUTE]]]], iov_len=4096}], msg_iovlen=1, msg_controllen=0, msg_flags=0}, 0) = 396 <0.000014>
+212233 12:35:34.812692 recvmsg(4, {msg_name={sa_family=AF_NETLINK, nl_pid=0, nl_groups=00000000}, msg_namelen=12, msg_iov=[{iov_base=[{nlmsg_len=20, nlmsg_type=NLMSG_DONE, nlmsg_flags=NLM_F_MULTI, nlmsg_seq=1788246334, nlmsg_pid=212233}, 0], iov_len=4096}], msg_iovlen=1, msg_controllen=0, msg_flags=0}, 0) = 20 <0.000014>
+212233 12:35:34.812740 close(4)         = 0 <0.000016>
+212233 12:35:34.812780 newfstatat(AT_FDCWD, "/etc/nsswitch.conf", {st_mode=S_IFREG|0644, st_size=3012, ...}, 0) = 0 <0.000019>
+212233 12:35:34.812828 newfstatat(AT_FDCWD, "/etc/resolv.conf", {st_mode=S_IFREG|0644, st_size=146, ...}, 0) = 0 <0.000013>
+212233 12:35:34.812869 openat(AT_FDCWD, "/etc/hosts", O_RDONLY|O_CLOEXEC) = 4 <0.000033>
+212233 12:35:34.812927 fstat(4, {st_mode=S_IFREG|0644, st_size=3136, ...}) = 0 <0.000012>
+212233 12:35:34.812968 lseek(4, 0, SEEK_SET) = 0 <0.000012>
+212233 12:35:34.813003 read(4, "127.0.0.1   localhost localhost."..., 4096) = 3136 <0.000014>
+212233 12:35:34.813053 read(4, "", 4096) = 0 <0.000012>
+212233 12:35:34.813086 close(4)         = 0 <0.000014>
+212233 12:35:34.813127 socket(AF_INET, SOCK_DGRAM|SOCK_CLOEXEC|SOCK_NONBLOCK, IPPROTO_IP) = 4 <0.000017>
+212233 12:35:34.813169 setsockopt(4, SOL_IP, IP_RECVERR, [1], 4) = 0 <0.000039>
+212233 12:35:34.813236 connect(4, {sa_family=AF_INET, sin_port=htons(53), sin_addr=inet_addr("10.18.7.16")}, 16) = 0 <0.000036>
+212233 12:35:34.813311 poll([{fd=4, events=POLLOUT}], 1, 0) = 1 ([{fd=4, revents=POLLOUT}]) <0.000013>
+212233 12:35:34.813354 sendmmsg(4, [{msg_hdr={msg_name=NULL, msg_namelen=0, msg_iov=[{iov_base="\246\375\1\0\0\1\0\0\0\0\0\0\17GITFOSCFJUMP001\4cor"..., iov_len=45}], msg_iovlen=1, msg_controllen=0, msg_flags=0}, msg_len=45}, {msg_hdr={msg_name=NULL, msg_namelen=0, msg_iov=[{iov_base="U\363\1\0\0\1\0\0\0\0\0\0\17GITFOSCFJUMP001\4cor"..., iov_len=45}], msg_iovlen=1, msg_controllen=0, msg_flags=0}, msg_len=45}], 2, MSG_NOSIGNAL) = 2 <0.000064>
+212233 12:35:34.813450 poll([{fd=4, events=POLLIN}], 1, 5000) = 0 (Timeout) <5.005091>
+212233 12:35:39.818719 socket(AF_INET, SOCK_DGRAM|SOCK_CLOEXEC|SOCK_NONBLOCK, IPPROTO_IP) = 5 <0.000038>
+212233 12:35:39.818833 setsockopt(5, SOL_IP, IP_RECVERR, [1], 4) = 0 <0.000018>
+212233 12:35:39.818910 connect(5, {sa_family=AF_INET, sin_port=htons(53), sin_addr=inet_addr("10.18.5.150")}, 16) = 0 <0.000048>
+212233 12:35:39.818994 poll([{fd=5, events=POLLOUT}], 1, 0) = 1 ([{fd=5, revents=POLLOUT}]) <0.000016>
+212233 12:35:39.819046 sendmmsg(5, [{msg_hdr={msg_name=NULL, msg_namelen=0, msg_iov=[{iov_base="\246\375\1\0\0\1\0\0\0\0\0\0\17GITFOSCFJUMP001\4cor"..., iov_len=45}], msg_iovlen=1, msg_controllen=0, msg_flags=0}, msg_len=45}, {msg_hdr={msg_name=NULL, msg_namelen=0, msg_iov=[{iov_base="U\363\1\0\0\1\0\0\0\0\0\0\17GITFOSCFJUMP001\4cor"..., iov_len=45}], msg_iovlen=1, msg_controllen=0, msg_flags=0}, msg_len=45}], 2, MSG_NOSIGNAL) = 2 <0.000123>
+212233 12:35:39.819241 poll([{fd=5, events=POLLIN}], 1, 3000) = 0 (Timeout) <3.003121>
+212233 12:35:42.822490 socket(AF_INET, SOCK_DGRAM|SOCK_CLOEXEC|SOCK_NONBLOCK, IPPROTO_IP) = 6 <0.000050>
+212233 12:35:42.822630 setsockopt(6, SOL_IP, IP_RECVERR, [1], 4) = 0 <0.000039>
+212233 12:35:42.822764 connect(6, {sa_family=AF_INET, sin_port=htons(53), sin_addr=inet_addr("10.176.126.200")}, 16) = 0 <0.000060>
+212233 12:35:42.822880 poll([{fd=6, events=POLLOUT}], 1, 0) = 1 ([{fd=6, revents=POLLOUT}]) <0.000030>
+212233 12:35:42.822971 sendmmsg(6, [{msg_hdr={msg_name=NULL, msg_namelen=0, msg_iov=[{iov_base="\246\375\1\0\0\1\0\0\0\0\0\0\17GITFOSCFJUMP001\4cor"..., iov_len=45}], msg_iovlen=1, msg_controllen=0, msg_flags=0}, msg_len=45}, {msg_hdr={msg_name=NULL, msg_namelen=0, msg_iov=[{iov_base="U\363\1\0\0\1\0\0\0\0\0\0\17GITFOSCFJUMP001\4cor"..., iov_len=45}], msg_iovlen=1, msg_controllen=0, msg_flags=0}, msg_len=45}], 2, MSG_NOSIGNAL) = 2 <0.000138>
+212233 12:35:42.823215 poll([{fd=6, events=POLLIN}], 1, 6000) = 1 ([{fd=6, revents=POLLIN}]) <0.001683>
+212233 12:35:42.824980 ioctl(6, FIONREAD, [114]) = 0 <0.000034>
+212233 12:35:42.825072 recvfrom(6, "\246\375\201\203\0\1\0\0\0\1\0\0\17GITFOSCFJUMP001\4cor"..., 2048, 0, {sa_family=AF_INET, sin_port=htons(53), sin_addr=inet_addr("10.176.126.200")}, [28 => 16]) = 114 <0.000034>
+212233 12:35:42.825178 poll([{fd=6, events=POLLIN}], 1, 5997) = 1 ([{fd=6, revents=POLLIN}]) <0.000721>
+212233 12:35:42.826003 ioctl(6, FIONREAD, [45]) = 0 <0.000025>
+212233 12:35:42.826098 recvfrom(6, "U\363\201\200\0\1\0\0\0\0\0\0\17GITFOSCFJUMP001\4cor"..., 65536, 0, {sa_family=AF_INET, sin_port=htons(53), sin_addr=inet_addr("10.176.126.200")}, [28 => 16]) = 45 <0.000023>
+212233 12:35:42.826191 close(4)         = 0 <0.000049>
+212233 12:35:42.826286 close(5)         = 0 <0.000019>
+212233 12:35:42.826346 close(6)         = 0 <0.000015>
+212233 12:35:42.826408 socket(AF_INET, SOCK_DGRAM|SOCK_CLOEXEC|SOCK_NONBLOCK, IPPROTO_IP) = 4 <0.000021>
+212233 12:35:42.826454 setsockopt(4, SOL_IP, IP_RECVERR, [1], 4) = 0 <0.000016>
+212233 12:35:42.826509 connect(4, {sa_family=AF_INET, sin_port=htons(53), sin_addr=inet_addr("10.18.7.16")}, 16) = 0 <0.000031>
+212233 12:35:42.826626 poll([{fd=4, events=POLLOUT}], 1, 0) = 1 ([{fd=4, revents=POLLOUT}]) <0.000016>
+212233 12:35:42.826725 sendmmsg(4, [{msg_hdr={msg_name=NULL, msg_namelen=0, msg_iov=[{iov_base="\213\244\1\0\0\1\0\0\0\0\0\0\17GITFOSCFJUMP001\0\0\1\0"..., iov_len=33}], msg_iovlen=1, msg_controllen=0, msg_flags=0}, msg_len=33}, {msg_hdr={msg_name=NULL, msg_namelen=0, msg_iov=[{iov_base="\330\243\1\0\0\1\0\0\0\0\0\0\17GITFOSCFJUMP001\0\0\34\0"..., iov_len=33}], msg_iovlen=1, msg_controllen=0, msg_flags=0}, msg_len=33}], 2, MSG_NOSIGNAL) = 2 <0.000070>
+212233 12:35:42.826846 poll([{fd=4, events=POLLIN}], 1, 5000) = 0 (Timeout) <5.005099>
+212233 12:35:47.832073 socket(AF_INET, SOCK_DGRAM|SOCK_CLOEXEC|SOCK_NONBLOCK, IPPROTO_IP) = 5 <0.000037>
+212233 12:35:47.832191 setsockopt(5, SOL_IP, IP_RECVERR, [1], 4) = 0 <0.000021>
+212233 12:35:47.832296 connect(5, {sa_family=AF_INET, sin_port=htons(53), sin_addr=inet_addr("10.18.5.150")}, 16) = 0 <0.000045>
+212233 12:35:47.832383 poll([{fd=5, events=POLLOUT}], 1, 0) = 1 ([{fd=5, revents=POLLOUT}]) <0.000015>
+212233 12:35:47.832430 sendmmsg(5, [{msg_hdr={msg_name=NULL, msg_namelen=0, msg_iov=[{iov_base="\213\244\1\0\0\1\0\0\0\0\0\0\17GITFOSCFJUMP001\0\0\1\0"..., iov_len=33}], msg_iovlen=1, msg_controllen=0, msg_flags=0}, msg_len=33}, {msg_hdr={msg_name=NULL, msg_namelen=0, msg_iov=[{iov_base="\330\243\1\0\0\1\0\0\0\0\0\0\17GITFOSCFJUMP001\0\0\34\0"..., iov_len=33}], msg_iovlen=1, msg_controllen=0, msg_flags=0}, msg_len=33}], 2, MSG_NOSIGNAL) = 2 <0.000109>
+212233 12:35:47.832592 poll([{fd=5, events=POLLIN}], 1, 3000) = 0 (Timeout) <3.003111>
+212233 12:35:50.835831 socket(AF_INET, SOCK_DGRAM|SOCK_CLOEXEC|SOCK_NONBLOCK, IPPROTO_IP) = 6 <0.000040>
+212233 12:35:50.835931 setsockopt(6, SOL_IP, IP_RECVERR, [1], 4) = 0 <0.000020>
+212233 12:35:50.836011 connect(6, {sa_family=AF_INET, sin_port=htons(53), sin_addr=inet_addr("10.176.126.200")}, 16) = 0 <0.000044>
+212233 12:35:50.836090 poll([{fd=6, events=POLLOUT}], 1, 0) = 1 ([{fd=6, revents=POLLOUT}]) <0.000015>
+212233 12:35:50.836140 sendmmsg(6, [{msg_hdr={msg_name=NULL, msg_namelen=0, msg_iov=[{iov_base="\213\244\1\0\0\1\0\0\0\0\0\0\17GITFOSCFJUMP001\0\0\1\0"..., iov_len=33}], msg_iovlen=1, msg_controllen=0, msg_flags=0}, msg_len=33}, {msg_hdr={msg_name=NULL, msg_namelen=0, msg_iov=[{iov_base="\330\243\1\0\0\1\0\0\0\0\0\0\17GITFOSCFJUMP001\0\0\34\0"..., iov_len=33}], msg_iovlen=1, msg_controllen=0, msg_flags=0}, msg_len=33}], 2, MSG_NOSIGNAL) = 2 <0.000104>
+212233 12:35:50.836345 poll([{fd=6, events=POLLIN}], 1, 6000) = 1 ([{fd=6, revents=POLLIN}]) <0.012722>
+212233 12:35:50.849253 ioctl(6, FIONREAD, [33]) = 0 <0.000045>
+212233 12:35:50.849417 recvfrom(6, "\330\243\201\200\0\1\0\0\0\0\0\0\17GITFOSCFJUMP001\0\0\34\0"..., 2048, 0, {sa_family=AF_INET, sin_port=htons(53), sin_addr=inet_addr("10.176.126.200")}, [28 => 16]) = 33 <0.000028>
+212233 12:35:50.849517 poll([{fd=6, events=POLLIN}], 1, 5986) = 1 ([{fd=6, revents=POLLIN}]) <0.001795>
+212233 12:35:50.851419 ioctl(6, FIONREAD, [33]) = 0 <0.000030>
+212233 12:35:50.851531 recvfrom(6, "\213\244\201\205\0\1\0\0\0\0\0\0\17GITFOSCFJUMP001\0\0\1\0"..., 65536, 0, {sa_family=AF_INET, sin_port=htons(53), sin_addr=inet_addr("10.176.126.200")}, [28 => 16]) = 33 <0.000016>
+212233 12:35:50.851620 close(4)         = 0 <0.000050>
+212233 12:35:50.851730 close(5)         = 0 <0.000018>
+212233 12:35:50.851774 close(6)         = 0 <0.000015>
+212233 12:35:50.851822 rt_sigprocmask(SIG_BLOCK, [HUP USR1 USR2 PIPE ALRM CHLD TSTP URG VTALRM PROF WINCH IO], [], 8) = 0 <0.000016>
+212233 12:35:50.851878 uname({sysname="Linux", nodename="GITFOSCFJUMP001", ...}) = 0 <0.000015>
+212233 12:35:50.851926 socket(AF_NETLINK, SOCK_RAW|SOCK_CLOEXEC|SOCK_NONBLOCK, NETLINK_ROUTE) = 4 <0.000028>
+212233 12:35:50.851980 getsockopt(4, SOL_SOCKET, SO_PROTOCOL, [0], [4]) = 0 <0.000016>
+212233 12:35:50.852025 setsockopt(4, SOL_NETLINK, NETLINK_EXT_ACK, [1], 4) = 0 <0.000025>
+212233 12:35:50.852123 setsockopt(4, SOL_NETLINK, NETLINK_GET_STRICT_CHK, [1], 4) = 0 <0.000021>
+212233 12:35:50.852173 setsockopt(4, SOL_NETLINK, NETLINK_PKTINFO, [1], 4) = 0 <0.000014>
+212233 12:35:50.852214 bind(4, {sa_family=AF_NETLINK, nl_pid=0, nl_groups=00000000}, 16) = 0 <0.000024>
+212233 12:35:50.852267 getsockname(4, {sa_family=AF_NETLINK, nl_pid=212233, nl_groups=00000000}, [16 => 12]) = 0 <0.000010>
+212233 12:35:50.852320 getsockopt(4, SOL_NETLINK, NETLINK_LIST_MEMBERSHIPS, NULL, [0]) = 0 <0.000011>
+212233 12:35:50.852364 sendto(4, [{nlmsg_len=24, nlmsg_type=RTM_GETADDR, nlmsg_flags=NLM_F_REQUEST|NLM_F_ACK|NLM_F_DUMP, nlmsg_seq=2898219209, nlmsg_pid=0}, {ifa_family=AF_UNSPEC, ifa_prefixlen=0, ifa_flags=0, ifa_scope=RT_SCOPE_UNIVERSE, ifa_index=0}], 24, 0, {sa_family=AF_NETLINK, nl_pid=0, nl_groups=00000000}, 128) = 24 <0.000029>
+212233 12:35:50.852530 recvmsg(4, {msg_name={sa_family=AF_NETLINK, nl_pid=0, nl_groups=00000000}, msg_namelen=128 => 12, msg_iov=[{iov_base=NULL, iov_len=0}], msg_iovlen=1, msg_control=[{cmsg_len=20, cmsg_level=SOL_NETLINK, cmsg_type=0x3, cmsg_data="\x00\x00\x00\x00"}], msg_controllen=24, msg_flags=MSG_TRUNC}, MSG_PEEK|MSG_TRUNC) = 396 <0.000014>
+212233 12:35:50.852628 recvmsg(4, {msg_name={sa_family=AF_NETLINK, nl_pid=0, nl_groups=00000000}, msg_namelen=128 => 12, msg_iov=[{iov_base=[[{nlmsg_len=76, nlmsg_type=RTM_NEWADDR, nlmsg_flags=NLM_F_MULTI, nlmsg_seq=2898219209, nlmsg_pid=212233}, {ifa_family=AF_INET, ifa_prefixlen=8, ifa_flags=IFA_F_PERMANENT, ifa_scope=RT_SCOPE_HOST, ifa_index=if_nametoindex("lo")}, [[{nla_len=8, nla_type=IFA_ADDRESS}, inet_addr("127.0.0.1")], [{nla_len=8, nla_type=IFA_LOCAL}, inet_addr("127.0.0.1")], [{nla_len=7, nla_type=IFA_LABEL}, "lo"], [{nla_len=8, nla_type=IFA_FLAGS}, IFA_F_PERMANENT], [{nla_len=20, nla_type=IFA_CACHEINFO}, {ifa_prefered=4294967295, ifa_valid=4294967295, cstamp=128, tstamp=128}]]], [{nlmsg_len=88, nlmsg_type=RTM_NEWADDR, nlmsg_flags=NLM_F_MULTI, nlmsg_seq=2898219209, nlmsg_pid=212233}, {ifa_family=AF_INET, ifa_prefixlen=23, ifa_flags=IFA_F_PERMANENT, ifa_scope=RT_SCOPE_UNIVERSE, ifa_index=if_nametoindex("ens192")}, [[{nla_len=8, nla_type=IFA_ADDRESS}, inet_addr("10.177.177.114")], [{nla_len=8, nla_type=IFA_LOCAL}, inet_addr("10.177.177.114")], [{nla_len=8, nla_type=IFA_BROADCAST}, inet_addr("10.177.177.255")], [{nla_len=11, nla_type=IFA_LABEL}, "ens192"], [{nla_len=8, nla_type=IFA_FLAGS}, IFA_F_PERMANENT|IFA_F_NOPREFIXROUTE], [{nla_len=20, nla_type=IFA_CACHEINFO}, {ifa_prefered=4294967295, ifa_valid=4294967295, cstamp=725, tstamp=725}]]], [{nlmsg_len=88, nlmsg_type=RTM_NEWADDR, nlmsg_flags=NLM_F_MULTI, nlmsg_seq=2898219209, nlmsg_pid=212233}, {ifa_family=AF_INET, ifa_prefixlen=16, ifa_flags=IFA_F_PERMANENT, ifa_scope=RT_SCOPE_UNIVERSE, ifa_index=if_nametoindex("docker0")}, [[{nla_len=8, nla_type=IFA_ADDRESS}, inet_addr("172.17.0.1")], [{nla_len=8, nla_type=IFA_LOCAL}, inet_addr("172.17.0.1")], [{nla_len=8, nla_type=IFA_BROADCAST}, inet_addr("172.17.255.255")], [{nla_len=12, nla_type=IFA_LABEL}, "docker0"], [{nla_len=8, nla_type=IFA_FLAGS}, IFA_F_PERMANENT], [{nla_len=20, nla_type=IFA_CACHEINFO}, {ifa_prefered=4294967295, ifa_valid=4294967295, cstamp=1189, tstamp=1189}]]], [{nlmsg_len=72, nlmsg_type=RTM_NEWADDR, nlmsg_flags=NLM_F_MULTI, nlmsg_seq=2898219209, nlmsg_pid=212233}, {ifa_family=AF_INET6, ifa_prefixlen=128, ifa_flags=IFA_F_PERMANENT, ifa_scope=RT_SCOPE_HOST, ifa_index=if_nametoindex("lo")}, [[{nla_len=20, nla_type=IFA_ADDRESS}, inet_pton(AF_INET6, "::1")], [{nla_len=20, nla_type=IFA_CACHEINFO}, {ifa_prefered=4294967295, ifa_valid=4294967295, cstamp=128, tstamp=128}], [{nla_len=8, nla_type=IFA_FLAGS}, IFA_F_PERMANENT]]], [{nlmsg_len=72, nlmsg_type=RTM_NEWADDR, nlmsg_flags=NLM_F_MULTI, nlmsg_seq=2898219209, nlmsg_pid=212233}, {ifa_family=AF_INET6, ifa_prefixlen=64, ifa_flags=IFA_F_PERMANENT, ifa_scope=RT_SCOPE_LINK, ifa_index=if_nametoindex("ens192")}, [[{nla_len=20, nla_type=IFA_ADDRESS}, inet_pton(AF_INET6, "fe80::111a:70ed:70ee:1580")], [{nla_len=20, nla_type=IFA_CACHEINFO}, {ifa_prefered=4294967295, ifa_valid=4294967295, cstamp=726, tstamp=726}], [{nla_len=8, nla_type=IFA_FLAGS}, IFA_F_PERMANENT|IFA_F_NOPREFIXROUTE]]]], iov_len=792}], msg_iovlen=1, msg_control=[{cmsg_len=20, cmsg_level=SOL_NETLINK, cmsg_type=0x3, cmsg_data="\x00\x00\x00\x00"}], msg_controllen=24, msg_flags=0}, MSG_TRUNC) = 396 <0.000013>
+212233 12:35:50.852732 ppoll([{fd=4, events=POLLIN}], 1, {tv_sec=24, tv_nsec=999798000}, NULL, 8) = 1 ([{fd=4, revents=POLLIN}], left {tv_sec=24, tv_nsec=999797250}) <0.000016>
+212233 12:35:50.852804 recvmsg(4, {msg_name={sa_family=AF_NETLINK, nl_pid=0, nl_groups=00000000}, msg_namelen=128 => 12, msg_iov=[{iov_base=NULL, iov_len=0}], msg_iovlen=1, msg_control=[{cmsg_len=20, cmsg_level=SOL_NETLINK, cmsg_type=0x3, cmsg_data="\x00\x00\x00\x00"}], msg_controllen=24, msg_flags=MSG_TRUNC}, MSG_PEEK|MSG_TRUNC) = 20 <0.000012>
+212233 12:35:50.852849 recvmsg(4, {msg_name={sa_family=AF_NETLINK, nl_pid=0, nl_groups=00000000}, msg_namelen=128 => 12, msg_iov=[{iov_base=[{nlmsg_len=20, nlmsg_type=NLMSG_DONE, nlmsg_flags=NLM_F_MULTI, nlmsg_seq=2898219209, nlmsg_pid=212233}, 0], iov_len=792}], msg_iovlen=1, msg_control=[{cmsg_len=20, cmsg_level=SOL_NETLINK, cmsg_type=0x3, cmsg_data="\x00\x00\x00\x00"}], msg_controllen=24, msg_flags=0}, MSG_TRUNC) = 20 <0.000012>
+212233 12:35:50.852898 close(4)         = 0 <0.000015>
+212233 12:35:50.852936 rt_sigprocmask(SIG_SETMASK, [], NULL, 8) = 0 <0.000013>
+212233 12:35:50.852981 openat(AT_FDCWD, "/etc/gai.conf", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory) <0.000023>
+212233 12:35:50.853039 futex(0x7f5471c03364, FUTEX_WAKE_PRIVATE, 2147483647) = 0 <0.000049>
+212233 12:35:50.853129 socket(AF_INET, SOCK_DGRAM|SOCK_CLOEXEC, IPPROTO_IP) = 4 <0.000018>
+212233 12:35:50.853182 connect(4, {sa_family=AF_INET, sin_port=htons(0), sin_addr=inet_addr("10.177.177.114")}, 16) = 0 <0.000051>
+212233 12:35:50.853288 getsockname(4, {sa_family=AF_INET, sin_port=htons(48799), sin_addr=inet_addr("10.177.177.114")}, [28 => 16]) = 0 <0.000014>
+212233 12:35:50.853338 connect(4, {sa_family=AF_UNSPEC, sa_data="\0\0\0\0\0\0\0\0\0\0\0\0\0\0"}, 16) = 0 <0.000017>
+212233 12:35:50.853414 connect(4, {sa_family=AF_INET, sin_port=htons(0), sin_addr=inet_addr("172.17.0.1")}, 16) = 0 <0.000033>
+212233 12:35:50.853472 getsockname(4, {sa_family=AF_INET, sin_port=htons(53874), sin_addr=inet_addr("172.17.0.1")}, [28 => 16]) = 0 <0.000052>
+212233 12:35:50.853549 close(4)         = 0 <0.000018>
+212233 12:35:50.853590 socket(AF_INET6, SOCK_DGRAM|SOCK_CLOEXEC, IPPROTO_IP) = 4 <0.000023>
+212233 12:35:50.853639 connect(4, {sa_family=AF_INET6, sin6_port=htons(0), sin6_flowinfo=htonl(0), inet_pton(AF_INET6, "fe80::111a:70ed:70ee:1580", &sin6_addr), sin6_scope_id=if_nametoindex("ens192")}, 28) = 0 <0.000030>
+212233 12:35:50.853809 getsockname(4, {sa_family=AF_INET6, sin6_port=htons(34490), sin6_flowinfo=htonl(0), inet_pton(AF_INET6, "fe80::111a:70ed:70ee:1580", &sin6_addr), sin6_scope_id=if_nametoindex("ens192")}, [28]) = 0 <0.000043>
+212233 12:35:50.853933 close(4)         = 0 <0.000027>
+212233 12:35:50.853999 socket(AF_NETLINK, SOCK_RAW|SOCK_CLOEXEC, NETLINK_ROUTE) = 4 <0.000024>
+212233 12:35:50.854050 bind(4, {sa_family=AF_NETLINK, nl_pid=0, nl_groups=00000000}, 12) = 0 <0.000018>
+212233 12:35:50.854099 getsockname(4, {sa_family=AF_NETLINK, nl_pid=212233, nl_groups=00000000}, [12]) = 0 <0.000020>
+212233 12:35:50.854161 sendto(4, [{nlmsg_len=20, nlmsg_type=RTM_GETLINK, nlmsg_flags=NLM_F_REQUEST|NLM_F_DUMP, nlmsg_seq=1788246350, nlmsg_pid=0}, {ifi_family=AF_UNSPEC, ...}], 20, 0, {sa_family=AF_NETLINK, nl_pid=0, nl_groups=00000000}, 12) = 20 <0.000092>
+212233 12:35:50.854384 recvmsg(4, {msg_name={sa_family=AF_NETLINK, nl_pid=0, nl_groups=00000000}, msg_namelen=12, msg_iov=[{iov_base=[[{nlmsg_len=1404, nlmsg_type=RTM_NEWLINK, nlmsg_flags=NLM_F_MULTI, nlmsg_seq=1788246350, nlmsg_pid=212233}, {ifi_family=AF_UNSPEC, ifi_type=ARPHRD_LOOPBACK, ifi_index=if_nametoindex("lo"), ifi_flags=IFF_UP|IFF_LOOPBACK|IFF_RUNNING|IFF_LOWER_UP, ifi_change=0}, [[{nla_len=7, nla_type=IFLA_IFNAME}, "lo"], [{nla_len=8, nla_type=IFLA_TXQLEN}, 1000], [{nla_len=5, nla_type=IFLA_OPERSTATE}, 0], [{nla_len=5, nla_type=IFLA_LINKMODE}, 0], [{nla_len=8, nla_type=IFLA_MTU}, 65536], [{nla_len=8, nla_type=IFLA_MIN_MTU}, 0], [{nla_len=8, nla_type=IFLA_MAX_MTU}, 0], [{nla_len=8, nla_type=IFLA_GROUP}, 0], [{nla_len=8, nla_type=IFLA_PROMISCUITY}, 0], [{nla_len=8, nla_type=IFLA_ALLMULTI}, 0], [{nla_len=8, nla_type=IFLA_NUM_TX_QUEUES}, 1], [{nla_len=8, nla_type=IFLA_GSO_MAX_SEGS}, 65535], [{nla_len=8, nla_type=IFLA_GSO_MAX_SIZE}, 65536], [{nla_len=8, nla_type=IFLA_GRO_MAX_SIZE}, 65536], [{nla_len=8, nla_type=IFLA_GSO_IPV4_MAX_SIZE}, 65536], [{nla_len=8, nla_type=IFLA_GRO_IPV4_MAX_SIZE}, 65536], [{nla_len=8, nla_type=IFLA_TSO_MAX_SIZE}, 524280], [{nla_len=8, nla_type=IFLA_TSO_MAX_SEGS}, 65535], [{nla_len=8, nla_type=0x42 /* IFLA_??? */}, "\x00\x00\x00\x00"], [{nla_len=8, nla_type=IFLA_NUM_RX_QUEUES}, 1], [{nla_len=5, nla_type=IFLA_CARRIER}, 1], [{nla_len=8, nla_type=IFLA_CARRIER_CHANGES}, 0], [{nla_len=8, nla_type=IFLA_CARRIER_UP_COUNT}, 0], [{nla_len=8, nla_type=IFLA_CARRIER_DOWN_COUNT}, 0], [{nla_len=5, nla_type=IFLA_PROTO_DOWN}, 0], [{nla_len=10, nla_type=IFLA_ADDRESS}, 00:00:00:00:00:00], [{nla_len=10, nla_type=IFLA_BROADCAST}, 00:00:00:00:00:00], [{nla_len=196, nla_type=IFLA_STATS64}, {rx_packets=24773, tx_packets=24773, rx_bytes=2701503, tx_bytes=2701503, rx_errors=0, tx_errors=0, rx_dropped=0, tx_dropped=0, multicast=0, collisions=0, rx_length_errors=0, rx_over_errors=0, rx_crc_errors=0, rx_frame_errors=0, rx_fifo_errors=0, rx_missed_errors=0, tx_aborted_errors=0, tx_carrier_errors=0, tx_fifo_errors=0, tx_heartbeat_errors=0, tx_window_errors=0, rx_compressed=0, tx_compressed=0, rx_nohandler=0}], [{nla_len=100, nla_type=IFLA_STATS}, {rx_packets=24773, tx_packets=24773, rx_bytes=2701503, tx_bytes=2701503, rx_errors=0, tx_errors=0, rx_dropped=0, tx_dropped=0, multicast=0, collisions=0, rx_length_errors=0, rx_over_errors=0, rx_crc_errors=0, rx_frame_errors=0, rx_fifo_errors=0, rx_missed_errors=0, tx_aborted_errors=0, tx_carrier_errors=0, tx_fifo_errors=0, tx_heartbeat_errors=0, tx_window_errors=0, rx_compressed=0, tx_compressed=0, rx_nohandler=0}], [{nla_len=12, nla_type=IFLA_XDP}, [{nla_len=5, nla_type=IFLA_XDP_ATTACHED}, XDP_ATTACHED_NONE]], [{nla_len=12, nla_type=IFLA_QDISC}, "noqueue"], [{nla_len=784, nla_type=IFLA_AF_SPEC}, [[{nla_len=136, nla_type=AF_INET}, [{nla_len=132, nla_type=IFLA_INET_CONF}, [[IPV4_DEVCONF_FORWARDING-1]=1, [IPV4_DEVCONF_MC_FORWARDING-1]=0, [IPV4_DEVCONF_PROXY_ARP-1]=0, [IPV4_DEVCONF_ACCEPT_REDIRECTS-1]=1, [IPV4_DEVCONF_SECURE_REDIRECTS-1]=1, [IPV4_DEVCONF_SEND_REDIRECTS-1]=1, [IPV4_DEVCONF_SHARED_MEDIA-1]=1, [IPV4_DEVCONF_RP_FILTER-1]=1, [IPV4_DEVCONF_ACCEPT_SOURCE_ROUTE-1]=0, [IPV4_DEVCONF_BOOTP_RELAY-1]=0, [IPV4_DEVCONF_LOG_MARTIANS-1]=0, [IPV4_DEVCONF_TAG-1]=0, [IPV4_DEVCONF_ARPFILTER-1]=0, [IPV4_DEVCONF_MEDIUM_ID-1]=0, [IPV4_DEVCONF_NOXFRM-1]=1, [IPV4_DEVCONF_NOPOLICY-1]=1, [IPV4_DEVCONF_FORCE_IGMP_VERSION-1]=0, [IPV4_DEVCONF_ARP_ANNOUNCE-1]=0, [IPV4_DEVCONF_ARP_IGNORE-1]=0, [IPV4_DEVCONF_PROMOTE_SECONDARIES-1]=1, [IPV4_DEVCONF_ARP_ACCEPT-1]=0, [IPV4_DEVCONF_ARP_NOTIFY-1]=0, [IPV4_DEVCONF_ACCEPT_LOCAL-1]=0, [IPV4_DEVCONF_SRC_VMARK-1]=0, [IPV4_DEVCONF_PROXY_ARP_PVLAN-1]=0, [IPV4_DEVCONF_ROUTE_LOCALNET-1]=0, [IPV4_DEVCONF_IGMPV2_UNSOLICITED_REPORT_INTERVAL-1]=10000, [IPV4_DEVCONF_IGMPV3_UNSOLICITED_REPORT_INTERVAL-1]=1000, [IPV4_DEVCONF_IGNORE_ROUTES_WITH_LINKDOWN-1]=0, [IPV4_DEVCONF_DROP_UNICAST_IN_L2_MULTICAST-1]=0, [IPV4_DEVCONF_DROP_GRATUITOUS_ARP-1]=0, [IPV4_DEVCONF_BC_FORWARDING-1]=0]]], [{nla_len=644, nla_type=AF_INET6}, [[{nla_len=8, nla_type=IFLA_INET6_FLAGS}, IF_READY], [{nla_len=20, nla_type=IFLA_INET6_CACHEINFO}, {max_reasm_len=65535, tstamp=128, reachable_time=26435, retrans_time=1000}], [{nla_len=216, nla_type=IFLA_INET6_CONF}, [[DEVCONF_FORWARDING]=0, [DEVCONF_HOPLIMIT]=64, [DEVCONF_MTU6]=65536, [DEVCONF_ACCEPT_RA]=1, [DEVCONF_ACCEPT_REDIRECTS]=1, [DEVCONF_AUTOCONF]=1, [DEVCONF_DAD_TRANSMITS]=1, [DEVCONF_RTR_SOLICITS]=-1, [DEVCONF_RTR_SOLICIT_INTERVAL]=4000, [DEVCONF_RTR_SOLICIT_DELAY]=1000, [DEVCONF_USE_TEMPADDR]=-1, [DEVCONF_TEMP_VALID_LFT]=604800, [DEVCONF_TEMP_PREFERED_LFT]=86400, [DEVCONF_REGEN_MAX_RETRY]=3, [DEVCONF_MAX_DESYNC_FACTOR]=600, [DEVCONF_MAX_ADDRESSES]=16, [DEVCONF_FORCE_MLD_VERSION]=0, [DEVCONF_ACCEPT_RA_DEFRTR]=1, [DEVCONF_ACCEPT_RA_PINFO]=1, [DEVCONF_ACCEPT_RA_RTR_PREF]=1, [DEVCONF_RTR_PROBE_INTERVAL]=60000, [DEVCONF_ACCEPT_RA_RT_INFO_MAX_PLEN]=0, [DEVCONF_PROXY_NDP]=0, [DEVCONF_OPTIMISTIC_DAD]=0, [DEVCONF_ACCEPT_SOURCE_ROUTE]=0, [DEVCONF_MC_FORWARDING]=0, [DEVCONF_DISABLE_IPV6]=0, [DEVCONF_ACCEPT_DAD]=-1, [DEVCONF_FORCE_TLLAO]=0, [DEVCONF_NDISC_NOTIFY]=0, [DEVCONF_MLDV1_UNSOLICITED_REPORT_INTERVAL]=10000, [DEVCONF_MLDV2_UNSOLICITED_REPORT_INTERVAL]=1000, ...]], [{nla_len=308, nla_type=IFLA_INET6_STATS}, [[IPSTATS_MIB_NUM]=38, [IPSTATS_MIB_INPKTS]=58, [IPSTATS_MIB_INOCTETS]=4060, [IPSTATS_MIB_INDELIVERS]=58, [IPSTATS_MIB_OUTFORWDATAGRAMS]=0, [IPSTATS_MIB_OUTPKTS]=58, [IPSTATS_MIB_OUTOCTETS]=4060, [IPSTATS_MIB_INHDRERRORS]=0, [IPSTATS_MIB_INTOOBIGERRORS]=0, [IPSTATS_MIB_INNOROUTES]=0, [IPSTATS_MIB_INADDRERRORS]=0, [IPSTATS_MIB_INUNKNOWNPROTOS]=0, [IPSTATS_MIB_INTRUNCATEDPKTS]=0, [IPSTATS_MIB_INDISCARDS]=0, [IPSTATS_MIB_OUTDISCARDS]=0, [IPSTATS_MIB_OUTNOROUTES]=0, [IPSTATS_MIB_REASMTIMEOUT]=0, [IPSTATS_MIB_REASMREQDS]=0, [IPSTATS_MIB_REASMOKS]=0, [IPSTATS_MIB_REASMFAILS]=0, [IPSTATS_MIB_FRAGOKS]=0, [IPSTATS_MIB_FRAGFAILS]=0, [IPSTATS_MIB_FRAGCREATES]=0, [IPSTATS_MIB_INMCASTPKTS]=0, [IPSTATS_MIB_OUTMCASTPKTS]=0, [IPSTATS_MIB_INBCASTPKTS]=0, [IPSTATS_MIB_OUTBCASTPKTS]=0, [IPSTATS_MIB_INMCASTOCTETS]=0, [IPSTATS_MIB_OUTMCASTOCTETS]=0, [IPSTATS_MIB_INBCASTOCTETS]=0, [IPSTATS_MIB_OUTBCASTOCTETS]=0, [IPSTATS_MIB_CSUMERRORS]=0, ...]], [{nla_len=60, nla_type=IFLA_INET6_ICMP6STATS}, [[ICMP6_MIB_NUM]=7, [ICMP6_MIB_INMSGS]=0, [ICMP6_MIB_INERRORS]=0, [ICMP6_MIB_OUTMSGS]=0, [ICMP6_MIB_OUTERRORS]=0, [ICMP6_MIB_CSUMERRORS]=0, [6 /* ICMP6_MIB_??? */]=0]], [{nla_len=20, nla_type=IFLA_INET6_TOKEN}, inet_pton(AF_INET6, "::")], [{nla_len=5, nla_type=IFLA_INET6_ADDR_GEN_MODE}, IN6_ADDR_GEN_MODE_EUI64]]]]], ...]], [{nlmsg_len=1460, nlmsg_type=RTM_NEWLINK, nlmsg_flags=NLM_F_MULTI, nlmsg_seq=1788246350, nlmsg_pid=212233}, {ifi_family=AF_UNSPEC, ifi_type=ARPHRD_ETHER, ifi_index=if_nametoindex("ens192"), ifi_flags=IFF_UP|IFF_BROADCAST|IFF_RUNNING|IFF_MULTICAST|IFF_LOWER_UP, ifi_change=0}, [[{nla_len=11, nla_type=IFLA_IFNAME}, "ens192"], [{nla_len=8, nla_type=IFLA_TXQLEN}, 1000], [{nla_len=5, nla_type=IFLA_OPERSTATE}, 6], [{nla_len=5, nla_type=IFLA_LINKMODE}, 0], [{nla_len=8, nla_type=IFLA_MTU}, 1500], [{nla_len=8, nla_type=IFLA_MIN_MTU}, 60], [{nla_len=8, nla_type=IFLA_MAX_MTU}, 9190], [{nla_len=8, nla_type=IFLA_GROUP}, 0], [{nla_len=8, nla_type=IFLA_PROMISCUITY}, 0], [{nla_len=8, nla_type=IFLA_ALLMULTI}, 0], [{nla_len=8, nla_type=IFLA_NUM_TX_QUEUES}, 8], [{nla_len=8, nla_type=IFLA_GSO_MAX_SEGS}, 65535], [{nla_len=8, nla_type=IFLA_GSO_MAX_SIZE}, 65536], [{nla_len=8, nla_type=IFLA_GRO_MAX_SIZE}, 65536], [{nla_len=8, nla_type=IFLA_GSO_IPV4_MAX_SIZE}, 65536], [{nla_len=8, nla_type=IFLA_GRO_IPV4_MAX_SIZE}, 65536], [{nla_len=8, nla_type=IFLA_TSO_MAX_SIZE}, 65536], [{nla_len=8, nla_type=IFLA_TSO_MAX_SEGS}, 65535], [{nla_len=8, nla_type=0x42 /* IFLA_??? */}, "\x00\x00\x00\x00"], [{nla_len=8, nla_type=IFLA_NUM_RX_QUEUES}, 8], [{nla_len=5, nla_type=IFLA_CARRIER}, 1], [{nla_len=8, nla_type=IFLA_CARRIER_CHANGES}, 1], [{nla_len=8, nla_type=IFLA_CARRIER_UP_COUNT}, 1], [{nla_len=8, nla_type=IFLA_CARRIER_DOWN_COUNT}, 0], [{nla_len=5, nla_type=IFLA_PROTO_DOWN}, 0], [{nla_len=10, nla_type=IFLA_ADDRESS}, 00:50:56:81:ac:31], [{nla_len=10, nla_type=IFLA_BROADCAST}, ff:ff:ff:ff:ff:ff], [{nla_len=196, nla_type=IFLA_STATS64}, {rx_packets=8376637, tx_packets=3632213, rx_bytes=9732511319, tx_bytes=326093370, rx_errors=0, tx_errors=0, rx_dropped=3981, tx_dropped=0, multicast=1558, collisions=0, rx_length_errors=0, rx_over_errors=0, rx_crc_errors=0, rx_frame_errors=0, rx_fifo_errors=0, rx_missed_errors=0, tx_aborted_errors=0, tx_carrier_errors=0, tx_fifo_errors=0, tx_heartbeat_errors=0, tx_window_errors=0, rx_compressed=0, tx_compressed=0, rx_nohandler=0}], [{nla_len=100, nla_type=IFLA_STATS}, {rx_packets=8376637, tx_packets=3632213, rx_bytes=1142576727, tx_bytes=326093370, rx_errors=0, tx_errors=0, rx_dropped=3981, tx_dropped=0, multicast=1558, collisions=0, rx_length_errors=0, rx_over_errors=0, rx_crc_errors=0, rx_frame_errors=0, rx_fifo_errors=0, rx_missed_errors=0, tx_aborted_errors=0, tx_carrier_errors=0, tx_fifo_errors=0, tx_heartbeat_errors=0, tx_window_errors=0, rx_compressed=0, tx_compressed=0, rx_nohandler=0}], [{nla_len=12, nla_type=IFLA_XDP}, [{nla_len=5, nla_type=IFLA_XDP_ATTACHED}, XDP_ATTACHED_NONE]], [{nla_len=10, nla_type=IFLA_PERM_ADDRESS}, 00:50:56:81:ac:31], [{nla_len=7, nla_type=IFLA_QDISC}, "mq"], ...]]], iov_len=4096}], msg_iovlen=1, msg_controllen=0, msg_flags=0}, 0) = 2864 <0.000026>
+212233 12:35:50.854560 recvmsg(4, {msg_name={sa_family=AF_NETLINK, nl_pid=0, nl_groups=00000000}, msg_namelen=12, msg_iov=[{iov_base=[{nlmsg_len=1852, nlmsg_type=RTM_NEWLINK, nlmsg_flags=NLM_F_MULTI, nlmsg_seq=1788246350, nlmsg_pid=212233}, {ifi_family=AF_UNSPEC, ifi_type=ARPHRD_ETHER, ifi_index=if_nametoindex("docker0"), ifi_flags=IFF_UP|IFF_BROADCAST|IFF_MULTICAST, ifi_change=0}, [[{nla_len=12, nla_type=IFLA_IFNAME}, "docker0"], [{nla_len=8, nla_type=IFLA_TXQLEN}, 0], [{nla_len=5, nla_type=IFLA_OPERSTATE}, 2], [{nla_len=5, nla_type=IFLA_LINKMODE}, 0], [{nla_len=8, nla_type=IFLA_MTU}, 1500], [{nla_len=8, nla_type=IFLA_MIN_MTU}, 68], [{nla_len=8, nla_type=IFLA_MAX_MTU}, 65535], [{nla_len=8, nla_type=IFLA_GROUP}, 0], [{nla_len=8, nla_type=IFLA_PROMISCUITY}, 0], [{nla_len=8, nla_type=IFLA_ALLMULTI}, 0], [{nla_len=8, nla_type=IFLA_NUM_TX_QUEUES}, 1], [{nla_len=8, nla_type=IFLA_GSO_MAX_SEGS}, 65535], [{nla_len=8, nla_type=IFLA_GSO_MAX_SIZE}, 65536], [{nla_len=8, nla_type=IFLA_GRO_MAX_SIZE}, 65536], [{nla_len=8, nla_type=IFLA_GSO_IPV4_MAX_SIZE}, 65536], [{nla_len=8, nla_type=IFLA_GRO_IPV4_MAX_SIZE}, 65536], [{nla_len=8, nla_type=IFLA_TSO_MAX_SIZE}, 65536], [{nla_len=8, nla_type=IFLA_TSO_MAX_SEGS}, 65535], [{nla_len=8, nla_type=0x42 /* IFLA_??? */}, "\x00\x00\x00\x00"], [{nla_len=8, nla_type=IFLA_NUM_RX_QUEUES}, 1], [{nla_len=5, nla_type=IFLA_CARRIER}, 0], [{nla_len=8, nla_type=IFLA_CARRIER_CHANGES}, 1], [{nla_len=8, nla_type=IFLA_CARRIER_UP_COUNT}, 0], [{nla_len=8, nla_type=IFLA_CARRIER_DOWN_COUNT}, 1], [{nla_len=5, nla_type=IFLA_PROTO_DOWN}, 0], [{nla_len=10, nla_type=IFLA_ADDRESS}, ba:9a:3a:eb:0b:5c], [{nla_len=10, nla_type=IFLA_BROADCAST}, ff:ff:ff:ff:ff:ff], [{nla_len=196, nla_type=IFLA_STATS64}, {rx_packets=0, tx_packets=0, rx_bytes=0, tx_bytes=0, rx_errors=0, tx_errors=0, rx_dropped=0, tx_dropped=2, multicast=0, collisions=0, rx_length_errors=0, rx_over_errors=0, rx_crc_errors=0, rx_frame_errors=0, rx_fifo_errors=0, rx_missed_errors=0, tx_aborted_errors=0, tx_carrier_errors=0, tx_fifo_errors=0, tx_heartbeat_errors=0, tx_window_errors=0, rx_compressed=0, tx_compressed=0, rx_nohandler=0}], [{nla_len=100, nla_type=IFLA_STATS}, {rx_packets=0, tx_packets=0, rx_bytes=0, tx_bytes=0, rx_errors=0, tx_errors=0, rx_dropped=0, tx_dropped=2, multicast=0, collisions=0, rx_length_errors=0, rx_over_errors=0, rx_crc_errors=0, rx_frame_errors=0, rx_fifo_errors=0, rx_missed_errors=0, tx_aborted_errors=0, tx_carrier_errors=0, tx_fifo_errors=0, tx_heartbeat_errors=0, tx_window_errors=0, rx_compressed=0, tx_compressed=0, rx_nohandler=0}], [{nla_len=12, nla_type=IFLA_XDP}, [{nla_len=5, nla_type=IFLA_XDP_ATTACHED}, XDP_ATTACHED_NONE]], [{nla_len=444, nla_type=IFLA_LINKINFO}, [[{nla_len=11, nla_type=IFLA_INFO_KIND}, "bridge"], [{nla_len=428, nla_type=IFLA_INFO_DATA}, [[{nla_len=12, nla_type=IFLA_BR_HELLO_TIMER}, 0], [{nla_len=12, nla_type=IFLA_BR_TCN_TIMER}, 0], [{nla_len=12, nla_type=IFLA_BR_TOPOLOGY_CHANGE_TIMER}, 0], [{nla_len=12, nla_type=IFLA_BR_GC_TIMER}, 23880 /* 238.80 s */], [{nla_len=8, nla_type=IFLA_BR_FORWARD_DELAY}, 1500 /* 15.00 s */], [{nla_len=8, nla_type=IFLA_BR_HELLO_TIME}, 200 /* 2.00 s */], [{nla_len=8, nla_type=IFLA_BR_MAX_AGE}, 2000 /* 20.00 s */], [{nla_len=8, nla_type=IFLA_BR_AGEING_TIME}, 30000 /* 300.00 s */], [{nla_len=8, nla_type=IFLA_BR_STP_STATE}, 0], [{nla_len=6, nla_type=IFLA_BR_PRIORITY}, 32768], [{nla_len=5, nla_type=IFLA_BR_VLAN_FILTERING}, 0], [{nla_len=6, nla_type=IFLA_BR_GROUP_FWD_MASK}, 0], [{nla_len=12, nla_type=IFLA_BR_BRIDGE_ID}, {prio=[128, 0], addr=ba:9a:3a:eb:0b:5c}], [{nla_len=12, nla_type=IFLA_BR_ROOT_ID}, {prio=[128, 0], addr=ba:9a:3a:eb:0b:5c}], [{nla_len=6, nla_type=IFLA_BR_ROOT_PORT}, 0], [{nla_len=8, nla_type=IFLA_BR_ROOT_PATH_COST}, 0], [{nla_len=5, nla_type=IFLA_BR_TOPOLOGY_CHANGE}, 0], [{nla_len=5, nla_type=IFLA_BR_TOPOLOGY_CHANGE_DETECTED}, 0], [{nla_len=10, nla_type=IFLA_BR_GROUP_ADDR}, 01:80:c2:00:00:00], [{nla_len=12, nla_type=IFLA_BR_MULTI_BOOLOPT}, {optval=0, optmask=1<<BR_BOOLOPT_NO_LL_LEARN|1<<BR_BOOLOPT_MCAST_VLAN_SNOOPING|1<<BR_BOOLOPT_MST_ENABLE|0x8}], [{nla_len=8, nla_type=0x30 /* IFLA_BR_??? */}, "\x00\x00\x00\x00"], [{nla_len=8, nla_type=0x31 /* IFLA_BR_??? */}, "\x00\x00\x00\x00"], [{nla_len=6, nla_type=IFLA_BR_VLAN_PROTOCOL}, htons(ETH_P_8021Q)], [{nla_len=6, nla_type=IFLA_BR_VLAN_DEFAULT_PVID}, 1], [{nla_len=5, nla_type=IFLA_BR_VLAN_STATS_ENABLED}, 0], [{nla_len=5, nla_type=IFLA_BR_VLAN_STATS_PER_PORT}, 0], [{nla_len=5, nla_type=IFLA_BR_MCAST_ROUTER}, 1], [{nla_len=5, nla_type=IFLA_BR_MCAST_SNOOPING}, 1], [{nla_len=5, nla_type=IFLA_BR_MCAST_QUERY_USE_IFADDR}, 0], [{nla_len=5, nla_type=IFLA_BR_MCAST_QUERIER}, 0], [{nla_len=5, nla_type=IFLA_BR_MCAST_STATS_ENABLED}, 0], [{nla_len=8, nla_type=IFLA_BR_MCAST_HASH_ELASTICITY}, 16], ...]]]], [{nla_len=12, nla_type=IFLA_QDISC}, "noqueue"], ...]], iov_len=4096}], msg_iovlen=1, msg_controllen=0, msg_flags=0}, 0) = 1852 <0.000013>
+212233 12:35:50.854663 close(4)         = 0 <0.000015>
+212233 12:35:50.854783 times(NULL)      = 439205454 <0.000024>
+212233 12:35:50.854927 socket(AF_INET, SOCK_STREAM, IPPROTO_IP) = 4 <0.000018>
+212233 12:35:50.854974 fcntl(4, F_SETFL, O_RDONLY|O_NONBLOCK) = 0 <0.000012>
+212233 12:35:50.855016 connect(4, {sa_family=AF_INET, sin_port=htons(1600), sin_addr=inet_addr("10.177.179.106")}, 16) = -1 EINPROGRESS (Operation now in progress) <0.000160>
+212233 12:35:50.855227 times(NULL)      = 439205454 <0.000025>
+212233 12:35:50.855303 mmap(NULL, 802816, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_ANONYMOUS, -1, 0) = 0x7f547253c000 <0.000030>
+212233 12:35:50.855372 poll([{fd=4, events=POLLOUT}], 1, 60000) = 1 ([{fd=4, revents=POLLOUT}]) <0.002147>
+212233 12:35:50.857576 getsockopt(4, SOL_SOCKET, SO_ERROR, [0], [4]) = 0 <0.000013>
+212233 12:35:50.857625 fcntl(4, F_GETFL) = 0x802 (flags O_RDWR|O_NONBLOCK) <0.000012>
+212233 12:35:50.857659 fcntl(4, F_SETFL, O_RDWR) = 0 <0.000015>
+212233 12:35:50.857699 getsockname(4, {sa_family=AF_INET, sin_port=htons(44398), sin_addr=inet_addr("10.177.177.114")}, [128 => 16]) = 0 <0.000013>
+212233 12:35:50.857750 getsockopt(4, SOL_SOCKET, SO_SNDBUF, [87040], [4]) = 0 <0.000011>
+212233 12:35:50.857786 getsockopt(4, SOL_SOCKET, SO_RCVBUF, [131072], [4]) = 0 <0.000012>
+212233 12:35:50.857826 setsockopt(4, SOL_TCP, TCP_NODELAY, [1], 4) = 0 <0.000016>
+212233 12:35:50.857929 fcntl(4, F_SETFD, FD_CLOEXEC) = 0 <0.000012>
+212233 12:35:50.858067 rt_sigaction(SIGPIPE, {sa_handler=SIG_IGN, sa_mask=~[ILL TRAP ABRT BUS FPE SEGV USR2 TERM XCPU XFSZ SYS RTMIN RT_1], sa_flags=SA_RESTORER|SA_RESTART|SA_SIGINFO, sa_restorer=0x7f5471a3fb30}, {sa_handler=SIG_DFL, sa_mask=[], sa_flags=0}, 8) = 0 <0.000012>
+212233 12:35:50.858166 write(4, "\1\32\0\0\1\0\0\0\1>\1,\fA \0\377\377\177\10\0\0\1\0\0\320\0J\0\0\24\0"..., 282) = 282 <0.000050>
+212233 12:35:50.858266 read(4, "\0\n\0\0\5\2\0\0\0014", 8208) = 10 <0.001669>
+212233 12:35:50.859993 read(4, "\1>\0\0\6\0\0\0\0@(ADDRESS=(PROTOCOL=TCP"..., 8208) = 318 <0.000013>
+212233 12:35:50.860061 setsockopt(4, SOL_SOCKET, SO_SNDTIMEO_OLD, "\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0", 16) = 0 <0.000014>
+212233 12:35:50.860101 setsockopt(4, SOL_SOCKET, SO_RCVTIMEO_OLD, "\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0", 16) = 0 <0.000012>
+212233 12:35:50.860149 close(4)         = 0 <0.000041>
+212233 12:35:50.860267 socket(AF_INET, SOCK_STREAM, IPPROTO_IP) = 4 <0.000029>
+212233 12:35:50.860336 fcntl(4, F_SETFL, O_RDONLY|O_NONBLOCK) = 0 <0.000012>
+212233 12:35:50.860370 connect(4, {sa_family=AF_INET, sin_port=htons(1600), sin_addr=inet_addr("10.177.179.104")}, 16) = -1 EINPROGRESS (Operation now in progress) <0.000125>
+212233 12:35:50.860535 times(NULL)      = 439205454 <0.000012>
+212233 12:35:50.860649 poll([{fd=4, events=POLLOUT}], 1, 60000) = 1 ([{fd=4, revents=POLLOUT}]) <0.000639>
+212233 12:35:50.861366 getsockopt(4, SOL_SOCKET, SO_ERROR, [0], [4]) = 0 <0.000013>
+212233 12:35:50.861413 fcntl(4, F_GETFL) = 0x802 (flags O_RDWR|O_NONBLOCK) <0.000012>
+212233 12:35:50.861448 fcntl(4, F_SETFL, O_RDWR) = 0 <0.000013>
+212233 12:35:50.861482 getsockname(4, {sa_family=AF_INET, sin_port=htons(57470), sin_addr=inet_addr("10.177.177.114")}, [128 => 16]) = 0 <0.000013>
+212233 12:35:50.861529 getsockopt(4, SOL_SOCKET, SO_SNDBUF, [87040], [4]) = 0 <0.000060>
+212233 12:35:50.861615 getsockopt(4, SOL_SOCKET, SO_RCVBUF, [131072], [4]) = 0 <0.000042>
+212233 12:35:50.861683 setsockopt(4, SOL_TCP, TCP_NODELAY, [1], 4) = 0 <0.000015>
+212233 12:35:50.861722 fcntl(4, F_SETFD, FD_CLOEXEC) = 0 <0.000011>
+212233 12:35:50.861795 rt_sigaction(SIGPIPE, {sa_handler=SIG_IGN, sa_mask=~[ILL TRAP ABRT BUS FPE SEGV USR2 TERM XCPU XFSZ SYS RTMIN RT_1], sa_flags=SA_RESTORER|SA_RESTART|SA_SIGINFO, sa_restorer=0x7f5471a3fb30}, {sa_handler=SIG_IGN, sa_mask=~[ILL TRAP ABRT BUS FPE KILL SEGV USR2 TERM STOP XCPU XFSZ SYS RTMIN RT_1], sa_flags=SA_RESTORER|SA_RESTART|SA_SIGINFO, sa_restorer=0x7f5471a3fb30}, 8) = 0 <0.000013>
+212233 12:35:50.861895 write(4, "\0J\0\0\1\4\0\0\1>\1,\fA \0\377\377\177\10\0\0\1\0\0\373\0J\0\0\24\0"..., 74) = 74 <0.000037>
+212233 12:35:50.861965 write(4, "\1\5\0\0\6\4\0\0\0\0(DESCRIPTION=(CONNECT_"..., 261) = 261 <0.000031>
+212233 12:35:50.862023 read(4, "\0\10\0\0\v\4\0\0", 8208) = 8 <0.015910>
+212233 12:35:50.878067 write(4, "\0J\0\0\1\4\0\0\1>\1,\fA \0\377\377\177\10\0\0\1\0\0\373\0J\0\0\24\0"..., 74) = 74 <0.000103>
+212233 12:35:50.878249 write(4, "\1\5\0\0\6\4\0\0\0\0(DESCRIPTION=(CONNECT_"..., 261) = 261 <0.000056>
+212233 12:35:50.878388 read(4, "\0-\0\0\2\4\0\0\1>\fA\0\0\0\0\1\0\0\0\0-AA\0\0\0\0\0\0\0\0"..., 8208) = 45 <0.000361>
+212233 12:35:50.878837 sendto(4, "!", 1, MSG_OOB, NULL, 0) = 1 <0.000044>
+212233 12:35:50.878991 write(4, "\0\0\0\n\f \0\0\2\0", 10) = 10 <0.000139>
+212233 12:35:50.879460 getpid()         = 212233 <0.000039>
+212233 12:35:50.879575 write(4, "\0\0\0\237\6$\0\0\0\0\336\255\276\357\0\225\0\0\0\0\0\4\0\0\4\0\3\0\0\0\0\0"..., 159) = 159 <0.000054>
+212233 12:35:50.879698 read(4, "\0\0\3\257\6$\0\0\0\0\336\255\276\357\3\245\0\0\0\0\0\4\0\0\4\0\3\0\0\0\0\0"..., 8208) = 943 <0.000911>
+212233 12:35:50.880740 openat(AT_FDCWD, "/opt/oracle/instantclient/instantclient_21_12/ldap/admin/fips.ora", O_RDONLY) = -1 ENOENT (No such file or directory) <0.000048>
+212233 12:35:50.884030 getpid()         = 212233 <0.000020>
+212233 12:35:50.884095 getpid()         = 212233 <0.000014>
+212233 12:35:50.884189 openat(AT_FDCWD, "/dev/random", O_RDONLY) = 5 <0.000040>
+212233 12:35:50.884290 close(5)         = 0 <0.000018>
+212233 12:35:50.884336 openat(AT_FDCWD, "entropy", O_RDONLY) = -1 ENOENT (No such file or directory) <0.000017>
+212233 12:35:50.884385 getpid()         = 212233 <0.000014>
+212233 12:35:50.884423 getuid()         = 1006 <0.000014>
+212233 12:35:50.884467 openat(AT_FDCWD, "/dev/random", O_RDONLY|O_NONBLOCK|O_CLOEXEC) = 5 <0.000042>
+212233 12:35:50.884541 read(5, "\307", 1) = 1 <0.000014>
+212233 12:35:50.884586 close(5)         = 0 <0.000061>
+212233 12:35:50.884681 openat(AT_FDCWD, "entropy", O_RDONLY) = -1 ENOENT (No such file or directory) <0.000017>
+212233 12:35:50.884726 getpid()         = 212233 <0.000014>
+212233 12:35:50.884765 getuid()         = 1006 <0.000016>
+212233 12:35:50.884806 openat(AT_FDCWD, "/dev/random", O_RDONLY|O_NONBLOCK|O_CLOEXEC) = 5 <0.000018>
+212233 12:35:50.884850 read(5, "E", 1)  = 1 <0.000014>
+212233 12:35:50.884890 close(5)         = 0 <0.000014>
+212233 12:35:50.884928 openat(AT_FDCWD, "entropy", O_RDONLY) = -1 ENOENT (No such file or directory) <0.000016>
+212233 12:35:50.884972 openat(AT_FDCWD, "entropy", O_RDONLY) = -1 ENOENT (No such file or directory) <0.000016>
+212233 12:35:50.885015 openat(AT_FDCWD, "/dev/random", O_RDONLY|O_NONBLOCK|O_CLOEXEC) = 5 <0.000016>
+212233 12:35:50.885057 read(5, "\302", 1) = 1 <0.000023>
+212233 12:35:50.885106 close(5)         = 0 <0.000014>
+212233 12:35:50.885143 openat(AT_FDCWD, "entropy", O_RDONLY) = -1 ENOENT (No such file or directory) <0.000015>
+212233 12:35:50.885185 openat(AT_FDCWD, "entropy", O_RDONLY) = -1 ENOENT (No such file or directory) <0.000016>
+212233 12:35:50.885233 openat(AT_FDCWD, "/dev/random", O_RDONLY|O_NONBLOCK|O_CLOEXEC) = 5 <0.000017>
+212233 12:35:50.885281 read(5, "c", 1)  = 1 <0.000058>
+212233 12:35:50.885371 close(5)         = 0 <0.000014>
+212233 12:35:50.885409 openat(AT_FDCWD, "entropy", O_RDONLY) = -1 ENOENT (No such file or directory) <0.000015>
+212233 12:35:50.885452 openat(AT_FDCWD, "entropy", O_RDONLY) = -1 ENOENT (No such file or directory) <0.000015>
+212233 12:35:50.885494 openat(AT_FDCWD, "/dev/random", O_RDONLY|O_NONBLOCK|O_CLOEXEC) = 5 <0.000018>
+212233 12:35:50.885629 read(5, "E", 1)  = 1 <0.000024>
+212233 12:35:50.885720 close(5)         = 0 <0.000015>
+212233 12:35:50.885760 openat(AT_FDCWD, "entropy", O_RDONLY) = -1 ENOENT (No such file or directory) <0.000016>
+212233 12:35:50.885808 openat(AT_FDCWD, "entropy", O_RDONLY) = -1 ENOENT (No such file or directory) <0.000017>
+212233 12:35:50.885857 openat(AT_FDCWD, "/dev/random", O_RDONLY|O_NONBLOCK|O_CLOEXEC) = 5 <0.000018>
+212233 12:35:50.885902 read(5, "\227", 1) = 1 <0.000014>
+212233 12:35:50.885941 close(5)         = 0 <0.000014>
+212233 12:35:50.885979 openat(AT_FDCWD, "entropy", O_RDONLY) = -1 ENOENT (No such file or directory) <0.000015>
+212233 12:35:50.886021 getpid()         = 212233 <0.000013>
+212233 12:35:50.886057 getuid()         = 1006 <0.000013>
+212233 12:35:50.886096 openat(AT_FDCWD, "entropy", O_RDONLY) = -1 ENOENT (No such file or directory) <0.000016>
+212233 12:35:50.886140 openat(AT_FDCWD, "/dev/random", O_RDONLY|O_NONBLOCK|O_CLOEXEC) = 5 <0.000017>
+212233 12:35:50.886182 read(5, "\321", 1) = 1 <0.000015>
+212233 12:35:50.886221 close(5)         = 0 <0.000013>
+212233 12:35:50.886269 openat(AT_FDCWD, "entropy", O_RDONLY) = -1 ENOENT (No such file or directory) <0.000016>
+212233 12:35:50.886333 openat(AT_FDCWD, "entropy", O_RDONLY) = -1 ENOENT (No such file or directory) <0.000015>
+212233 12:35:50.886375 openat(AT_FDCWD, "/dev/random", O_RDONLY|O_NONBLOCK|O_CLOEXEC) = 5 <0.000035>
+212233 12:35:50.886437 read(5, "?", 1)  = 1 <0.000016>
+212233 12:35:50.886479 close(5)         = 0 <0.000014>
+212233 12:35:50.886515 openat(AT_FDCWD, "entropy", O_RDONLY) = -1 ENOENT (No such file or directory) <0.000015>
+212233 12:35:50.886563 openat(AT_FDCWD, "entropy", O_RDONLY) = -1 ENOENT (No such file or directory) <0.000046>
+212233 12:35:50.886644 openat(AT_FDCWD, "/dev/random", O_RDONLY|O_NONBLOCK|O_CLOEXEC) = 5 <0.000018>
+212233 12:35:50.886690 read(5, "\236", 1) = 1 <0.000014>
+212233 12:35:50.886731 close(5)         = 0 <0.000014>
+212233 12:35:50.886767 openat(AT_FDCWD, "entropy", O_RDONLY) = -1 ENOENT (No such file or directory) <0.000016>
+212233 12:35:50.886810 openat(AT_FDCWD, "entropy", O_RDONLY) = -1 ENOENT (No such file or directory) <0.000015>
+212233 12:35:50.886852 openat(AT_FDCWD, "/dev/random", O_RDONLY|O_NONBLOCK|O_CLOEXEC) = 5 <0.000017>
+212233 12:35:50.886911 read(5, "\333", 1) = 1 <0.000015>
+212233 12:35:50.886952 close(5)         = 0 <0.000014>
+212233 12:35:50.886994 openat(AT_FDCWD, "entropy", O_RDONLY) = -1 ENOENT (No such file or directory) <0.000016>
+212233 12:35:50.887043 openat(AT_FDCWD, "entropy", O_RDONLY) = -1 ENOENT (No such file or directory) <0.000017>
+212233 12:35:50.887090 getpid()         = 212233 <0.000013>
+212233 12:35:50.887131 getuid()         = 1006 <0.000014>
+212233 12:35:50.887170 openat(AT_FDCWD, "/dev/random", O_RDONLY|O_NONBLOCK|O_CLOEXEC) = 5 <0.000071>
+212233 12:35:50.887285 read(5, "\355", 1) = 1 <0.000018>
+212233 12:35:50.887338 close(5)         = 0 <0.000025>
+212233 12:35:50.887393 openat(AT_FDCWD, "entropy", O_RDONLY) = -1 ENOENT (No such file or directory) <0.000018>
+212233 12:35:50.887440 getpid()         = 212233 <0.000014>
+212233 12:35:50.887476 getuid()         = 1006 <0.000014>
+212233 12:35:50.887513 openat(AT_FDCWD, "/dev/random", O_RDONLY|O_NONBLOCK|O_CLOEXEC) = 5 <0.000020>
+212233 12:35:50.887561 read(5, "\253", 1) = 1 <0.000029>
+212233 12:35:50.887668 close(5)         = 0 <0.000021>
+212233 12:35:50.887713 openat(AT_FDCWD, "entropy", O_RDONLY) = -1 ENOENT (No such file or directory) <0.000016>
+212233 12:35:50.887757 openat(AT_FDCWD, "entropy", O_RDONLY) = -1 ENOENT (No such file or directory) <0.000015>
+212233 12:35:50.887799 openat(AT_FDCWD, "/dev/random", O_RDONLY|O_NONBLOCK|O_CLOEXEC) = 5 <0.000018>
+212233 12:35:50.887841 read(5, "8", 1)  = 1 <0.000014>
+212233 12:35:50.887881 close(5)         = 0 <0.000014>
+212233 12:35:50.887918 openat(AT_FDCWD, "entropy", O_RDONLY) = -1 ENOENT (No such file or directory) <0.000015>
+212233 12:35:50.887960 openat(AT_FDCWD, "entropy", O_RDONLY) = -1 ENOENT (No such file or directory) <0.000017>
+212233 12:35:50.888005 openat(AT_FDCWD, "/dev/random", O_RDONLY|O_NONBLOCK|O_CLOEXEC) = 5 <0.000016>
+212233 12:35:50.888047 read(5, "\210", 1) = 1 <0.000014>
+212233 12:35:50.888087 close(5)         = 0 <0.000014>
+212233 12:35:50.888123 openat(AT_FDCWD, "entropy", O_RDONLY) = -1 ENOENT (No such file or directory) <0.000016>
+212233 12:35:50.888166 openat(AT_FDCWD, "entropy", O_RDONLY) = -1 ENOENT (No such file or directory) <0.000015>
+212233 12:35:50.888212 openat(AT_FDCWD, "/dev/random", O_RDONLY|O_NONBLOCK|O_CLOEXEC) = 5 <0.000158>
+212233 12:35:50.888406 read(5, "\25", 1) = 1 <0.000015>
+212233 12:35:50.888450 close(5)         = 0 <0.000015>
+212233 12:35:50.888490 openat(AT_FDCWD, "entropy", O_RDONLY) = -1 ENOENT (No such file or directory) <0.000016>
+212233 12:35:50.888535 openat(AT_FDCWD, "entropy", O_RDONLY) = -1 ENOENT (No such file or directory) <0.000016>
+212233 12:35:50.888581 openat(AT_FDCWD, "/dev/random", O_RDONLY|O_NONBLOCK|O_CLOEXEC) = 5 <0.000018>
+212233 12:35:50.888628 read(5, "\256", 1) = 1 <0.000013>
+212233 12:35:50.888667 close(5)         = 0 <0.000018>
+212233 12:35:50.888726 getpid()         = 212233 <0.000014>
+212233 12:35:50.888804 openat(AT_FDCWD, "entropy", O_RDONLY) = -1 ENOENT (No such file or directory) <0.000015>
+212233 12:35:50.888850 getpid()         = 212233 <0.000012>
+212233 12:35:50.888894 getuid()         = 1006 <0.000007>
+212233 12:35:50.888927 openat(AT_FDCWD, "/dev/random", O_RDONLY|O_NONBLOCK|O_CLOEXEC) = 5 <0.000019>
+212233 12:35:50.888976 read(5, "\320", 1) = 1 <0.000014>
+212233 12:35:50.889016 close(5)         = 0 <0.000014>
+212233 12:35:50.889052 openat(AT_FDCWD, "entropy", O_RDONLY) = -1 ENOENT (No such file or directory) <0.000015>
+212233 12:35:50.889098 openat(AT_FDCWD, "entropy", O_RDONLY) = -1 ENOENT (No such file or directory) <0.000016>
+212233 12:35:50.889141 openat(AT_FDCWD, "/dev/random", O_RDONLY|O_NONBLOCK|O_CLOEXEC) = 5 <0.000016>
+212233 12:35:50.889183 read(5, "\330", 1) = 1 <0.000014>
+212233 12:35:50.889225 close(5)         = 0 <0.000014>
+212233 12:35:50.889262 openat(AT_FDCWD, "entropy", O_RDONLY) = -1 ENOENT (No such file or directory) <0.000015>
+212233 12:35:50.889306 openat(AT_FDCWD, "entropy", O_RDONLY) = -1 ENOENT (No such file or directory) <0.000019>
+212233 12:35:50.889354 openat(AT_FDCWD, "/dev/random", O_RDONLY|O_NONBLOCK|O_CLOEXEC) = 5 <0.000019>
+212233 12:35:50.889401 read(5, "\320", 1) = 1 <0.000015>
+212233 12:35:50.889442 close(5)         = 0 <0.000014>
+212233 12:35:50.889480 openat(AT_FDCWD, "entropy", O_RDONLY) = -1 ENOENT (No such file or directory) <0.000016>
+212233 12:35:50.889522 openat(AT_FDCWD, "entropy", O_RDONLY) = -1 ENOENT (No such file or directory) <0.000015>
+212233 12:35:50.889563 openat(AT_FDCWD, "/dev/random", O_RDONLY|O_NONBLOCK|O_CLOEXEC) = 5 <0.000016>
+212233 12:35:50.889606 read(5, "\213", 1) = 1 <0.000013>
+212233 12:35:50.889645 close(5)         = 0 <0.000015>
+212233 12:35:50.889683 openat(AT_FDCWD, "entropy", O_RDONLY) = -1 ENOENT (No such file or directory) <0.000017>
+212233 12:35:50.889729 openat(AT_FDCWD, "entropy", O_RDONLY) = -1 ENOENT (No such file or directory) <0.000024>
+212233 12:35:50.889780 openat(AT_FDCWD, "/dev/random", O_RDONLY|O_NONBLOCK|O_CLOEXEC) = 5 <0.000030>
+212233 12:35:50.889844 read(5, "\331", 1) = 1 <0.000014>
+212233 12:35:50.889890 close(5)         = 0 <0.000014>
+212233 12:35:50.889927 openat(AT_FDCWD, "entropy", O_RDONLY) = -1 ENOENT (No such file or directory) <0.000014>
+212233 12:35:50.889969 getpid()         = 212233 <0.000013>
+212233 12:35:50.890005 getuid()         = 1006 <0.000019>
+212233 12:35:50.890048 openat(AT_FDCWD, "entropy", O_RDONLY) = -1 ENOENT (No such file or directory) <0.000020>
+212233 12:35:50.890098 openat(AT_FDCWD, "/dev/random", O_RDONLY|O_NONBLOCK|O_CLOEXEC) = 5 <0.000023>
+212233 12:35:50.890151 read(5, ".", 1)  = 1 <0.000014>
+212233 12:35:50.890193 close(5)         = 0 <0.000019>
+212233 12:35:50.890234 openat(AT_FDCWD, "entropy", O_RDONLY) = -1 ENOENT (No such file or directory) <0.000016>
+212233 12:35:50.890278 openat(AT_FDCWD, "entropy", O_RDONLY) = -1 ENOENT (No such file or directory) <0.000015>
+212233 12:35:50.890331 openat(AT_FDCWD, "/dev/random", O_RDONLY|O_NONBLOCK|O_CLOEXEC) = 5 <0.000016>
+212233 12:35:50.890374 read(5, "v", 1)  = 1 <0.000014>
+212233 12:35:50.890413 close(5)         = 0 <0.000014>
+212233 12:35:50.890450 openat(AT_FDCWD, "entropy", O_RDONLY) = -1 ENOENT (No such file or directory) <0.000015>
+212233 12:35:50.890495 openat(AT_FDCWD, "entropy", O_RDONLY) = -1 ENOENT (No such file or directory) <0.000054>
+212233 12:35:50.890577 openat(AT_FDCWD, "/dev/random", O_RDONLY|O_NONBLOCK|O_CLOEXEC) = 5 <0.000016>
+212233 12:35:50.890621 read(5, "\341", 1) = 1 <0.000014>
+212233 12:35:50.890664 close(5)         = 0 <0.000016>
+212233 12:35:50.890704 openat(AT_FDCWD, "entropy", O_RDONLY) = -1 ENOENT (No such file or directory) <0.000015>
+212233 12:35:50.890750 openat(AT_FDCWD, "entropy", O_RDONLY) = -1 ENOENT (No such file or directory) <0.000015>
+212233 12:35:50.890792 openat(AT_FDCWD, "/dev/random", O_RDONLY|O_NONBLOCK|O_CLOEXEC) = 5 <0.000017>
+212233 12:35:50.890836 read(5, "\352", 1) = 1 <0.000013>
+212233 12:35:50.890877 close(5)         = 0 <0.000015>
+212233 12:35:50.890914 openat(AT_FDCWD, "entropy", O_RDONLY) = -1 ENOENT (No such file or directory) <0.000015>
+212233 12:35:50.890955 openat(AT_FDCWD, "entropy", O_RDONLY) = -1 ENOENT (No such file or directory) <0.000014>
+212233 12:35:50.890995 getpid()         = 212233 <0.000013>
+212233 12:35:50.891030 getuid()         = 1006 <0.000013>
+212233 12:35:50.891065 openat(AT_FDCWD, "/dev/random", O_RDONLY|O_NONBLOCK|O_CLOEXEC) = 5 <0.000016>
+212233 12:35:50.891107 read(5, "/", 1)  = 1 <0.000014>
+212233 12:35:50.891147 close(5)         = 0 <0.000014>
+212233 12:35:50.891188 openat(AT_FDCWD, "entropy", O_RDONLY) = -1 ENOENT (No such file or directory) <0.000015>
+212233 12:35:50.891229 getpid()         = 212233 <0.000013>
+212233 12:35:50.891265 getuid()         = 1006 <0.000014>
+212233 12:35:50.891303 openat(AT_FDCWD, "/dev/random", O_RDONLY|O_NONBLOCK|O_CLOEXEC) = 5 <0.000016>
+212233 12:35:50.891344 read(5, "/", 1)  = 1 <0.000013>
+212233 12:35:50.891383 close(5)         = 0 <0.000013>
+212233 12:35:50.891419 openat(AT_FDCWD, "entropy", O_RDONLY) = -1 ENOENT (No such file or directory) <0.000015>
+212233 12:35:50.891460 openat(AT_FDCWD, "entropy", O_RDONLY) = -1 ENOENT (No such file or directory) <0.000015>
+212233 12:35:50.891501 openat(AT_FDCWD, "/dev/random", O_RDONLY|O_NONBLOCK|O_CLOEXEC) = 5 <0.000016>
+212233 12:35:50.891542 read(5, "\225", 1) = 1 <0.000013>
+212233 12:35:50.891581 close(5)         = 0 <0.000014>
+212233 12:35:50.891617 openat(AT_FDCWD, "entropy", O_RDONLY) = -1 ENOENT (No such file or directory) <0.000014>
+212233 12:35:50.891657 openat(AT_FDCWD, "entropy", O_RDONLY) = -1 ENOENT (No such file or directory) <0.000016>
+212233 12:35:50.891727 openat(AT_FDCWD, "/dev/random", O_RDONLY|O_NONBLOCK|O_CLOEXEC) = 5 <0.000020>
+212233 12:35:50.891779 read(5, "\327", 1) = 1 <0.000017>
+212233 12:35:50.891823 close(5)         = 0 <0.000018>
+212233 12:35:50.891903 openat(AT_FDCWD, "entropy", O_RDONLY) = -1 ENOENT (No such file or directory) <0.000018>
+212233 12:35:50.891950 openat(AT_FDCWD, "entropy", O_RDONLY) = -1 ENOENT (No such file or directory) <0.000017>
+212233 12:35:50.891996 openat(AT_FDCWD, "/dev/random", O_RDONLY|O_NONBLOCK|O_CLOEXEC) = 5 <0.000021>
+212233 12:35:50.892043 read(5, "]", 1)  = 1 <0.000046>
+212233 12:35:50.892157 close(5)         = 0 <0.000018>
+212233 12:35:50.892218 openat(AT_FDCWD, "entropy", O_RDONLY) = -1 ENOENT (No such file or directory) <0.000019>
+212233 12:35:50.892288 openat(AT_FDCWD, "entropy", O_RDONLY) = -1 ENOENT (No such file or directory) <0.000018>
+212233 12:35:50.892341 openat(AT_FDCWD, "/dev/random", O_RDONLY|O_NONBLOCK|O_CLOEXEC) = 5 <0.000020>
+212233 12:35:50.892437 read(5, "X", 1)  = 1 <0.000017>
+212233 12:35:50.892482 close(5)         = 0 <0.000019>
+212233 12:35:50.892541 getpid()         = 212233 <0.000016>
+212233 12:35:50.982115 write(4, "\0\0\1#\6$\0\0\0\0\336\255\276\357\1\31\0\0\0\0\0\1\0\0\3\0\1\0\0\0\0\1"..., 291) = 291 <0.000114>
+212233 12:35:50.982508 getpid()         = 212233 <0.000016>
+212233 12:35:50.982644 rt_sigaction(SIGTSTP, {sa_handler=SIG_IGN, sa_mask=~[ILL TRAP ABRT BUS FPE SEGV USR2 TERM XCPU XFSZ SYS RTMIN RT_1], sa_flags=SA_RESTORER|SA_RESTART|SA_SIGINFO, sa_restorer=0x7f5471a3fb30}, {sa_handler=SIG_DFL, sa_mask=[], sa_flags=0}, 8) = 0 <0.000016>
+212233 12:35:50.982706 ioctl(0, TCGETS, 0x7ffe6cad0900) = -1 ENOTTY (Inappropriate ioctl for device) <0.000018>
+212233 12:35:50.982805 getpid()         = 212233 <0.000015>
+212233 12:35:50.982849 openat(AT_FDCWD, "/proc/212233/stat", O_RDONLY) = 5 <0.000046>
+212233 12:35:50.982928 fstat(5, {st_mode=S_IFREG|0444, st_size=0, ...}) = 0 <0.000015>
+212233 12:35:50.982973 read(5, "212233 (sqlplus) R 212230 212230"..., 1024) = 303 <0.000022>
+212233 12:35:50.983027 lseek(5, 0, SEEK_CUR) = 303 <0.000014>
+212233 12:35:50.983065 lseek(5, 45, SEEK_SET) = 45 <0.000016>
+212233 12:35:50.983105 close(5)         = 0 <0.000021>
+212233 12:35:50.983153 uname({sysname="Linux", nodename="GITFOSCFJUMP001", ...}) = 0 <0.000014>
+212233 12:35:50.983207 uname({sysname="Linux", nodename="GITFOSCFJUMP001", ...}) = 0 <0.000014>
+212233 12:35:50.983248 getpid()         = 212233 <0.000013>
+212233 12:35:50.983303 getuid()         = 1006 <0.000014>
+212233 12:35:50.983344 newfstatat(AT_FDCWD, "/etc/nsswitch.conf", {st_mode=S_IFREG|0644, st_size=3012, ...}, 0) = 0 <0.000023>
+212233 12:35:50.983405 openat(AT_FDCWD, "/etc/passwd", O_RDONLY|O_CLOEXEC) = 5 <0.000032>
+212233 12:35:50.983465 fstat(5, {st_mode=S_IFREG|0644, st_size=2346, ...}) = 0 <0.000013>
+212233 12:35:50.983509 lseek(5, 0, SEEK_SET) = 0 <0.000014>
+212233 12:35:50.983546 read(5, "root:x:0:0:root:/root:/bin/bash\n"..., 4096) = 2346 <0.000016>
+212233 12:35:50.983602 close(5)         = 0 <0.000015>
+212233 12:35:50.983754 write(4, "\0\0\0,\6$\0\0\0\0s+\225\220\224L\343\22\240gS\301\351_\373\264H\257\341\364\302\370"..., 44) = 44 <0.000051>
+212233 12:35:50.983840 read(4, "\0\0\0\374\6$\0\0\0\0\304\rZo. \361\370\332XoA1\226.\210\350\10\237;\333\223"..., 8208) = 252 <0.000541>
+212233 12:35:50.984456 brk(0x2617000)   = 0x2617000 <0.000022>
+212233 12:35:50.984585 write(4, "\0\0\0\\\6$\0\0\0\0[\17u\367\223\325\7\7\21*\256Sr\243EGmm\326\331\277\177"..., 92) = 92 <0.000041>
+212233 12:35:50.984656 read(4, "\0\0\0\34\6$\0\0\0\0vZ,\1\262\201ibd?\255f\255#\316a\1\0", 8208) = 28 <0.000844>
+212233 12:35:50.985857 write(4, "\0\0\1\f\6$\0\0\0\0\22\365N\33{\241\234\333\366\3\244\34DA\223\264\202\275\341\10`\377"..., 268) = 268 <0.000091>
+212233 12:35:50.986024 read(4, "\0\0\2\f\6$\0\0\0\0\373\361S\203\374&\257\210\363\353\202\341]\365c/\347z#\345\27$"..., 8208) = 524 <0.003248>
+212233 12:35:50.991698 getpid()         = 212233 <0.000016>
+212233 12:35:50.991765 getpid()         = 212233 <0.000014>
+212233 12:35:50.991809 getpid()         = 212233 <0.000015>
+212233 12:35:50.991858 getpid()         = 212233 <0.000013>
+212233 12:35:50.992025 rt_sigaction(SIGRT_1, {sa_handler=0x7f5471a88db0, sa_mask=[], sa_flags=SA_RESTORER|SA_ONSTACK|SA_RESTART|SA_SIGINFO, sa_restorer=0x7f5471a3fb30}, NULL, 8) = 0 <0.000013>
+212233 12:35:50.992071 rt_sigprocmask(SIG_UNBLOCK, [RTMIN RT_1], NULL, 8) = 0 <0.000013>
+212233 12:35:50.992111 mmap(NULL, 135104, PROT_NONE, MAP_PRIVATE|MAP_ANONYMOUS|MAP_STACK, -1, 0) = 0x7f547709e000 <0.000026>
+212233 12:35:50.992163 mprotect(0x7f547709f000, 131008, PROT_READ|PROT_WRITE) = 0 <0.000019>
+212233 12:35:50.992227 rt_sigprocmask(SIG_BLOCK, ~[], [], 8) = 0 <0.000014>
+212233 12:35:50.992278 clone3({flags=CLONE_VM|CLONE_FS|CLONE_FILES|CLONE_SIGHAND|CLONE_THREAD|CLONE_SYSVSEM|CLONE_SETTLS|CLONE_PARENT_SETTID|CLONE_CHILD_CLEARTID, child_tid=0x7f54770be8d0, parent_tid=0x7f54770be8d0, exit_signal=0, stack=0x7f547709e000, stack_size=0x14bc0, tls=0x7f54770be600} => {parent_tid=[212473]}, 88) = 212473 <0.000098>
+212473 12:35:50.992473 <... rseq resumed>) = 0 <0.000019>
+212233 12:35:50.992483 <... rt_sigprocmask resumed>NULL, 8) = 0 <0.000015>
+212473 12:35:50.992494 set_robust_list(0x7f54770be8e0, 24) = 0 <0.000022>
+212473 12:35:50.992542 rt_sigprocmask(SIG_SETMASK, [], NULL, 8) = 0 <0.000015>
+212233 12:35:50.992642 <... write resumed>) = 1308 <0.000042>
+212233 12:35:50.992667 read(4, "\0\0\t\234\6$\0\0\0\0\t\20\207\r<\242\243q\304\375\211\373\365\247\275\351\317X\324\274\373\341"..., 8208) = 2460 <0.007358>
+212233 12:35:51.001359 write(4, "\0\0\0L\6$\0\0\0\0wR\326\323\231\266h@\235\361\nA\307\302\365\225\246\317D\376\377\227"..., 76) = 76 <0.000071>
+212233 12:35:51.001503 read(4, "\0\0\0|\6$\0\0\0\0\226\262\3266\362\7H\340t\v\370a\372U\255\2138\347\177\244\376L"..., 8208) = 124 <0.000711>
+212233 12:35:51.002383 write(4, "\0\0\1\234\6$\0\0\0\0\254\207\323\255%\313'l\205}7^\371\321\3049\376\372\20\231/+"..., 412) = 412 <0.000049>
+212233 12:35:51.002487 read(4, "\0\0\1\314\6$\0\0\0\0\351J\21\256h\216\354\257\210\n\227\31\225?\357\235\2442\ro\375\217"..., 8208) = 460 <0.000561>
+212233 12:35:51.003211 write(4, "\0\0\0\34\6$\0\0\0\0\340\350%\235\361\361\3244\220\373VXO\305\27\"\6\1", 28) = 28 <0.000067>
+212233 12:35:51.003330 read(4, "\0\0\0\274\6$\0\0\0\0\272L.\354\361\371\277\264Pp\3466\341\263\227\24\331\244\331\322n\203"..., 8208) = 188 <0.000437>
+212233 12:35:51.003919 write(4, "\0\0\1\274\6$\0\0\0\0\330\16\22\v\220!\211\373\215\261\332\262\351\352\247\312\264\314m'\205="..., 444) = 444 <0.000066>
+212233 12:35:51.004022 read(4, "\0\0\1,\6$\0\0\0\0\371\241\305j\276\271bt\357\304\311\367\217\f\250M\207\230\3507\276m"..., 8208) = 300 <0.000863>
+212233 12:35:51.004998 write(4, "\0\0\0,\6$\0\0\0\0\276q\25\231\17\35\360K\365\7r\240\301\377\210>\27^(\36;s"..., 44) = 44 <0.000037>
+212233 12:35:51.005069 read(4, "\0\0\0\34\6$\0\0\0\0l\223\303\3573\267>D\344\32\301\6\377\34(\f\n\1", 8208) = 28 <0.000378>
+212233 12:35:51.005504 write(4, "\0\0\0\34\6$\0\0\0\0^\\\206\260h\356\223\344\241b7<dJ\247\305\16\1", 28) = 28 <0.000038>
+212233 12:35:51.005608 read(4, "\0\0\0\34\6$\0\0\0\0I\2173\314\206/S-y\352\272\2567,\330\235\n\1", 8208) = 28 <0.000335>
+212233 12:35:51.006075 stat("/opt/oracle/instantclient/instantclient_21_12/glogin.sql", {st_mode=S_IFREG|0644, st_size=342, ...}) = 0 <0.000050>
+212233 12:35:51.006178 stat("/opt/oracle/instantclient/instantclient_21_12/", {st_mode=S_IFDIR|0755, st_size=4096, ...}) = 0 <0.000016>
+212233 12:35:51.006232 access("/opt/oracle/instantclient/instantclient_21_12/glogin.sql", F_OK) = 0 <0.000021>
+212233 12:35:51.006318 statfs("/opt/oracle/instantclient/instantclient_21_12/glogin.sql", {f_type=XFS_SUPER_MAGIC, f_bsize=4096, f_blocks=2605056, f_bfree=838045, f_bavail=838045, f_files=5242880, f_ffree=5235698, f_fsid={val=[0xfd02, 0]}, f_namelen=255, f_frsize=4096, f_flags=ST_VALID|ST_RELATIME}) = 0 <0.000020>
+212233 12:35:51.006386 openat(AT_FDCWD, "/opt/oracle/instantclient/instantclient_21_12/glogin.sql", O_RDONLY) = 5 <0.000046>
+212233 12:35:51.006466 fcntl(5, F_SETFD, FD_CLOEXEC) = 0 <0.000015>
+212233 12:35:51.006532 read(5, "--\n-- Copyright (c) 1988, 2005, "..., 57344) = 342 <0.000017>
+212233 12:35:51.006580 brk(0x263a000)   = 0x263a000 <0.000020>
+212233 12:35:51.006647 read(5, "", 57344) = 0 <0.000014>
+212233 12:35:51.006696 brk(0x262c000)   = 0x262c000 <0.000059>
+212233 12:35:51.006782 brk(0x261e000)   = 0x261e000 <0.000015>
+212233 12:35:51.006822 close(5)         = 0 <0.000017>
+212233 12:35:51.006878 fstat(0, {st_mode=S_IFIFO|0600, st_size=0, ...}) = 0 <0.000015>
+212233 12:35:51.006924 read(0, "exit\n", 4096) = 5 <0.000015>
+212233 12:35:51.007037 getsockopt(4, SOL_TCP, TCP_INFO, "\1\0\0\0\0\7w\1\20\25\3\0@\234\0\0\250\5\0\0\250\5\0\0\0\0\0\0\0\0\0\0"..., [200]) = 0 <0.000018>
+212233 12:35:51.007116 write(4, "\0\0\0\354\6$\0\0\0\0\242W\221/\361\310!\264\371=\313\"L\t\220\267\234D5i\37\373"..., 236) = 236 <0.000044>
+212233 12:35:51.007202 read(4, "\0\0\0\34\6$\0\0\0\0`i\323\261~\243\377K\323\371S\"\317@\274\344\n\1", 8208) = 28 <0.000930>
+212233 12:35:51.008235 setsockopt(4, SOL_SOCKET, SO_SNDTIMEO_OLD, "\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0", 16) = 0 <0.000094>
+212233 12:35:51.008392 setsockopt(4, SOL_SOCKET, SO_RCVTIMEO_OLD, "\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0", 16) = 0 <0.000014>
+212233 12:35:51.008441 write(4, "\0\0\0\n\6$\0\0\0@", 10) = 10 <0.000040>
+212233 12:35:51.008554 close(4)         = 0 <0.000033>
+212233 12:35:51.008643 rt_sigprocmask(SIG_BLOCK, [INT], NULL, 8) = 0 <0.000048>
+212233 12:35:51.008731 rt_sigaction(SIGINT, {sa_handler=SIG_DFL, sa_mask=~[ILL TRAP ABRT BUS FPE SEGV USR2 TERM XCPU XFSZ SYS RTMIN RT_1], sa_flags=SA_RESTORER|SA_RESTART|SA_SIGINFO, sa_restorer=0x7f5471a3fb30}, {sa_handler=0x7f54727f1c70, sa_mask=~[ILL TRAP ABRT BUS FPE KILL SEGV USR2 TERM STOP XCPU XFSZ SYS RTMIN RT_1], sa_flags=SA_RESTORER|SA_RESTART|SA_SIGINFO, sa_restorer=0x7f5471a3fb30}, 8) = 0 <0.000012>
+212233 12:35:51.008776 rt_sigprocmask(SIG_UNBLOCK, [INT], NULL, 8) = 0 <0.000011>
+212233 12:35:51.008832 munmap(0x7f547253c000, 802816) = 0 <0.000029>
+212233 12:35:51.008918 futex(0x24d34c8, FUTEX_WAKE_PRIVATE, 1) = 1 <0.000021>
+212473 12:35:51.008978 <... futex resumed>) = 0 <0.016358>
+212473 12:35:51.009002 futex(0x24d33d0, FUTEX_WAKE_PRIVATE, 1) = 0 <0.000013>
+212473 12:35:51.009066 rt_sigprocmask(SIG_BLOCK, ~[RT_1], NULL, 8) = 0 <0.000014>
+212473 12:35:51.009113 madvise(0x7f547709e000, 65536, MADV_DONTNEED) = 0 <0.000022>
+212233 12:35:51.009219 <... futex resumed>) = 0 <0.000245>
