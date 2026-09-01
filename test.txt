@@ -1,5 +1,3 @@
-[scf-uat@GITFOSCFJUMP001 piyush]$ mkdir p
-mkdir: cannot create directory ‘p’: No space left on device
 [scf-uat@GITFOSCFJUMP001 piyush]$ df -h
 Filesystem                   Size  Used Avail Use% Mounted on
 devtmpfs                     7.7G     0  7.7G   0% /dev
@@ -16,4 +14,90 @@ efivarfs                     256K   44K  208K  18% /sys/firmware/efi/efivars
 /dev/mapper/rhel-var          25G  5.7G   20G  23% /var
 tmpfs                        1.6G   52K  1.6G   1% /run/user/42
 tmpfs                        1.6G   36K  1.6G   1% /run/user/1006
-[scf-uat@GITFOSCFJUMP001 piyush]$
+[scf-uat@GITFOSCFJUMP001 piyush]$ du -sh /home/* 2>/dev/null | sort -h
+0       /home/ansadm
+0       /home/SOCVA
+0       /home/splunk
+4.0K    /home/ADDMITAM
+4.0K    /home/wipuxadm
+14G     /home/scf-uat
+[scf-uat@GITFOSCFJUMP001 piyush]$ du -sh /home/scf-uat/* 2?/dev/null | sort -h
+du: cannot access '2?/dev/null': No such file or directory
+0       /home/scf-uat/bash
+0       /home/scf-uat/pod-logs
+4.0K    /home/scf-uat/10.177.179.102
+4.0K    /home/scf-uat/10.177.179.103
+4.0K    /home/scf-uat/10.177.179.104
+4.0K    /home/scf-uat/ABOUT.txt
+4.0K    /home/scf-uat/bash_script
+4.0K    /home/scf-uat/certificate.der
+4.0K    /home/scf-uat/certificate.der.txt
+4.0K    /home/scf-uat/db-secret-sealed.yaml
+4.0K    /home/scf-uat/globalscflink.statebank.cer
+4.0K    /home/scf-uat/LICENSE.txt
+4.0K    /home/scf-uat/liquibase.bat
+4.0K    /home/scf-uat/log-script.sh
+4.0K    /home/scf-uat/README.txt
+4.0K    /home/scf-uat/sbi_service_restart.sh
+4.0K    /home/scf-uat/tms-sealed-secret.yaml
+4.0K    /home/scf-uat/tms-secret.yaml
+4.0K    /home/scf-uat/UNINSTALL.txt
+12K     /home/scf-uat/docker_image_push.sh
+12K     /home/scf-uat/GETTING_STARTED.txt
+12K     /home/scf-uat/latest_images
+12K     /home/scf-uat/LICENSE
+12K     /home/scf-uat/logs.txt
+12K     /home/scf-uat/nitin
+16K     /home/scf-uat/lib
+16K     /home/scf-uat/temp.txt
+36K     /home/scf-uat/demo
+36K     /home/scf-uat/sealed-secrets-minimal
+48K     /home/scf-uat/README.md
+60K     /home/scf-uat/licenses
+72K     /home/scf-uat/examples
+92K     /home/scf-uat/helm_artifacts.tgz
+96K     /home/scf-uat/helm_artifacts_uat_12082026.tar.gz
+96K     /home/scf-uat/helm_artifacts_uat_28082026.tar.gz
+108K    /home/scf-uat/piyush
+144K    /home/scf-uat/credable-web.log
+172K    /home/scf-uat/helm_artifacts_uat_updated_12082026.zip
+212K    /home/scf-uat/helm_artifacts_sealed_secret_12_08_2026.zip
+452K    /home/scf-uat/changelog.txt
+484K    /home/scf-uat/oradiag_scf-uat
+784K    /home/scf-uat/helm_artifacts_uat
+788K    /home/scf-uat/helm_artifacts
+892K    /home/scf-uat/helm_artifacts_sealed
+1.5M    /home/scf-uat/credable-payment.log
+2.2M    /home/scf-uat/credable-web.log.2026-06-25-AM
+2.4M    /home/scf-uat/credable-backend.log
+3.8M    /home/scf-uat/Test.txt
+6.3M    /home/scf-uat/liquibase-scripts.zip
+8.9M    /home/scf-uat/internal
+9.0M    /home/scf-uat/credable-backend.log1234
+13M     /home/scf-uat/credable-payment04.08.2026.log
+17M     /home/scf-uat/uat.tgz
+18M     /home/scf-uat/liquibase
+19M     /home/scf-uat/uat
+22M     /home/scf-uat/credable-payment.log.2026-08-18-PM
+24M     /home/scf-uat/backup
+24M     /home/scf-uat/credable-backend_1706.zip
+30M     /home/scf-uat/oracle-table-copy-bundle.zip
+44M     /home/scf-uat/credable-backend_170626
+51M     /home/scf-uat/bin
+79M     /home/scf-uat/oracle
+128M    /home/scf-uat/credable-backend_170626AM
+134M    /home/scf-uat/logs.zip
+168M    /home/scf-uat/discounting-web.tar
+190M    /home/scf-uat/credable-backend.log.2026-06-25-AM
+229M    /home/scf-uat/credable-backend_1.log
+284M    /home/scf-uat/notional-backend.tar
+287M    /home/scf-uat/dfx-web.tar
+514M    /home/scf-uat/global-control-plane.tar
+538M    /home/scf-uat/credable-backend.log18.08.206
+623M    /home/scf-uat/discounting-backend.tar
+651M    /home/scf-uat/common-entity.tar
+737M    /home/scf-uat/ddrx-pms.tar
+858M    /home/scf-uat/ddrx-web.tar
+921M    /home/scf-uat/dfx-backend.tar
+936M    /home/scf-uat/ddrx-backend.tar
+5.9G    /home/scf-uat/docker_images
