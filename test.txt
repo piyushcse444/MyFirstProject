@@ -1,10 +1,9 @@
-<!-- Oracle JDBC driver library -->
-<library id="oracleLib">
-    <fileset dir="D:\piyush\development\server\wlp\usr\shared\resources" includes="ojdbc8-12.2.0.1.jar"/>
-</library>
-
-<!-- Updated JNDI name to match your config.properties -->
-<dataSource id="OracleDS_ID" jndiName="jdbc/OracleDS" transactional="true" type="javax.sql.DataSource">
-    <jdbcDriver libraryRef="oracleLib"/>
-    <properties.oracle password="" url="jdbc:oracle:thin:@//10.189.41.213:1522/BCQPUAT" user="BCQI"/>
-</dataSource>
+<!-- Enable features -->
+<featureManager>
+    <feature>jsp-2.3</feature>
+    <feature>servlet-4.0</feature>
+    <feature>jndi-1.0</feature>
+    <feature>localConnector-1.0</feature>
+    <feature>jdbc-4.2</feature>
+    <feature>jpaContainer-2.2</feature>
+    </featureManager>
