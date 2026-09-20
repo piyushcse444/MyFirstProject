@@ -1,9 +1,176 @@
-<!-- Enable features -->
+when i access /bcqi/login.htm it throw below error
+
+
+[ERROR   ] Context initialization failed
+Error creating bean with name 'cagCcgHandler': Unsatisfied dependency expressed through field 'ccgRequestService'; nested exception is org.springframework.beans.factory.UnsatisfiedDependencyException: Error creating bean with name 'CCGRequestService': Unsatisfied dependency expressed through field 'CagCcgDAOImpl'; nested exception is org.springframework.beans.factory.UnsatisfiedDependencyException: Error creating bean with name 'cagCcgDAOImpl': Unsatisfied dependency expressed through field 'dataSource'; nested exception is org.springframework.beans.factory.BeanCreationException: Error creating bean with name 'dataSource' defined in class path resource [com/bcqp/config/DataSourceConfig.class]: Bean instantiation via factory method failed; nested exception is org.springframework.beans.BeanInstantiationException: Failed to instantiate [javax.sql.DataSource]: Factory method 'dataSource' threw exception; nested exception is javax.naming.NamingException: CWWKE0800W: An attempt was made to retrieve an initial context for [jdbc/OracleDS] but no JNDI feature is configured.
+[ERROR   ] SRVE0271E: Uncaught init() exception created by servlet [dispatcher] in application [bcqiV5S.war]: org.springframework.beans.factory.UnsatisfiedDependencyException: Error creating bean with name 'cagCcgHandler': Unsatisfied dependency expressed through field 'ccgRequestService'; nested exception is org.springframework.beans.factory.UnsatisfiedDependencyException: Error creating bean with name 'CCGRequestService': Unsatisfied dependency expressed through field 'CagCcgDAOImpl'; nested exception is org.springframework.beans.factory.UnsatisfiedDependencyException: Error creating bean with name 'cagCcgDAOImpl': Unsatisfied dependency expressed through field 'dataSource'; nested exception is org.springframework.beans.factory.BeanCreationException: Error creating bean with name 'dataSource' defined in class path resource [com/bcqp/config/DataSourceConfig.class]: Bean instantiation via factory method failed; nested exception is org.springframework.beans.BeanInstantiationException: Failed to instantiate [javax.sql.DataSource]: Factory method 'dataSource' threw exception; nested exception is javax.naming.NamingException: CWWKE0800W: An attempt was made to retrieve an initial context for [jdbc/OracleDS] but no JNDI feature is configured.
+        at org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor$AutowiredFieldElement.resolveFieldValue(AutowiredAnnotationBeanPostProcessor.java:713)
+        at org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor$AutowiredFieldElement.inject(AutowiredAnnotationBeanPostProcessor.java:693)
+        at org.springframework.beans.factory.annotation.InjectionMetadata.inject(InjectionMetadata.java:119)
+        at org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor.postProcessProperties(AutowiredAnnotationBeanPostProcessor.java:408)
+        at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.populateBean(AbstractAutowireCapableBeanFactory.java:1431)
+        at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.doCreateBean(AbstractAutowireCapableBeanFactory.java:619)
+        at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBean(AbstractAutowireCapableBeanFactory.java:542)
+        at org.springframework.beans.factory.support.AbstractBeanFactory.lambda$doGetBean$0(AbstractBeanFactory.java:336)
+        at org.springframework.beans.factory.support.DefaultSingletonBeanRegistry.getSingleton(DefaultSingletonBeanRegistry.java:234)
+        at org.springframework.beans.factory.support.AbstractBeanFactory.doGetBean(AbstractBeanFactory.java:334)
+        at org.springframework.beans.factory.support.AbstractBeanFactory.getBean(AbstractBeanFactory.java:209)
+        at org.springframework.beans.factory.support.DefaultListableBeanFactory.preInstantiateSingletons(DefaultListableBeanFactory.java:955)
+        at org.springframework.context.support.AbstractApplicationContext.finishBeanFactoryInitialization(AbstractApplicationContext.java:932)
+        at org.springframework.context.support.AbstractApplicationContext.refresh(AbstractApplicationContext.java:591)
+        at org.springframework.web.context.ContextLoader.configureAndRefreshWebApplicationContext(ContextLoader.java:399)
+        at org.springframework.web.context.ContextLoader.initWebApplicationContext(ContextLoader.java:278)
+        at org.springframework.web.context.ContextLoaderListener.contextInitialized(ContextLoaderListener.java:103)
+        at com.ibm.ws.webcontainer.webapp.WebApp.notifyServletContextCreated(WebApp.java:2464)
+        at [internal classes]
+Caused by: org.springframework.beans.factory.BeanCreationException: Error creating bean with name 'dataSource' defined in class path resource [com/bcqp/config/DataSourceConfig.class]: Bean instantiation via factory method failed; nested exception is org.springframework.beans.BeanInstantiationException: Failed to instantiate [javax.sql.DataSource]: Factory method 'dataSource' threw exception; nested exception is javax.naming.NamingException: CWWKE0800W: An attempt was made to retrieve an initial context for [jdbc/OracleDS] but no JNDI feature is configured.
+        at org.springframework.beans.factory.support.ConstructorResolver.instantiate(ConstructorResolver.java:646)
+        at org.springframework.beans.factory.support.ConstructorResolver.instantiateUsingFactoryMethod(ConstructorResolver.java:477)
+        at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.instantiateUsingFactoryMethod(AbstractAutowireCapableBeanFactory.java:1352)
+        at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBeanInstance(AbstractAutowireCapableBeanFactory.java:1195)
+        at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.doCreateBean(AbstractAutowireCapableBeanFactory.java:582)
+        at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBean(AbstractAutowireCapableBeanFactory.java:542)
+        at org.springframework.beans.factory.support.AbstractBeanFactory.lambda$doGetBean$0(AbstractBeanFactory.java:336)
+        at org.springframework.beans.factory.support.DefaultSingletonBeanRegistry.getSingleton(DefaultSingletonBeanRegistry.java:234)
+        at org.springframework.beans.factory.support.AbstractBeanFactory.doGetBean(AbstractBeanFactory.java:334)
+        at org.springframework.beans.factory.support.AbstractBeanFactory.getBean(AbstractBeanFactory.java:209)
+        at org.springframework.beans.factory.config.DependencyDescriptor.resolveCandidate(DependencyDescriptor.java:276)
+        at org.springframework.beans.factory.support.DefaultListableBeanFactory.doResolveDependency(DefaultListableBeanFactory.java:1391)
+        at org.springframework.beans.factory.support.DefaultListableBeanFactory.resolveDependency(DefaultListableBeanFactory.java:1311)
+        at org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor$AutowiredFieldElement.resolveFieldValue(AutowiredAnnotationBeanPostProcessor.java:710)
+        ... 46 more
+Caused by: org.springframework.beans.BeanInstantiationException: Failed to instantiate [javax.sql.DataSource]: Factory method 'dataSource' threw exception; nested exception is javax.naming.NamingException: CWWKE0800W: An attempt was made to retrieve an initial context for [jdbc/OracleDS] but no JNDI feature is configured.
+        at org.springframework.beans.factory.support.SimpleInstantiationStrategy.instantiate(SimpleInstantiationStrategy.java:185)
+        at org.springframework.beans.factory.support.ConstructorResolver.instantiate(ConstructorResolver.java:641)
+        ... 59 more
+Caused by: javax.naming.NamingException: CWWKE0800W: An attempt was made to retrieve an initial context for [jdbc/OracleDS] but no JNDI feature is configured.
+        at com.ibm.ws.kernel.pseudo.internal.PseudoContext.fail(PseudoContext.java:94)
+        at [internal classes]
+        at java.naming/javax.naming.InitialContext.lookup(InitialContext.java:409)
+        at org.springframework.jndi.JndiTemplate.lambda$lookup$0(JndiTemplate.java:157)
+        at org.springframework.jndi.JndiTemplate.execute(JndiTemplate.java:92)
+        at org.springframework.jndi.JndiTemplate.lookup(JndiTemplate.java:157)
+        at org.springframework.jndi.JndiTemplate.lookup(JndiTemplate.java:179)
+        at org.springframework.jndi.JndiLocatorSupport.lookup(JndiLocatorSupport.java:96)
+        at org.springframework.jndi.JndiObjectLocator.lookup(JndiObjectLocator.java:114)
+        at org.springframework.jndi.JndiObjectTargetSource.afterPropertiesSet(JndiObjectTargetSource.java:100)
+        at org.springframework.jndi.JndiObjectFactoryBean$JndiObjectProxyFactory.createJndiObjectProxy(JndiObjectFactoryBean.java:329)
+        at org.springframework.jndi.JndiObjectFactoryBean$JndiObjectProxyFactory.access$000(JndiObjectFactoryBean.java:316)
+        at org.springframework.jndi.JndiObjectFactoryBean.afterPropertiesSet(JndiObjectFactoryBean.java:208)
+        at com.bcqp.config.DataSourceConfig.dataSource(DataSourceConfig.java:30)
+        at com.bcqp.config.DataSourceConfig$$EnhancerBySpringCGLIB$$1195e969.CGLIB$dataSource$0(<generated>)
+        at com.bcqp.config.DataSourceConfig$$EnhancerBySpringCGLIB$$1195e969$$FastClassBySpringCGLIB$$8206bf1a.invoke(<generated>)
+        at org.springframework.cglib.proxy.MethodProxy.invokeSuper(MethodProxy.java:244)
+        at org.springframework.context.annotation.ConfigurationClassEnhancer$BeanMethodInterceptor.intercept(ConfigurationClassEnhancer.java:331)
+        at com.bcqp.config.DataSourceConfig$$EnhancerBySpringCGLIB$$1195e969.dataSource(<generated>)
+        at jdk.internal.reflect.GeneratedMethodAccessor395.invoke(Unknown Source)
+        at java.base/java.lang.reflect.Method.invoke(Method.java:569)
+        at org.springframework.beans.factory.support.SimpleInstantiationStrategy.instantiate(SimpleInstantiationStrategy.java:154)
+        ... 60 more
+
+[ERROR   ] SRVE0315E: An exception occurred: java.lang.Throwable: javax.servlet.ServletException: SRVE0207E: Uncaught initialization exception created by servlet
+        at com.ibm.ws.webcontainer.webapp.WebApp.handleRequest(WebApp.java:5154)
+        at [internal classes]
+Caused by: javax.servlet.ServletException: SRVE0207E: Uncaught initialization exception created by servlet
+        at com.ibm.ws.webcontainer.servlet.ServletWrapper.init(ServletWrapper.java:376)
+        ... 1 more
+Caused by (repeated) ... : org.springframework.beans.factory.UnsatisfiedDependencyException: Error creating bean with name 'cagCcgHandler': Unsatisfied dependency expressed through field 'ccgRequestService'; nested exception is org.springframework.beans.factory.UnsatisfiedDependencyException: Error creating bean with name 'CCGRequestService': Unsatisfied dependency expressed through field 'CagCcgDAOImpl'; nested exception is org.springframework.beans.factory.UnsatisfiedDependencyException: Error creating bean with name 'cagCcgDAOImpl': Unsatisfied dependency expressed through field 'dataSource'; nested exception is org.springframework.beans.factory.BeanCreationException: Error creating bean with name 'dataSource' defined in class path resource [com/bcqp/config/DataSourceConfig.class]: Bean instantiation via factory method failed; nested exception is org.springframework.beans.BeanInstantiationException: Failed to instantiate [javax.sql.DataSource]: Factory method 'dataSource' threw exception; nested exception is javax.naming.NamingException: CWWKE0800W: An attempt was made to retrieve an initial context for [jdbc/OracleDS] but no JNDI feature is configured.
+        at org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor$AutowiredFieldElement.resolveFieldValue(AutowiredAnnotationBeanPostProcessor.java:713)
+        at org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor$AutowiredFieldElement.inject(AutowiredAnnotationBeanPostProcessor.java:693)
+        at org.springframework.beans.factory.annotation.InjectionMetadata.inject(InjectionMetadata.java:119)
+        at org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor.postProcessProperties(AutowiredAnnotationBeanPostProcessor.java:408)
+        at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.populateBean(AbstractAutowireCapableBeanFactory.java:1431)
+        at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.doCreateBean(AbstractAutowireCapableBeanFactory.java:619)
+        at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBean(AbstractAutowireCapableBeanFactory.java:542)
+        at org.springframework.beans.factory.support.AbstractBeanFactory.lambda$doGetBean$0(AbstractBeanFactory.java:336)
+        at org.springframework.beans.factory.support.DefaultSingletonBeanRegistry.getSingleton(DefaultSingletonBeanRegistry.java:234)
+        at org.springframework.beans.factory.support.AbstractBeanFactory.doGetBean(AbstractBeanFactory.java:334)
+        at org.springframework.beans.factory.support.AbstractBeanFactory.getBean(AbstractBeanFactory.java:209)
+        at org.springframework.beans.factory.support.DefaultListableBeanFactory.preInstantiateSingletons(DefaultListableBeanFactory.java:955)
+        at org.springframework.context.support.AbstractApplicationContext.finishBeanFactoryInitialization(AbstractApplicationContext.java:932)
+        at org.springframework.context.support.AbstractApplicationContext.refresh(AbstractApplicationContext.java:591)
+        at org.springframework.web.context.ContextLoader.configureAndRefreshWebApplicationContext(ContextLoader.java:399)
+        at org.springframework.web.context.ContextLoader.initWebApplicationContext(ContextLoader.java:278)
+        at org.springframework.web.context.ContextLoaderListener.contextInitialized(ContextLoaderListener.java:103)
+        at com.ibm.ws.webcontainer.webapp.WebApp.notifyServletContextCreated(WebApp.java:2464)
+        ... 1 more
+Caused by: org.springframework.beans.factory.BeanCreationException: Error creating bean with name 'dataSource' defined in class path resource [com/bcqp/config/DataSourceConfig.class]: Bean instantiation via factory method failed; nested exception is org.springframework.beans.BeanInstantiationException: Failed to instantiate [javax.sql.DataSource]: Factory method 'dataSource' threw exception; nested exception is javax.naming.NamingException: CWWKE0800W: An attempt was made to retrieve an initial context for [jdbc/OracleDS] but no JNDI feature is configured.
+        at org.springframework.beans.factory.support.ConstructorResolver.instantiate(ConstructorResolver.java:646)
+        at org.springframework.beans.factory.support.ConstructorResolver.instantiateUsingFactoryMethod(ConstructorResolver.java:477)
+        at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.instantiateUsingFactoryMethod(AbstractAutowireCapableBeanFactory.java:1352)
+        at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBeanInstance(AbstractAutowireCapableBeanFactory.java:1195)
+        at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.doCreateBean(AbstractAutowireCapableBeanFactory.java:582)
+        at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBean(AbstractAutowireCapableBeanFactory.java:542)
+        at org.springframework.beans.factory.support.AbstractBeanFactory.lambda$doGetBean$0(AbstractBeanFactory.java:336)
+        at org.springframework.beans.factory.support.DefaultSingletonBeanRegistry.getSingleton(DefaultSingletonBeanRegistry.java:234)
+        at org.springframework.beans.factory.support.AbstractBeanFactory.doGetBean(AbstractBeanFactory.java:334)
+        at org.springframework.beans.factory.support.AbstractBeanFactory.getBean(AbstractBeanFactory.java:209)
+        at org.springframework.beans.factory.config.DependencyDescriptor.resolveCandidate(DependencyDescriptor.java:276)
+        at org.springframework.beans.factory.support.DefaultListableBeanFactory.doResolveDependency(DefaultListableBeanFactory.java:1391)
+        at org.springframework.beans.factory.support.DefaultListableBeanFactory.resolveDependency(DefaultListableBeanFactory.java:1311)
+        at org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor$AutowiredFieldElement.resolveFieldValue(AutowiredAnnotationBeanPostProcessor.java:710)
+        ... 46 more
+Caused by: org.springframework.beans.BeanInstantiationException: Failed to instantiate [javax.sql.DataSource]: Factory method 'dataSource' threw exception; nested exception is javax.naming.NamingException: CWWKE0800W: An attempt was made to retrieve an initial context for [jdbc/OracleDS] but no JNDI feature is configured.
+        at org.springframework.beans.factory.support.SimpleInstantiationStrategy.instantiate(SimpleInstantiationStrategy.java:185)
+        at org.springframework.beans.factory.support.ConstructorResolver.instantiate(ConstructorResolver.java:641)
+        ... 59 more
+Caused by: javax.naming.NamingException: CWWKE0800W: An attempt was made to retrieve an initial context for [jdbc/OracleDS] but no JNDI feature is configured.
+        at com.ibm.ws.kernel.pseudo.internal.PseudoContext.fail(PseudoContext.java:94)
+        at [internal classes]
+        at java.naming/javax.naming.InitialContext.lookup(InitialContext.java:409)
+        at org.springframework.jndi.JndiTemplate.lambda$lookup$0(JndiTemplate.java:157)
+        at org.springframework.jndi.JndiTemplate.execute(JndiTemplate.java:92)
+        at org.springframework.jndi.JndiTemplate.lookup(JndiTemplate.java:157)
+        at org.springframework.jndi.JndiTemplate.lookup(JndiTemplate.java:179)
+        at org.springframework.jndi.JndiLocatorSupport.lookup(JndiLocatorSupport.java:96)
+        at org.springframework.jndi.JndiObjectLocator.lookup(JndiObjectLocator.java:114)
+        at org.springframework.jndi.JndiObjectTargetSource.afterPropertiesSet(JndiObjectTargetSource.java:100)
+        at org.springframework.jndi.JndiObjectFactoryBean$JndiObjectProxyFactory.createJndiObjectProxy(JndiObjectFactoryBean.java:329)
+        at org.springframework.jndi.JndiObjectFactoryBean$JndiObjectProxyFactory.access$000(JndiObjectFactoryBean.java:316)
+        at org.springframework.jndi.JndiObjectFactoryBean.afterPropertiesSet(JndiObjectFactoryBean.java:208)
+        at com.bcqp.config.DataSourceConfig.dataSource(DataSourceConfig.java:30)
+        at com.bcqp.config.DataSourceConfig$$EnhancerBySpringCGLIB$$1195e969.CGLIB$dataSource$0(<generated>)
+        at com.bcqp.config.DataSourceConfig$$EnhancerBySpringCGLIB$$1195e969$$FastClassBySpringCGLIB$$8206bf1a.invoke(<generated>)
+        at org.springframework.cglib.proxy.MethodProxy.invokeSuper(MethodProxy.java:244)
+        at org.springframework.context.annotation.ConfigurationClassEnhancer$BeanMethodInterceptor.intercept(ConfigurationClassEnhancer.java:331)
+        at com.bcqp.config.DataSourceConfig$$EnhancerBySpringCGLIB$$1195e969.dataSource(<generated>)
+        at jdk.internal.reflect.GeneratedMethodAccessor395.invoke(Unknown Source)
+        at java.base/java.lang.reflect.Method.invoke(Method.java:569)
+        at org.springframework.beans.factory.support.SimpleInstantiationStrategy.instantiate(SimpleInstantiationStrategy.java:154)
+        ... 60 more
+
+
+my server.xml
+
+
+<server description="new server">
+<!--  Enable features  -->
 <featureManager>
-    <feature>jsp-2.3</feature>
-    <feature>servlet-4.0</feature>
-    <feature>jndi-1.0</feature>
-    <feature>localConnector-1.0</feature>
-    <feature>jdbc-4.2</feature>
-    <feature>jpaContainer-2.2</feature>
-    </featureManager>
+<feature>jsp-2.3</feature>
+<feature>servlet-4.0</feature>
+<feature>jndi-1.0</feature>
+<feature>localConnector-1.0</feature>
+<feature>jdbc-4.2</feature>
+<feature>jpaContainer-2.2</feature>
+</featureManager>
+<webContainer disableServlet30Compatibility="true"/>
+<!--  Oracle JDBC driver library  -->
+<library id="oracleLib">
+<fileset dir="D:\piyush\development\server\wlp\usr\shared\resources" includes="ojdbc8-12.2.0.1.jar"/>
+</library>
+<!--  Updated JNDI name to match your config.properties  -->
+<dataSource id="OracleDS_ID" jndiName="jdbc/OracleDS" transactional="true" type="javax.sql.DataSource">
+<jdbcDriver libraryRef="oracleLib"/>
+<properties.oracle password="bcqi123$" url="jdbc:oracle:thin:@//10.189.41.213:1522/BCQPUAT" user="BCQI"/>
+</dataSource>
+<httpEndpoint httpPort="9081" httpsPort="9443" id="defaultHttpEndpoint"/>
+<applicationManager autoExpand="true"/>
+<ssl id="defaultSSLConfig" trustDefaultCerts="true"/>
+<applicationMonitor updateTrigger="mbean"/>
+<webApplication contextRoot="bcqi" id="bcqiV5S.war" location="D:\piyush\development\bcqiV5S" name="bcqiV5S.war"/>
+</server>
+
+
+an di have a ojdbc8-12.2.0.1.jar insidre D:\piyush\development\server\wlp\usr\shared\resources folder
+
+
