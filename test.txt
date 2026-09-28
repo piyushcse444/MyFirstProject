@@ -1,11 +1,427 @@
-D:\piyush\BCQISpring5\BCQISpring5\server file\wlp\wlp\bin>.\server.bat debug defaultserver
-Listening for transport dt_socket at address: 7777
-Launching defaultServer (WebSphere Application Server 25.0.0.9/wlp-1.0.105.cl250920250821-1629) on Java HotSpot(TM) 64-Bit Server VM, version 1.8.0_471-b09 (en_IN)
-[AUDIT   ] CWWKE0001I: The server defaultServer has been launched.
-[AUDIT   ] CWWKE0100I: This product is licensed for development, and limited production use. The full license terms can be viewed here: https://public.dhe.ibm.com/ibmdl/export/pub/software/websphere/wasdev/license/base_ilan/ilan/25.0.0.9/lafiles/en.html
-[AUDIT   ] CWWKZ0058I: Monitoring dropins for applications.
-[AUDIT   ] CWWKT0016I: Web application available (default_host): http://localhost:9081/bcqi/
-[AUDIT   ] CWWKZ0001I: Application bcqiV5S.war started in 4.929 seconds.
-[AUDIT   ] CWWKF0012I: The server installed the following features: [el-3.0, jdbc-4.2, jndi-1.0, jpaContainer-2.2, jsp-2.3, localConnector-1.0, servlet-4.0].
-[AUDIT   ] CWWKF0011I: The defaultServer server is ready to run a smarter planet. The defaultServer server started in 8.313 seconds.
-[WARNING ] SRVE0190E: File not found: /login.htm
+/*
+ * CorpLogonHandler.java
+ * Created on Mar 7, 2006
+ *
+ * Copyright (c) 2005 by SBI All Rights Reserved.
+ * $Header: $
+ */
+//History
+//Mar 7, 2006 KRISHNA KUMAR - Initial Creation
+
+package com.sbi.handler;
+
+import java.io.IOException;
+
+
+import java.security.SecureRandom;
+import java.util.Arrays;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
+import javax.annotation.PostConstruct;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.servlet.ModelAndView;
+
+import com.sbi.common.utils.SBIModelViewCache;
+import com.sbi.dao.CommonDAO;
+import com.sbi.exception.ApplicationResponse;
+import com.sbi.model.User;
+import com.sbi.service.LogonService;
+import com.sbi.utils.Constants;
+
+import eu.bitwalker.useragentutils.UserAgent;
+
+@Controller
+@SuppressWarnings({ "unchecked", "rawtypes" })
+public class LogonHandler {
+
+	@Value("${superAdminURL}")
+	private String superAdminURL;
+
+	@Value("${doAdminURL}")
+	private String doAdminURL;
+
+	@Value("${foAdminURL}")
+	private String foAdminURL;
+
+	@Value("${doURL}")
+	private String doURL;
+
+	@Value("${foURL}")
+	private String foURL;
+
+	@Value("${gtdURL}")
+	private String gtdURL;
+
+	@Value("${gmukURL}")
+	private String gmukURL;
+
+	@Value("${cagURL}")
+	private String cagURL;
+
+	@Value("${ccgURL}")
+	private String ccgURL;
+
+	private static final Object UserInitial = null;
+
+	protected static final Logger logger = LogManager.getLogger(LogonHandler.class);
+
+	@Value("${firstLoginURL}")
+	private String firstLoginURL;
+
+	private Map myPageURL;
+
+	@Autowired
+	private LogonService logonService;
+
+	@Value("${baseURL}")
+	private String baseURL;
+
+	@Autowired
+	private CommonDAO CommonDAOImpl;
+
+	@PostConstruct
+	private void initialize() {
+		setMyPageUrls();
+	}
+
+	private static boolean servletFlag = true;
+
+	@RequestMapping("/login.htm")
+	public ModelAndView loginDisplay(HttpServletRequest request, HttpServletResponse response) {
+		logger.info("loginDisplay(HttpServletRequest request, HttpServletResponse response) method begins");
+
+		System.out.println("=== LOGIN CONTROLLER CALLED 1 ===");
+		HttpSession session1 = request.getSession();
+		session1.invalidate();
+
+		HttpSession session = request.getSession();
+
+		session.setAttribute("refereshFlag_1", new Boolean(true));
+		Map outParams = new HashMap();
+		String url = request.getServletPath();
+
+		SecureRandom rand = new SecureRandom();
+
+		String keyString = rand.toString();
+		outParams.put("keyString", keyString);
+		if (url.equals("/adminlogin.htm"))
+			outParams.put("role", "admin");
+
+		if (servletFlag) {
+			servletFlag = false;
+		}
+		request.setAttribute("auditAction", "PAGEDISPLAY");
+		request.setAttribute("dataString", "");
+		logger.info("loginDisplay(HttpServletRequest request, HttpServletResponse response) method ends");
+		return new ModelAndView("loginDisplay", Constants.ERROR_MODEL, outParams);
+	}
+	
+	
+	@RequestMapping("/loginsubmit.htm")
+	public ModelAndView loginSubmit(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
+
+		System.out.println("=== LOGIN CONTROLLER CALLED 2 ===");
+		logger.info("loginSubmit(HttpServletRequest request, HttpServletResponse response) method begins");
+		HttpSession session = request.getSession();
+		session.setAttribute("refereshFlag_1", new Boolean(true));
+
+		if (servletFlag) {
+			servletFlag = false;
+		}
+
+		String userIPaddress = request.getHeader("ClientIP");
+		if (request.getRequestURL().toString().contains("localhost")) {
+			userIPaddress = "127.0.0.1";
+		}
+		SBIModelViewCache cache = null;
+
+		Map outParams = new HashMap();
+		String userName = request.getParameter(Constants.USER_NAME);
+		String password = request.getParameter(Constants.PASSWORD);
+
+		UserAgent userAgent = UserAgent.parseUserAgentString(request.getHeader("User-Agent"));
+		String userInitial = "";
+		
+		outParams.put("keyString", request.getParameter("keyString"));
+		String keyString = (String) request.getAttribute("keyString");
+		
+		if (userName != null && userName.trim() != "" && password != null && password.trim() != "") {
+
+			// ==========CAPTCHA VALIDATION FIRST=========
+			String captchaInput = request.getParameter("captchaInput");
+			String sessionCaptcha = (session != null) ? (String) session.getAttribute("captcha") : null;
+
+			if (sessionCaptcha == null || captchaInput == null || !captchaInput.equals(sessionCaptcha)) {
+				logger.warn("CAPTCHA validation failed for user: " + userName);
+
+				ApplicationResponse failureResponse = new ApplicationResponse(Constants.FAILURE);
+				failureResponse.setErrorCode("CAPTCHA_ERROR");
+
+				outParams.put(Constants.APPLICATION_RESPONSE, failureResponse);
+				outParams.put(Constants.ERROR_VIEW, "loginDisplay");
+				outParams.put(Constants.USER_NAME, userName);
+
+				// Generate new keyString for the return page
+				SecureRandom rand = new SecureRandom();
+				String keyString2 = rand.toString();
+				outParams.put("keyString", keyString2);
+
+				// Clear the captcha from session
+				session.removeAttribute("captcha");
+
+				return new ModelAndView("loginDisplay", Constants.ERROR_MODEL, outParams);
+			}
+
+			// Clear captcha after successful validation
+			session.removeAttribute("captcha");
+			logger.info("CAPTCHA validation successful");
+			// ========== CAPTCHA VALIDATION - END ==========
+
+			session.setAttribute("bulkEmailEnabled", CommonDAOImpl.isBulkEmailEnabled());
+
+			// ========== STEP 2: USERNAME & PASSWORD VALIDATION (ONLY AFTER CAPTCHA IS VALID) ==========
+			Map inputParams = new HashMap();
+			inputParams.put(Constants.USER_NAME, userName); 
+			inputParams.put(Constants.PASSWORD, password);
+			inputParams.put(Constants.IP_ADDRESS, userIPaddress);
+			inputParams.put("sessionId", session.getId());
+			inputParams.put("firstLogin", request.getParameter("firstLogin"));
+			inputParams.put("keyId", request.getParameter("keyString"));
+			inputParams.put("type", "login");
+
+			outParams = (Map) logonService.execute(inputParams);
+			outParams.put(Constants.USER_NAME, userName);
+			outParams.put(Constants.PASSWORD, password);
+			outParams.put(Constants.IP_ADDRESS, userIPaddress);
+
+			// Check if user exists
+			if ("NO".equals(outParams.get("UserExists"))) {
+				logger.info("User Doesn't Exist :: Authentication failed and redirecting to login page");
+				ApplicationResponse failureResponse = new ApplicationResponse(Constants.FAILURE);
+//				failureResponse.setErrorCode("UserNotActive");
+				failureResponse.setErrorCode("UserNotExist");
+				outParams.put(Constants.APPLICATION_RESPONSE, failureResponse);
+				outParams.put(Constants.ERROR_VIEW, "loginDisplay");
+				
+				// Generate new keyString for the return page
+				SecureRandom rand = new SecureRandom();
+				String keyString2 = rand.toString();
+				outParams.put("keyString", keyString2);
+				
+				return new ModelAndView("loginDisplay", Constants.ERROR_MODEL, outParams);
+			}
+
+			// Check if password is wrong
+			ApplicationResponse appRsp = (ApplicationResponse) outParams.get(Constants.APPLICATION_RESPONSE);
+			if (appRsp != null && appRsp.getStatus().equalsIgnoreCase(Constants.FAILURE)) {
+				logger.info("Invalid username/password :: Authentication failed");
+				outParams.put(Constants.ERROR_VIEW, "loginDisplay");
+				
+				// Generate new keyString for the return page
+				SecureRandom rand = new SecureRandom();
+				String keyString2 = rand.toString();
+				outParams.put("keyString", keyString2);
+				
+				return new ModelAndView("loginDisplay", Constants.ERROR_MODEL, outParams);
+			}
+
+			// ========== REST OF CODE CONTINUES HERE (Session creation, etc.) ==========
+			Map<String, Object> temp = new ConcurrentHashMap<String, Object>();
+			Enumeration e = session.getAttributeNames();
+			while (e != null && e.hasMoreElements()) {
+				String name = (String) e.nextElement();
+				Object value = session.getAttribute(name);
+				temp.put(name, value);
+			}
+			session.invalidate();
+			HttpSession session1 = request.getSession();
+
+			for (Map.Entry<String, Object> stringObjectEntry : temp.entrySet()) {
+				session1.setAttribute(stringObjectEntry.getKey(), stringObjectEntry.getValue());
+			}
+
+			session1.setAttribute("outParams", outParams);
+
+			if (null != request.getParameter("tokenId") && !("".equalsIgnoreCase(request.getParameter("tokenId")))) {
+				if (null != cache.getOldToken() || !("".equalsIgnoreCase(cache.getOldToken()))) {
+					cache.setOldToken(request.getParameter("tokenId").toString());
+				}
+			}
+
+			cache = session1.getAttribute("cachevar") == null ? new SBIModelViewCache()
+					: (SBIModelViewCache) session1.getAttribute("cachevar");
+
+			session1.setAttribute("cachevar", cache);
+			session1.setAttribute("userName", userName);
+
+			cache.setOldToken((String) request.getParameter("tokenId"));
+
+			if ("YES".equals(outParams.get("UserExists")) && (Integer) outParams.get("testFlag") > 0) {
+
+				session1.setAttribute("ForgotFlag", 0);
+				ApplicationResponse appRsp2 = (ApplicationResponse) outParams.get(Constants.APPLICATION_RESPONSE);
+				session1.setAttribute(Constants.USER, outParams.get(Constants.USER));
+				request.getRequestDispatcher("/changeloginpassword.htm").forward(request, response);
+			} else {
+
+				ApplicationResponse appRsp2 = (ApplicationResponse) outParams.get(Constants.APPLICATION_RESPONSE);
+				if (appRsp2.getStatus().equalsIgnoreCase(Constants.SUCCESS)) {
+					session1.setAttribute(Constants.USER, outParams.get(Constants.USER));
+					User user = (User) outParams.get(Constants.USER);
+					userInitial = (String) user.getUserInitial();
+
+					if (user.getUserId() != null) {
+						logger.info("User Authenticated and redirecting to landing page");
+						session1.setAttribute("FAG", "ANT1");
+						request.setAttribute("auditAction", "LOGIN");
+						request.setAttribute("dataString", "");
+						response.sendRedirect(baseURL + myPageURL.get(user.getType()));
+						System.out.println("=== DEBUG INFO ===");
+						System.out.println("baseURL: " + baseURL);
+						System.out.println("user.getType(): " + user.getType());
+						System.out.println("myPageURL.get(user.getType()): " + myPageURL.get(user.getType()));
+						System.out.println("==================");
+
+						return null;
+					}
+					outParams.put(Constants.ERROR_VIEW, "loginDisplay");
+				} else {
+					outParams.put("keyString", request.getParameter("keyString"));
+					logger.info("loginSubmit(HttpServletRequest request, HttpServletResponse response) method ends");
+					return new ModelAndView("loginDisplay", Constants.ERROR_MODEL, outParams);
+				}
+			}
+		}
+		logger.info("loginSubmit(HttpServletRequest request, HttpServletResponse response) method ends");
+
+		return new ModelAndView("loginDisplay", Constants.ERROR_MODEL, outParams);
+	}
+	
+
+	@RequestMapping("/sessiontimeout.htm")
+	public ModelAndView sessionTimeOutHandler(HttpServletRequest request, HttpServletResponse response) {
+		logger.info("sessionTimeOutHandler(HttpServletRequest request, HttpServletResponse response) method begins");
+		HttpSession session = request.getSession(false);
+		session.invalidate();
+		session = null;
+		logger.info("sessionTimeOutHandler(HttpServletRequest request, HttpServletResponse response) method ends");
+		return new ModelAndView("sessiontimeoutdisplay");
+	}
+
+	@RequestMapping("/logout.htm")
+	public ModelAndView logoutHandler(HttpServletRequest request, HttpServletResponse response) {
+		logger.info("logoutHandler(HttpServletRequest request, HttpServletResponse response) method begins");
+		HttpSession session = request.getSession(false);
+		Map outParams = new HashMap();
+		if (session != null) {
+			User user = (User) session.getAttribute(Constants.USER);
+			if (user != null) {
+				CommonDAOImpl.removeLoggdinUser(user.getUserAlias());
+
+				if (user.getRole().equals("ADMIN"))
+					outParams.put("role", "admin");
+			}
+
+			session.invalidate();
+
+		}
+		SecureRandom rand = new SecureRandom();
+		String keyString = rand.toString();
+		outParams.put("keyString", keyString);
+		outParams.put("logout", "logout");
+		request.setAttribute("auditAction", "LOGOUT");
+		request.setAttribute("dataString", "");
+		logger.info("logoutHandler(HttpServletRequest request, HttpServletResponse response) method ends");
+		return new ModelAndView("logoutdisplay", Constants.ERROR_MODEL, outParams);
+	}
+
+	@RequestMapping("/contact.htm")
+	public ModelAndView contactDisplay(HttpServletRequest request, HttpServletResponse response) {
+		logger.info("contactDisplay(HttpServletRequest request, HttpServletResponse response) method begins");
+		HttpSession session = request.getSession(true);
+		Map outParams = new HashMap();
+		String url = request.getServletPath();
+
+		request.setAttribute("auditAction", "PAGEDISPLAY");
+		request.setAttribute("dataString", "");
+		logger.info("contactDisplay(HttpServletRequest request, HttpServletResponse response) method ends");
+		return new ModelAndView("contactDisplay", Constants.ERROR_MODEL, outParams);
+	}
+
+	// Added by Anil for forget password
+
+	public ModelAndView forgetPassword(HttpServletRequest request, HttpServletResponse response) {
+		logger.info("forgetPassword(HttpServletRequest request, HttpServletResponse response) method begins");
+		HttpSession session = request.getSession(true);
+		Map outParams = new HashMap();
+
+		logger.info("forgetPassword(HttpServletRequest request, HttpServletResponse response) method ends");
+		return new ModelAndView("FpassDisplay", Constants.ERROR_MODEL, outParams);
+	}
+
+	public ModelAndView forgetpasswordsubmit(HttpServletRequest request, HttpServletResponse response) {
+		logger.info("forgetpasswordsubmit(HttpServletRequest request, HttpServletResponse response) method begins");
+		HttpSession session = request.getSession(true);
+		Map inParams = new HashMap();
+		Map outParams = new HashMap();
+		Enumeration params = request.getParameterNames();
+		while (params.hasMoreElements()) {
+			String param = (String) params.nextElement();
+			inParams.put(param, request.getParameter(param));
+		}
+
+		String captcha = "";
+		captcha = request.getParameter("captcha");
+		// Added by Koteswara for CAPTCHA Starts
+
+		if (captcha == null || (!captcha.equalsIgnoreCase("success"))) {
+
+			/* Map<Object,Object> outParams = new HashMap<Object,Object>(); */
+			String keyId = ""; // added for JSEncryption
+			// return_view = getReturnView(bankCode);
+			String contextName = request.getContextPath().substring(1);
+			captcha = outParams.get("captcha").toString();
+			if ("failure".equalsIgnoreCase(captcha)) {
+				String userName = request.getParameter("");
+				outParams.put("userName", userName);
+				return new ModelAndView("FpassDisplay", "errorModel", outParams);
+			}
+		}
+
+		inParams.put("type", "forgetpassword");
+		outParams = logonService.execute(inParams);
+
+		logger.info("forgetpasswordsubmit(HttpServletRequest request, HttpServletResponse response) method ends");
+		return new ModelAndView("forgetpasswordsubmit", Constants.ERROR_MODEL, outParams);
+	}
+
+	private void setMyPageUrls() {
+		HashMap<String, String> map = new HashMap<String, String>();
+		map.put("SuperAdmin", superAdminURL);
+		map.put("DO-Admin", doAdminURL);
+		map.put("FO-Admin", foAdminURL);
+		map.put("DO", doURL);
+		map.put("FO", foURL);
+		map.put("GTDUser", gtdURL);
+		map.put("GMUKUser", gmukURL);
+		map.put("Risk clearance CAG", cagURL);
+		map.put("Risk clearance CCG", ccgURL);
+
+		this.myPageURL = map;
+	}
+}
+
