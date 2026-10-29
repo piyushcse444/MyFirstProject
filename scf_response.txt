@@ -1,29 +1,106 @@
-package com.sbi.utils;
+Procuring Screening Committee Approval proposal			
+Note ID	IT Foreign Offices/ FY:2026-27/ Nomination/IPA ID Dated:29.07.2026		
+"CIO (Chairman)
+(For approval) "			In case the estimated cost of above 25 lakhs
+"CTO (Permanent Member)
+(For approval)"			
+Proposal Description	"Approval for the following development and integration tasks to be done by Wipro Ltd.,hired on nomination basis:
+1. FTI-SCF Integration in 22 remaining SBI Foreign Offices by within 31st December 2026;
+2. Upgradation of SR2026 within November 2026 and
+3. Development & enhancements for regulatory changes in Bangladesh within 31st October 2026.
 
-public interface Constants {
-	public static final String APPLICATION_RESPONSE = "applicationResponse";
-	public static final String FAILURE = "Failure";
-	public static final String ERROR_VIEW = "errorView";
-	public static final String ERROR_MODEL = "errorModel";
-	public static final String SESSION_ERROR = "sessionError";
-	public static final String USER = "user";
-	public static final String SUCCESS  = "success";
-	public static final String USER_NAME = "userName";
-	public static final String PASSWORD = "password";
-	public static final String IP_ADDRESS = "ipAddress";
-	public static final String USER_ID = "userId";
-	public static final String EMAIL = "emailId";
+4. Deviation for procurement outside GeM"		
+Mode of Procurement	Nomination		
+Activity proposed	Application Development, Maintenance and Testing; Application Service Providers (ASPs) including ATM Switch ASPs;		
+Background of the project	"Finastra Trade Innovation (FTI) is a Trade Finance & Supply Chain Finance (SCF) software from Finastra.FTI is a global trade finance engine which is being used by our Foreign Offices to process Letters of Credit,Guarantees,Collections and SCF. The integration of FTI & SCF has already been deployed for USA (Phase-I) and now the objective is integration of FTI with SCF product across the remaining 22 Foreign Offices (Phase-2). The key deliverables under phase-2 are as follows:
+a) API Integration : Integrate with Credible (a supply chain finance platform) through enterprise service bus (ESB),
+b) FTI Customization by adding new field layouts alongwith integration of extra data fields in API,
+c) Front-end Configuration in FTI through new SCF product setupworkflow orchestrations,Interest & Charges product-type wise mapping,security in user roles and groups and External system definition,
+d) Reporting : Customized report development for SCF product.
+In this regard,a proposal along with the details of commercials,terms & conditions and timeline has been submitted by Wipro Ltd. (attached as Annexure-I) , who is providing professional & technical services for customization,support and maintanance of the application since inception.  
 
-	public static final String DO_USER = "21";
-	public static final String DO_ADMIN_USER = "24";
-	public static final String FO_USER = "22";
-	public static final String FO_ADMIN_USER = "82";
-	public static final String GTD_USER = "23";
-	public static final String GMUK_USER = "325";
-	public static final String ADMIN = "81";
-	public static final String CCG_RISK = "370";
-	public static final String CAG_RISK = "369";
+2. In addition to the above,there is a need to upgrade FTI and Finastra Corporate Channel (FCC) to latest supported versions for all the 23 foreign offices.The expected outcome from this upgradation will be long-term stability,regulatory readiness for SWIFT SR2026,and FTI-FCC compatibility across all foreign offices.The key changes in FTI & FCC will be : 
+a) Discontinuation of unstructured addresss from Nov 2026,
+b) There will be new fields in HS Code & Incoterms in trade messages,
+c) Revisions to party fileds in MT4xx,MT7xx,MT798,and
+d) NACKs prevention through enhanced network validations.
+In this regard,a proposal along with the details of commercials,terms & conditions and timeline has been submitted by Wipro Ltd. (attached as Annexure-II) , who is providing professional & technical services for customization,support and maintanance of the application since inception.  
 
-//	public static final String pdfFilePath="D:/opt/docroot/bcqi/GTD/PDF/";  
-	public final String pdfFilePath="/opt/docroot/bcqi/GTD/PDF/";  
-}
+3. Another important requirement needs to be taken into consideration for development and enhancements as per regulatory changes in Bangladesh,focused on import letter of credit (ILC) module,customer and bill of entry.The key deliverables under this will be : 
+a) Customized new fields in ILC module for pre-shipment inspection,
+b) Customer master updation,
+c) New customer fields in UI,
+d) New Module for Bill of Entry detailswith back-end and front-end validations,and
+e) Incoporation of of fetch logic for all new customized fields.
+In this regard,a proposal along with the details of commercials,terms & conditions and timeline has been submitted by Wipro Ltd. (attached as Annexure-III) , who is providing professional & technical services for customization,support and maintanance of the application since inception.  
+ 
+4. The total proposed outlay to deliver these development,integration and enhancements will be Rs. 3,82,22,000.00 (Rupess Three Crore Eighty Two Lakh & Twenty Two Thousand only)."		
+Objectives/ purpose of proposed proposal (details to be given as to why outsourcing is needed)	"(i) Wipro Technologies Services Ltd is the SI of FTI and bridges FTI with our systems.
+(ii) Wipro provides on-site experienced resources for end-to-end solutions for FTI.
+(iii) Wipro,as a vendor partner possesses the requisite domain knowledge, technical expertise, source code access, and ownership rights necessary for maintenance and enhancements of the application, it is recommended to outsource the application development activities for aforementioned enhancements planned for current financial year (FY 2026-27)."		
+Bank has resources/capability to perform the service (If yes, please provide rationale)	NO		
+"Need Assessment (details to be provided on the following points:  
+i.	Background on Identification need Identification, 
+ii.	Proposed Design & Technical Solution
+iii.Decision for Outsourcing backed with Data and Research)"	NA		
+Procurement Type	Gr-II  Electronics & Computer items		
+Procurement Subtype	Gr II - C : Purchase and/or Development of software (including customization/integration)		
+Estimated Project Cost (Rs. in Lakhs)	382.22		
+Cost-benefit analysis (details to be given as to how proposed procurement will benefit the Bank)	"The proposed procurement will deliver substantial business and operational benefits. The key benefits arising from the proposed initiatives are as follows:
+1. Automation of PLP process will elimintae extensive manual effort undertaken by HR officials of WMBU department. The solution will automate the performance linked pay process thereby eliminating manual interventions involved in data collation, validation, PLP computation and payout processing in accordance with PLP policy. 
+2.  Digital investment journey for NRI customers will enable transaction capabilities thereby supporting business growth in the NRI segment. 
+3.  RM-Tablet app will enhance RM productivity by providing on-the-go access to customer information, potfolio insights and real-time servicing capabilities. 
+4. The introduction of SIF(Specilized Investment Fund) with minimum investment of Rs 10 Lakh, will provide differentiated investment alternative to wealth customer segment. The availability of wider range of investment products will facilitate deeper customer engagement and generate additional fee-based income opportunities for the bank.
+
+The cost incurred towards the proposed developments is commensurate with  benefits accruing to the bank in terms of improved productivity, increased revenue potential and strengthened competitiveness of the SBIWealth offerings.
+"		
+Expected outcome of procurement (details to be given as to how it will benefit Bank’s customer or staff)	"1.  The proposed initiatives will facilitate timely and accurate processing of PLP payouts to Lateral officials under Sales and Non-Sales roles. It will also free-up HR officials of administrative efforts required for manual PLP computation every quarter and year-end.
+2.  NRI Wealth customers will be able to digitally invest in approved domestic mutual funds schemes.
+3.  The initiatives such as Tablet app will improve RM productivity, make it more user-friendly, providing access to broader range of investment solutions such as SIF and drive greater customer engagement across wealth offerings."		
+Outsourcing Assessment Result (Details in the annexure)	"1. Outsourcing Determination: IT- Outsourced (Annexure - I)
+2. Materiality Assessment: Not Material (Annexure - II)
+3. Outcome of the service risk profiling: Low (Annexure - III)
+4. Exit checklist: Details in Annexure - IV"		
+Procurement through GeM Portal?	NO		
+Reason for not procuring from GeM	Professional and technical services being procured from existing vendor partner on nomination since inception of the application.		
+Whether Procurement is for AMC/ATS/S&S	NO		
+Nomination reason selected	"Additional work(s), Enhancement in the original application etc. where the nature and scope are substantially similar to the original contracted work, subject to entire procurements are Co-terminus with Original work Order and should be continuation of existing / related nature of work and not for development of new product. 
+
+Proposals involving new or entirely different application, enhancements or unrelated functionalities etc. relating to critical / part of Critical Information Systems (CIS) to the Bank are to be processed through competitive procurement route only. 
+
+Procurement of business-critical projects / products those were built by vendors from scratch on Nomination basis may be continued subject to review by the IT-PSC for Applications like IT FO, INB, CBS where the vendor has not been changed since inception. Nomination route of procurement should be subject to enhanced due diligence by the IT-PSC to ensure:
+a) Relevance of the proposed technology / procurement 
+b) Fair price discovery from the Market information, industry sources etc. "		
+Detailed Justification for proposing continuation of contract on nomination basis	Wipro Technologies Services Ltd is the SI of FTI and bridges FTI with our systems & provides on-site experienced resources with possesses the requisite domain knowledge & technical expertise for end-to-end solutions for FTI.		
+Detailed Transition Plan	Not applicable		
+Duration of the contract	Perpetual		
+TPNC Required? 	YES		
+If not applicable, reason for the same	NIL		
+Constitution of TPNC (section will be available only if TPNC required is selected as Yes)			
+TPNC along with following members:			
+Name  	Designation  	Chairman/Member/Secretary	
+To be allocated by PRD	According to allocation	Chairman	
+To be allocated by PRD	According to allocation	Member	
+To be allocated by PRD	According to allocation	Member	
+To be allocated by PRD	According to allocation	ISD Member	
+Praveen Kumar 	Dy. General Manager	Member	
+Abhimanyu Kumar 	Asst. General Manager (S)	Secretary	
+Sayantan Basu	Chief Manager	Member	
+Scope of the TPNC	As provided in IT Procurement Manual		
+Quorum for meeting	As provided in IT Procurement Manual		
+Expected time of completion of negotiation by TPNC	45 days from the date of committee formation.		
+GeM ARPTS (Availability Report and Past Transaction Summary)	NA		
+Recommendation	The above proposal is in line with the following conditions as mentioned in IT Procurement Policy/Manual & IT Outsourcing Policy/Manual		
+"We certify that: 
+1)	All information, data, details, justifications provided to the IT- PSC are appropriately verified and correct.
+2)	Necessary evidence, supporting documents are provided to IT - PSC.
+3)	In case of closed RFP among OEM channel partners, only platinum, gold or equivalent channel partners are considered. All such partners are invariably invited / proposed to be invited for necessary participation in the bidding process. 
+4)	Continuation of channel partners at the required level (platinum / gold or equivalent) is independently verified.
+5)	In case of continuation of previously awarded Nomination proposals, proposed vendors are not blacklisted."			
+We propose Continuation of IT contract for development, integration and enhancements of the mentioned applications from M/s Wipro Ltd. on nomination basis.			
+"Kindly Approve.
+
+(Praveen Kumar)
+Deputy General Manager
+IT Foreign Offices
+29.07.2026"			
