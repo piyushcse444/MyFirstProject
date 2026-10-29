@@ -1,69 +1,255 @@
-Map<String, Object> temp = new ConcurrentHashMap<String, Object>();
-			Enumeration e = session.getAttributeNames();
-			while (e != null && e.hasMoreElements()) {
-				String name = (String) e.nextElement();
-				Object value = session.getAttribute(name);
-				temp.put(name, value);
-			}
-			session.invalidate();
-			HttpSession session1 = request.getSession();
-
-			for (Map.Entry<String, Object> stringObjectEntry : temp.entrySet()) {
-				session1.setAttribute(stringObjectEntry.getKey(), stringObjectEntry.getValue());
-			}
-
-			session1.setAttribute("outParams", outParams);
-
-			if (null != request.getParameter("tokenId") && !("".equalsIgnoreCase(request.getParameter("tokenId")))) {
-				if (null != cache.getOldToken() || !("".equalsIgnoreCase(cache.getOldToken()))) {
-					cache.setOldToken(request.getParameter("tokenId").toString());
-				}
-			}
-
-			cache = session1.getAttribute("cachevar") == null ? new SBIModelViewCache()
-					: (SBIModelViewCache) session1.getAttribute("cachevar");
-
-			session1.setAttribute("cachevar", cache);
-			session1.setAttribute("userName", userName);
-
-			cache.setOldToken((String) request.getParameter("tokenId"));
-
-			if ("YES".equals(outParams.get("UserExists")) && (Integer) outParams.get("testFlag") > 0) {
-
-				session1.setAttribute("ForgotFlag", 0);
-				ApplicationResponse appRsp2 = (ApplicationResponse) outParams.get(Constants.APPLICATION_RESPONSE);
-				session1.setAttribute(Constants.USER, outParams.get(Constants.USER));
-				request.getRequestDispatcher("/changeloginpassword.htm").forward(request, response);
-			} else {
-
-				ApplicationResponse appRsp2 = (ApplicationResponse) outParams.get(Constants.APPLICATION_RESPONSE);
-				if (appRsp2.getStatus().equalsIgnoreCase(Constants.SUCCESS)) {
-					session1.setAttribute(Constants.USER, outParams.get(Constants.USER));
-					User user = (User) outParams.get(Constants.USER);
-					userInitial = (String) user.getUserInitial();
-
-					if (user.getUserId() != null) {
-						logger.info("User Authenticated and redirecting to landing page");
-						session1.setAttribute("FAG", "ANT1");
-						request.setAttribute("auditAction", "LOGIN");
-						request.setAttribute("dataString", "");
-						response.sendRedirect(baseURL + myPageURL.get(user.getType()));
-						System.out.println("=== DEBUG INFO ===");
-						System.out.println("baseURL: " + baseURL);
-						System.out.println("user.getType(): " + user.getType());
-						System.out.println("myPageURL.get(user.getType()): " + myPageURL.get(user.getType()));
-						System.out.println("==================");
-
-						return null;
-					}
-					outParams.put(Constants.ERROR_VIEW, "loginDisplay");
-				} else {
-					outParams.put("keyString", request.getParameter("keyString"));
-					logger.info("loginSubmit(HttpServletRequest request, HttpServletResponse response) method ends");
-					return new ModelAndView("loginDisplay", Constants.ERROR_MODEL, outParams);
-				}
-			}
-		}
-		logger.info("loginSubmit(HttpServletRequest request, HttpServletResponse response) method ends");
-
-		return new ModelAndView("loginDisplay", Constants.ERROR_MODEL, outParams);
+ 
+1 
+ 
+SBI 3.1.1 Release Note 
+ 
+Table of Contents 
+ 
+Overview .................................................................................................................................... 2 
+Feature Summary ....................................................................................................................... 2 
+Detailed Key Features ................................................................................................................ 2 
+1. Bank Name in Disbursement and Repayment Account Listing .......................................... 2 
+2. Custom Payment Date via Invoice File ............................................................................... 3 
+3. New Invoice Ingestion Flow ............................................................................................... 4 
+3.1. Invoice Ingestion Flow → Direct Invoice Upload ........................................................ 5 
+3.2. Invoice Ingestion Flow → Platform Standard Flow ..................................................... 5 
+3.3   Counterparty Code Generation Rule .......................................................................... 6 
+4. JPMC File Mapping with Invoice File .................................................................................. 6 
+5. 5-Character Validation on Benchmark Rate Code .............................................................. 7 
+Steps to Check all the above-mentioned features ..................................................................... 7 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+SBI SCF Platform v3.1.1 Release Note 
+Version History 
+Release Name Release Date Version 
+SBI 3.1.1 31st August 2026 3.1.1 
+  
+ 
+2 
+ 
+Overview 
+At the time of UAT & Go live sessions with SBI NYFO had highlighted few requirements which 
+would help them run the platform more efficiently, we intend to release the following 
+improvements: Bank Name visibility on account listings, a custom payment date field on the 
+invoice upload file, a new JPMC inbound file adapter with the associated invoice ingestion 
+and counterparty code generation flows for MRPA, and a 5-character validation on the 
+Benchmark Rate Code.  
+Through this release, we intend to give SBI Admins greater visibility and control over account 
+and payment data, streamline invoice ingestion for MRPA lead-bank arrangements, and 
+enforce data quality on rate configuration. 
+Feature Summary 
+Feature Purpose 
+1. Bank Name in 
+Disbursement and 
+Repayment Account 
+Listing 
+Bank Name is now visible as a default column in 
+the Manage Accounts listing, including pending
+approval state 
+2. Custom Payment Date 
+via Invoice File 
+Buyers/bank admins can specify a custom payment 
+date per invoice directly in the invoice upload file 
+3. New Invoice Ingestion 
+Flow 
+A new Invoice Ingestion Flow field, visible only for 
+MRPA programs, lets admins choose between 
+Direct Invoice Upload and Platform Standard Flow 
+ Invoice Ingestion Flow → 
+Direct Invoice Upload 
+ 
+ Invoice Ingestion Flow → 
+Platform Standard Flow 
+ 
+3. Counterparty Code 
+Generation Rule 
+Adds a Direct Invoice Upload option that lets MRPA 
+invoices be uploaded without a counterparty file 
+ 
+Supplier/counterparty codes are generated and 
+reused using a standardized SHA-256 checksum
+based rule 
+4. JPMC File Mapping with 
+Invoice File 
+The invoice upload file mapping logic now 
+consumes the JPMC lead bank file format as-is for 
+MRPA programs 
+5-Character Validation on 
+Benchmark Rate Code 
+Enforces a mandatory 5-character format on the 
+Benchmark Rate Code field for the SBI tenant 
+ 
+Detailed Key Features 
+1. Bank Name in Disbursement and Repayment Account Listing 
+Bank Name is now visible as a default column in both the Disbursement Account Details and 
+Repayment Account Details listing tables under Banks Module 
+ 
+3 
+ 
+Banks Module → Select your Bank→ View/Edit → Set Preference → listing of configured 
+buyers → 3 vertical dots → Manage Accounts 
+• Records with any status of “Active” and "Pending" display Currency, Country, Account 
+Holder Name, Bank Name, Bank Account No., Bank Branch Name, BBAN, IBAN, NCC, 
+Status & Action 
+• All other existing functionality, including the 3-dot action menu for editing and 
+deleting a row remains unchanged, and no other columns are affected. 
+ 
+ 
+2. Custom Payment Date via Invoice File 
+Buyers/bank admins can now optionally provide a custom payment date for individual 
+invoices directly in the invoice upload file, so that invoices can be financed on a specific 
+future date without configuring custom payment dates through the platform UI. 
+• A new optional column, Custom Payment Date, has been added to the invoice upload 
+file. When provided and valid, it overrides the platform’s default payment date 
+calculation and is used as the payment date for that invoice. 
+• The date is validated at upload against bank currency holidays, the buyer’s calendar 
+(weekends and buyer holidays), and the applicable processing cut-off time, and must 
+fall on or before the due date/extended due date and on or after the invoice date. 
+• Rows with an invalid Custom Payment Date (past date, holiday, cut-off breach, or out
+of-range date) are rejected with a specific error message, while other valid rows in 
+the same file continue to be processed; a summary of rejected rows with reasons is 
+shown after processing. 
+• If the column is left blank, the invoice falls back to existing behaviour (default logic or 
+UI-configured custom payment dates in the risk-ops module). 
+• Where both the UI-configured custom payment date feature and a file-level date are 
+present for an invoice, the file-level date takes precedence. 
+ 
+4 
+ 
+3. New Invoice Ingestion Flow 
+A new Invoice Ingestion Flow field has been added to the Buyer Configuration section, visible 
+only for MRPA programs.The field appears in the Buyer Configuration section only when 
+Program Type = MRPA is selected under Buyers Module → Add New Buyer. 
+• The field offers exactly two dropdown options — Direct Invoice Upload and Platform 
+Standard Flow — and blank or invalid values are not permitted. 
+• Selecting Direct Invoice Upload means no counterparty file is required, and supplier 
+codes are auto generated by the platform at the time of invoice upload. 
+• Selecting Platform Standard Flow keeps existing behaviour unchanged: counterparty 
+file and invoice file upload are both mandatory, with de-duplication checks applied as 
+per current system logic. 
+This feature covers the effect of selecting Direct Invoice Upload as the Invoice Ingestion Flow 
+on the Counterparty and Invoice Upload pages. 
+• A buyer/program configured with Invoice Ingestion Flow = Direct Invoice Upload no 
+longer appears in the Counterparty page’s buyer dropdown/list, with no error shown 
+if a user searches or filters for it there. 
+• The same buyer/program remains available under Invoices → Add New/Upload 
+Invoices for direct file upload. 
+• On selecting the buyer name on the Upload Invoices screen, an information icon 
+appears below the Buyer Name header. 
+• The information icon displays "Inbound File Adapter (File Format) - <value>", with 
+the value dynamically fetched from the Inbound File Adapter configured for that 
+buyer; the icon does not appear if this value is missing. 
+• Behaviour for buyers/programs not on the Direct Invoice Upload flow remains 
+unchanged. 
+ 
+ 
+ 
+5 
+ 
+3.1. Invoice Ingestion Flow → Direct Invoice Upload 
+For MRPA buyers, a Direct Invoice Upload option is now available under Invoice Ingestion 
+Flow, allowing invoices to be uploaded without a counterparty file. 
+• When a bank admin configures Program Type = MRPA and Invoice Ingestion Flow = 
+Direct Invoice Upload for a buyer, no counterparty file is required for that 
+buyer/program. 
+• Invoices for that buyer/program can be uploaded directly through Invoices Module 
+→ Upload Invoices for processing. 
+ 
+3.2. Invoice Ingestion Flow → Platform Standard Flow 
+A Platform Standard Flow option is available under Invoice Ingestion Flow, preserving the 
+existing counterparty-then-invoice upload sequence. 
+• When a bank admin configures Program Type as MRPA with Invoice Ingestion Flow = 
+Platform Standard Flow, the platform follows the standard end-to-end flow for that 
+buyer/program. 
+• Under this flow, the admin must first upload the counterparty file via Supplier 
+Module → Add New, and only then upload the invoice file via Invoices Module → 
+Upload Invoices. 
+ 
+6 
+ 
+ 
+3.3   Counterparty Code Generation Rule 
+Introduces a standardized rule for generating and reusing counterparty/supplier codes when 
+invoices are uploaded under the Direct Invoice Upload flow. 
+• Supplier codes are generated using the first 20 characters of the SHA-256 hash of the 
+Buyer Code combined with the Supplier Name. 
+• On invoice upload, the platform performs a case-insensitive lookup against the 
+supplier master table. 
+• If the supplier name does not exist in the system, a new code is generated using the 
+checksum method and stored with status Active. 
+• If the supplier exists and is Active, the existing code is reused, and de-duplication 
+checks (Invoice ID + Supplier Code) apply for that supplier. 
+• If the supplier exists but is Inactive, the original code assigned to that supplier is 
+reused. 
+• No supplier record is created if the invoice file is rejected, and no duplicate suppliers 
+are created regardless of whether the supplier name is provided in upper case, camel 
+case, or lower case. 
+ 
+4. JPMC File Mapping with Invoice File 
+For MRPA programs, where the lead bank is JPMC, the invoice upload file mapping logic now 
+consumes the JPMC lead bank file as is, without requiring the SBI Admin to reformat or split 
+it into separate files. 
+• Invoice Upload File fields -Document ID, Document Date, Document Due Date, 
+Document Currency, Document Amount, Document Net Amount, and Payment Date 
+are mapped directly to their corresponding JPMC source file columns. 
+• Payment Date is captured from the JPMC file’s Effective Date column. 
+ 
+7 
+ 
+• Document Date, Document Due Date, and Payment Date follow the JPMC adapter’s 
+MM.DD.YYYY format; each adapter’s date format is applied and maintained 
+independently. 
+• The Acknowledgment File generated when the lead bank file is uploaded remains the 
+same as the existing acknowledgment shown for standard invoice uploads. 
+• Supplier codes are generated using the SHA-256 checksum method at the time of 
+upload: a new code is generated for a supplier not found in the system, an existing 
+Active supplier’s code is reused, and even a single-character variation in supplier 
+name results in a new code being generated. 
+• De-duplication checks (Invoice ID + Supplier Code) run within each buyer program; 
+the same supplier under two different buyer programs receives independent codes. 
+5. 5-Character Validation on Benchmark Rate Code 
+The Benchmark Rate Code field in the Manage Benchmark Rates section now enforces a 
+mandatory 5-character format, aligned with Finastra’s requirements, for the SBI tenant. 
+• In the Add Benchmark Rate modal, the Benchmark Rate Code field stops accepting 
+input beyond 5 characters, 6th character cannot be typed. 
+• If the field is submitted empty or with an invalid entry, the system displays 
+"Benchmark Rate Code must be exactly 5 characters (e.g., SON30)" in red directly 
+below the field, consistent with existing inline validation styling on the platform. 
+• The validation error clears automatically once the field is corrected to exactly 5 valid 
+characters. 
+• Special characters and spaces are not permitted in the Benchmark Rate Code. 
+Steps to Check all the above-mentioned features 
+1. Log in to the SBI SCF Platform with your Admin credentials. 
+2. Account Listing: Navigate to Banks → Set Preference → listing of configured buyers → 
+3 vertical dots → Manage Accounts. Confirm Bank Name is visible by default in both 
+the Disbursement and Repayment Account Details listings, and that Pending records 
+display Bank Name, Country, and Bank Account No. in red. 
+3. Custom Payment Date: Upload an invoice file with a Custom Payment Date populated 
+for a future working day and confirm the invoice is financed on that date. Repeat 
+with a past date, a holiday, and a cut-off breach, and confirm each row is rejected 
+with the corresponding error while other valid rows still process. 
+4. MRPA/JPMC Flow: For a buyer configured with Program Type = MRPA, confirm the 
+Invoice Ingestion Flow field appears with Direct Invoice Upload and Platform 
+Standard Flow as options, and does not appear for non-MRPA program types. 
+5. Select Direct Invoice Upload for a buyer and confirm it no longer appears on the 
+Counterparty page but is available under Invoices → Upload Invoices with the 
+ 
+8 
+ 
+adapter info icon showing "Inbound File Adapter (File Format) - JPMC" (or the 
+configured value) once a buyer is selected. 
+6. Select Platform Standard Flow for MRPA buyer and confirm the counterparty file 
+must be uploaded via Supplier Module → Add New before the invoice file can be 
+uploaded via Invoices Module → Upload Invoices. 
+7. Upload a JPMC-format invoice file for a Direct Invoice Upload buyer and confirm it is 
+consumed without reformatting, supplier codes are generated/reused correctly (new 
+vs. existing vs. inactive supplier), and the Acknowledgment File is generated as 
+expected. 
+8. Benchmark Rate Code: In Manage Benchmark Rates, confirm the Benchmark Rate 
+Code field stops input at 5 characters, shows the validation error on an empty/invalid 
+submission, and clears the error once corrected. 
