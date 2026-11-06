@@ -1,0 +1,105 @@
+Subj :- 
+
+Supply Chain Finance (SCF) – UAT Details and User Guide for Belgium FO 
+
+ 
+
+Body :- 
+
+ 
+
+Dear Team, 
+
+The Supply Chain Finance (SCF) solution has been implemented using the CredAble SCF platform, which is integrated with Finastra TI+ (FTI) to facilitate end-to-end processing of Supply Chain Finance transactions. 
+
+Key features of the solution include: 
+
+Support for both Payables and Receivables financing programs, including MRPA and Bilateral modules. 
+
+Multiple integration channels, including SFTP, Direct Upload, and ERP Connectors, for onboarding supplier/buyer data, invoices, and credit notes. 
+
+A centralized front-end for buyers, suppliers, and bank users to track invoice financing status and monitor program performance for Bilateral programs. 
+
+Automated validation and processing of invoices based on configured business rules before transactions are submitted to FTI. 
+
+Reverse integration with FTI to provide transaction status updates, along with document management and communication capabilities such as payment advices, financing agreements, repayment reminders, and other notifications. 
+
+The SCF solution has already been successfully deployed in the New York, Germany, Dubai , Gift City, Singapore and UK FO Production environment. We are now preparing for the Belgium FO Production rollout which will commence upon successful UAT sign-off. Our development team has completed the required UAT validation, and we request your team to perform UAT testing and provide your sign-off so that we can proceed with the Production deployment. 
+
+The SCF product has been released in FTI with functionality similar to Trade Credit. Users will be able to input transactions in the SCF module in FTI after the corresponding transactions are released from the CredAble platform. 
+
+Additionally,  FTI walkthrough contains step-by-step screenshots of FTI workflow to assist you during UAT. 
+
+UAT Details 
+
+AP SGFO URL: 
+https://uat.scf.globalbank.sbi/home?tenant=SA 
+
+Maker 
+Username: admin@sbi.in 
+Password: Credo@123 
+
+Username : makerbe1@sbi.in 
+
+Password : Credo@123 
+
+ 
+
+Checker 
+
+Username : checkerbe1@sbi.in 
+
+Password : Credo@123 
+
+ 
+
+Username : checkerbe2@sbi.in 
+
+Password : Credo@123 
+
+ 
+
+AR SGFO URL: 
+uat.scf.globalbank.sbi/dfx/?tenant=SA 
+
+Maker 
+Username: admin@sbi.in 
+Password: credo@123 
+
+Username : makerbe1@sbi.in 
+
+Password : credo@123 
+
+ 
+
+Checker 
+
+Username : checkerbe1@sbi.in 
+
+Password : credo@123 
+
+ 
+
+Username : checkerbe2@sbi.in 
+
+Password : credo@123 
+
+ 
+
+Reference Documents 
+
+The MRPA.zip serves as the central repository for all MRPA-related documentation, including user manuals, transactional flow documents, sample files, walkthrough videos, and a reference sheet containing hyperlinks to all training videos. 
+
+The Bilateral User Guides (Admin, Supplier, and Buyer). 
+
+An SCF Walkthrough Video has also been shared to assist you during UAT. 
+
+OneDrive Link: 
+
+    SCF_user_guide     
+
+For any queries or assistance during UAT, please reach out to itfo.scf.equentia@sbi.co.in. If required, we would be happy to support you over a Microsoft Teams call while you perform the UAT transactions, at your convenience. 
+
+Kindly complete the UAT testing and share your UAT sign-off at your earliest convenience so that we can proceed with the Production deployment for Belgium FO. 
+
+ 
