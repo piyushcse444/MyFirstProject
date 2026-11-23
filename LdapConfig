@@ -1,0 +1,129 @@
+//
+// Source code recreated from a .class file by IntelliJ IDEA
+// (powered by FernFlower decompiler)
+//
+
+package com.credable.backend.config;
+
+import java.io.InputStream;
+import java.security.KeyStore;
+import java.security.SecureRandom;
+import java.util.HashMap;
+import java.util.Map;
+import javax.net.ssl.KeyManager;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.TrustManagerFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.core.io.Resource;
+import org.springframework.ldap.core.LdapTemplate;
+import org.springframework.ldap.core.support.LdapContextSource;
+import org.springframework.ldap.pool2.factory.PoolConfig;
+import org.springframework.ldap.pool2.factory.PooledContextSource;
+import org.springframework.ldap.pool2.validation.DefaultDirContextValidator;
+import org.springframework.util.StringUtils;
+
+@Configuration
+@ConditionalOnProperty(
+    name = {"ldap.authentication-enabled"},
+    havingValue = "true"
+)
+public class LdapConfig {
+    private static final Logger LOG = LoggerFactory.getLogger(LdapConfig.class);
+
+    @Bean
+    public LdapContextSource ldapContextSource(LdapProperties props) {
+        LdapContextSource source = new LdapContextSource();
+        source.setUrl(props.getSearchUrl());
+        source.setBase(props.getBaseDn());
+        source.setUserDn(props.getServiceAccountDn());
+        source.setPassword(props.getServiceAccountPassword());
+        source.setReferral("ignore");
+        Map<String, Object> baseEnvProps = new HashMap();
+        if (this.isLdaps(props.getSearchUrl()) || this.isLdaps(props.getBindUrl())) {
+            this.initSslContext(props);
+        }
+
+        if (this.isLdaps(props.getSearchUrl())) {
+            baseEnvProps.put("java.naming.ldap.factory.socket", LdapSslSocketFactory.class.getName());
+        }
+
+        baseEnvProps.put("com.sun.jndi.ldap.connect.timeout", String.valueOf(props.getConnectTimeout()));
+        baseEnvProps.put("com.sun.jndi.ldap.read.timeout", String.valueOf(props.getReadTimeout()));
+        source.setBaseEnvironmentProperties(baseEnvProps);
+        source.afterPropertiesSet();
+
+        try {
+            source.getReadOnlyContext().close();
+            LOG.info("LDAP context source initialized and verified successfully");
+        } catch (Exception e) {
+            LOG.error("LDAP context source verification FAILED - check service account DN/password, SSL truststore, and network connectivity. SearchURL: {}, ServiceDN: {}, Error: {}", new Object[]{props.getSearchUrl(), props.getServiceAccountDn(), e.getMessage()});
+        }
+
+        return source;
+    }
+
+    @Bean
+    public PooledContextSource pooledContextSource(LdapContextSource ldapContextSource, LdapProperties props) {
+        PoolConfig poolConfig = new PoolConfig();
+        poolConfig.setMaxTotal(props.getPool().getMaxActive());
+        poolConfig.setMaxTotalPerKey(props.getPool().getMaxActive());
+        poolConfig.setMaxIdlePerKey(props.getPool().getMaxIdle());
+        poolConfig.setMinIdlePerKey(props.getPool().getMinIdle());
+        poolConfig.setMaxWaitMillis(props.getPool().getMaxWait());
+        poolConfig.setTestOnBorrow(true);
+        poolConfig.setTestWhileIdle(true);
+        PooledContextSource pooledSource = new PooledContextSource(poolConfig);
+        pooledSource.setContextSource(ldapContextSource);
+        pooledSource.setDirContextValidator(new DefaultDirContextValidator());
+        return pooledSource;
+    }
+
+    @Bean
+    public LdapTemplate ldapTemplate(PooledContextSource pooledContextSource) {
+        LdapTemplate ldapTemplate = new LdapTemplate(pooledContextSource);
+        ldapTemplate.setIgnorePartialResultException(true);
+        return ldapTemplate;
+    }
+
+    private void initSslContext(LdapProperties props) {
+        String truststorePath = props.getSsl().getTruststorePath();
+        if (!StringUtils.hasText(truststorePath)) {
+            LOG.info("No custom LDAP SSL truststore configured; using JVM default truststore");
+        } else {
+            try {
+                Resource resource;
+                if (truststorePath.startsWith("classpath:")) {
+                    resource = new ClassPathResource(truststorePath.substring("classpath:".length()));
+                } else {
+                    resource = new FileSystemResource(truststorePath);
+                }
+
+                KeyStore trustStore = KeyStore.getInstance(props.getSsl().getTruststoreType());
+
+                try (InputStream is = resource.getInputStream()) {
+                    char[] password = StringUtils.hasText(props.getSsl().getTruststorePassword()) ? props.getSsl().getTruststorePassword().toCharArray() : null;
+                    trustStore.load(is, password);
+                }
+
+                TrustManagerFactory tmf = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
+                tmf.init(trustStore);
+                SSLContext sslContext = SSLContext.getInstance("TLS");
+                sslContext.init((KeyManager[])null, tmf.getTrustManagers(), (SecureRandom)null);
+                LdapSslSocketFactory.setSslContext(sslContext);
+                LOG.info("LDAP SSL truststore loaded successfully from: {}", truststorePath);
+            } catch (Exception e) {
+                throw new IllegalStateException("Failed to load LDAP SSL truststore from: " + truststorePath, e);
+            }
+        }
+    }
+
+    private boolean isLdaps(String url) {
+        return url != null && url.startsWith("ldaps://");
+    }
+}
