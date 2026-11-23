@@ -1,0 +1,134 @@
+//
+// Source code recreated from a .class file by IntelliJ IDEA
+// (powered by FernFlower decompiler)
+//
+
+package com.credable.backend.service.impl;
+
+import com.credable.backend.config.LdapProperties;
+import com.credable.backend.config.LdapSslSocketFactory;
+import java.net.InetSocketAddress;
+import java.net.Socket;
+import java.net.URI;
+import java.util.Hashtable;
+import java.util.List;
+import javax.naming.directory.DirContext;
+import javax.naming.directory.InitialDirContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.ldap.core.DirContextAdapter;
+import org.springframework.ldap.core.LdapTemplate;
+import org.springframework.ldap.support.LdapEncoder;
+import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
+
+@Service
+@ConditionalOnProperty(
+    name = {"ldap.authentication-enabled"},
+    havingValue = "true"
+)
+public class LdapAuthService {
+    private static final Logger LOG = LoggerFactory.getLogger(LdapAuthService.class);
+    @Autowired
+    private LdapTemplate ldapTemplate;
+    @Autowired
+    private LdapProperties ldapProperties;
+
+    public boolean authenticate(String username, String password) {
+        String userDn = this.findUserDn(username);
+        if (!StringUtils.hasText(userDn)) {
+            return false;
+        } else {
+            LOG.info("LDAP user DN found: {}", userDn);
+            return this.bindAsUser(userDn, password);
+        }
+    }
+
+    public String findUserDn(String username) {
+        String safeUsername = LdapEncoder.filterEncode(username);
+        String filterStr = this.ldapProperties.getUserSearchFilter().replace("{0}", safeUsername);
+
+        List<String> results;
+        try {
+            results = this.ldapTemplate.search("", filterStr, (ctx) -> {
+                DirContextAdapter adapter = (DirContextAdapter)ctx;
+                String relativeDn = adapter.getDn().toString();
+                String baseDn = this.ldapProperties.getBaseDn();
+                return StringUtils.hasText(baseDn) ? relativeDn + "," + baseDn : relativeDn;
+            });
+        } catch (Exception e) {
+            Throwable root;
+            for(root = e; root.getCause() != null; root = root.getCause()) {
+            }
+
+            LOG.error("LDAP user search failed for username: {}. Error: {}. Root cause: {}", new Object[]{username, e.getMessage(), root.getMessage()});
+            return null;
+        }
+
+        String userDn = (String)results.stream().findFirst().orElse((Object)null);
+        if (userDn == null) {
+            LOG.warn("LDAP user DN not found for username: {}", username);
+        }
+
+        return userDn;
+    }
+
+    public boolean isLdapAvailable() {
+        return this.isSearchLdapAvailable();
+    }
+
+    public boolean isSearchLdapAvailable() {
+        return this.isLdapAvailable(this.ldapProperties.getSearchUrl(), "search");
+    }
+
+    public boolean isBindLdapAvailable() {
+        return this.isLdapAvailable(this.ldapProperties.getBindUrl(), "bind");
+    }
+
+    private boolean isLdapAvailable(String ldapUrl, String operation) {
+        try {
+            URI uri = URI.create(ldapUrl);
+            String host = uri.getHost();
+            int port = uri.getPort() > 0 ? uri.getPort() : this.defaultPort(uri.getScheme());
+
+            try (Socket socket = new Socket()) {
+                socket.connect(new InetSocketAddress(host, port), this.ldapProperties.getConnectTimeout());
+            }
+
+            return true;
+        } catch (Exception e) {
+            LOG.error("LDAP {} server is not reachable at {}: {}", new Object[]{operation, ldapUrl, e.getMessage()});
+            return false;
+        }
+    }
+
+    public boolean bindAsUser(String userDn, String password) {
+        Hashtable<String, String> env = new Hashtable();
+        env.put("java.naming.factory.initial", "com.sun.jndi.ldap.LdapCtxFactory");
+        env.put("java.naming.provider.url", this.ldapProperties.getBindUrl());
+        env.put("java.naming.security.authentication", "simple");
+        env.put("java.naming.security.principal", userDn);
+        env.put("java.naming.security.credentials", password);
+        if (this.ldapProperties.getBindUrl() != null && this.ldapProperties.getBindUrl().startsWith("ldaps://")) {
+            env.put("java.naming.ldap.factory.socket", LdapSslSocketFactory.class.getName());
+        }
+
+        env.put("com.sun.jndi.ldap.connect.timeout", String.valueOf(this.ldapProperties.getConnectTimeout()));
+        env.put("com.sun.jndi.ldap.read.timeout", String.valueOf(this.ldapProperties.getReadTimeout()));
+
+        try {
+            DirContext ctx = new InitialDirContext(env);
+            ctx.close();
+            return true;
+        } catch (Exception e) {
+            LOG.error("LDAP bind failed for user DN {}: {}", userDn, e.getMessage());
+            return false;
+        }
+    }
+
+    private int defaultPort(String scheme) {
+        return "ldaps".equalsIgnoreCase(scheme) ? 636 : 389;
+    }
+}
