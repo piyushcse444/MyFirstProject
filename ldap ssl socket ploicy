@@ -1,0 +1,57 @@
+//
+// Source code recreated from a .class file by IntelliJ IDEA
+// (powered by FernFlower decompiler)
+//
+
+package com.credable.backend.config;
+
+import java.io.IOException;
+import java.net.InetAddress;
+import java.net.Socket;
+import javax.net.SocketFactory;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLSocketFactory;
+
+public class LdapSslSocketFactory extends SSLSocketFactory {
+    private static SSLSocketFactory delegate;
+
+    public static void setSslContext(SSLContext sslContext) {
+        delegate = sslContext.getSocketFactory();
+    }
+
+    public static SocketFactory getDefault() {
+        return new LdapSslSocketFactory();
+    }
+
+    private SSLSocketFactory getDelegate() {
+        return delegate != null ? delegate : (SSLSocketFactory)SSLSocketFactory.getDefault();
+    }
+
+    public String[] getDefaultCipherSuites() {
+        return this.getDelegate().getDefaultCipherSuites();
+    }
+
+    public String[] getSupportedCipherSuites() {
+        return this.getDelegate().getSupportedCipherSuites();
+    }
+
+    public Socket createSocket(Socket s, String host, int port, boolean autoClose) throws IOException {
+        return this.getDelegate().createSocket(s, host, port, autoClose);
+    }
+
+    public Socket createSocket(String host, int port) throws IOException {
+        return this.getDelegate().createSocket(host, port);
+    }
+
+    public Socket createSocket(String host, int port, InetAddress localHost, int localPort) throws IOException {
+        return this.getDelegate().createSocket(host, port, localHost, localPort);
+    }
+
+    public Socket createSocket(InetAddress host, int port) throws IOException {
+        return this.getDelegate().createSocket(host, port);
+    }
+
+    public Socket createSocket(InetAddress address, int port, InetAddress localAddress, int localPort) throws IOException {
+        return this.getDelegate().createSocket(address, port, localAddress, localPort);
+    }
+}
