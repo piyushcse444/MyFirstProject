@@ -1,0 +1,164 @@
+//
+// Source code recreated from a .class file by IntelliJ IDEA
+// (powered by FernFlower decompiler)
+//
+
+package com.credable.ldaptester;
+
+import com.credable.backend.config.LdapProperties;
+import com.credable.backend.service.impl.LdapAuthService;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import javax.naming.directory.DirContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.boot.ApplicationArguments;
+import org.springframework.boot.ApplicationRunner;
+import org.springframework.boot.ExitCodeGenerator;
+import org.springframework.boot.SpringApplication;
+import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.ldap.core.support.LdapContextSource;
+import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
+
+@Component
+public class LdapDiagnosticsRunner implements ApplicationRunner {
+    private static final Logger LOG = LoggerFactory.getLogger(LdapDiagnosticsRunner.class);
+    private final ConfigurableApplicationContext context;
+    private final LdapProperties ldapProperties;
+    private final LdapTestProperties testProperties;
+    private final LdapContextSource ldapContextSource;
+    private final LdapAuthService ldapAuthService;
+
+    public LdapDiagnosticsRunner(ConfigurableApplicationContext context, LdapProperties ldapProperties, LdapTestProperties testProperties, LdapContextSource ldapContextSource, LdapAuthService ldapAuthService) {
+        this.context = context;
+        this.ldapProperties = ldapProperties;
+        this.testProperties = testProperties;
+        this.ldapContextSource = ldapContextSource;
+        this.ldapAuthService = ldapAuthService;
+    }
+
+    public void run(ApplicationArguments args) {
+        LOG.info("Starting LDAP diagnostics");
+        LOG.info("LDAP search URL: {}", this.ldapProperties.getSearchUrl());
+        LOG.info("LDAP bind URL: {}", this.ldapProperties.getBindUrl());
+        LOG.info("LDAP base DN: {}", this.ldapProperties.getBaseDn());
+        LOG.info("LDAP user search filter: {}", this.ldapProperties.getUserSearchFilter());
+        LOG.info("LDAP service account DN: {}", this.ldapProperties.getServiceAccountDn());
+        LOG.info("LDAP test user id: {}", this.testProperties.getUserId());
+        List<String> missingProperties = this.validateRequiredProperties();
+        if (!missingProperties.isEmpty()) {
+            LOG.error("Missing required LDAP test properties: {}", missingProperties);
+            this.exit(2);
+        } else {
+            if (this.isLdapsWithoutCustomTruststore()) {
+                LOG.warn("LDAPS is enabled without ldap.ssl.truststore-path; JVM default truststore will be used");
+            }
+
+            LdapAuthService var10002 = this.ldapAuthService;
+            Objects.requireNonNull(var10002);
+            boolean searchReachable = this.runStep("Search LDAP TCP connectivity", var10002::isSearchLdapAvailable);
+            if (!searchReachable) {
+                LOG.error("Skipping remaining diagnostics because search LDAP connectivity failed");
+                this.exit(1);
+            } else {
+                boolean serviceAccountBind = this.runStep("Service account bind", this::verifyServiceAccountBind);
+                if (!serviceAccountBind) {
+                    LOG.error("Skipping user search and user bind because service account bind failed");
+                    this.exit(1);
+                } else {
+                    String userDn = this.ldapAuthService.findUserDn(this.testProperties.getUserId());
+                    if (StringUtils.hasText(userDn)) {
+                        LOG.info("PASS - User search returned DN: {}", userDn);
+                        var10002 = this.ldapAuthService;
+                        Objects.requireNonNull(var10002);
+                        boolean bindReachable = this.runStep("Bind LDAP TCP connectivity", var10002::isBindLdapAvailable);
+                        if (!bindReachable) {
+                            LOG.error("Skipping user bind because bind LDAP connectivity failed");
+                            this.exit(1);
+                        } else {
+                            boolean userBind = this.runStep("User bind", () -> this.ldapAuthService.bindAsUser(userDn, this.testProperties.getPassword()));
+                            if (userBind) {
+                                LOG.info("LDAP diagnostics completed successfully");
+                                this.exit(0);
+                            } else {
+                                LOG.error("LDAP diagnostics failed");
+                                this.exit(1);
+                            }
+
+                        }
+                    } else {
+                        LOG.error("FAIL - User search did not return a DN for user id: {}", this.testProperties.getUserId());
+                        this.exit(1);
+                    }
+                }
+            }
+        }
+    }
+
+    private List<String> validateRequiredProperties() {
+        List<String> missingProperties = new ArrayList();
+        this.requireText(missingProperties, "ldap.search-url", this.ldapProperties.getSearchUrl());
+        this.requireText(missingProperties, "ldap.bind-url", this.ldapProperties.getBindUrl());
+        this.requireText(missingProperties, "ldap.base-dn", this.ldapProperties.getBaseDn());
+        this.requireText(missingProperties, "ldap.user-search-filter", this.ldapProperties.getUserSearchFilter());
+        this.requireText(missingProperties, "ldap.service-account.dn", this.ldapProperties.getServiceAccountDn());
+        this.requireText(missingProperties, "ldap.service-account.password", this.ldapProperties.getServiceAccountPassword());
+        this.requireText(missingProperties, "ldap.test.user-id", this.testProperties.getUserId());
+        this.requireText(missingProperties, "ldap.test.password", this.testProperties.getPassword());
+        return missingProperties;
+    }
+
+    private void requireText(List<String> missingProperties, String propertyName, String propertyValue) {
+        if (!StringUtils.hasText(propertyValue)) {
+            missingProperties.add(propertyName);
+        }
+
+    }
+
+    private boolean isLdapsWithoutCustomTruststore() {
+        return (this.isLdaps(this.ldapProperties.getSearchUrl()) || this.isLdaps(this.ldapProperties.getBindUrl())) && !StringUtils.hasText(this.ldapProperties.getSsl().getTruststorePath());
+    }
+
+    private boolean isLdaps(String url) {
+        return url != null && url.startsWith("ldaps://");
+    }
+
+    private boolean verifyServiceAccountBind() {
+        try {
+            DirContext context = this.ldapContextSource.getReadOnlyContext();
+            context.close();
+            return true;
+        } catch (Exception e) {
+            LOG.error("Service account bind failed: {}", e.getMessage());
+            return false;
+        }
+    }
+
+    private boolean runStep(String stepName, DiagnosticStep diagnosticStep) {
+        try {
+            boolean passed = diagnosticStep.run();
+            if (passed) {
+                LOG.info("PASS - {}", stepName);
+            } else {
+                LOG.error("FAIL - {}", stepName);
+            }
+
+            return passed;
+        } catch (Exception e) {
+            LOG.error("FAIL - {}: {}", stepName, e.getMessage());
+            return false;
+        }
+    }
+
+    private void exit(int exitCode) {
+        int springExitCode = SpringApplication.exit(this.context, new ExitCodeGenerator[]{() -> exitCode});
+        System.exit(springExitCode);
+    }
+
+    @FunctionalInterface
+    private interface DiagnosticStep {
+        boolean run();
+    }
+}
