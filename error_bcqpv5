@@ -1,0 +1,35 @@
+Caused by: org.springframework.beans.factory.NoSuchBeanDefinitionException: No qualifying bean of type 'com.sbi.ldap.LdapAuthService' available: expected at least 1 bean which qualifies as autowire candidate. Dependency annotations: {@org.springframework.beans.factory.annotation.Autowired(required=true)}
+        at org.springframework.beans.factory.support.DefaultListableBeanFactory.raiseNoMatchingBeanFound(DefaultListableBeanFactory.java:1801)
+        at org.springframework.beans.factory.support.DefaultListableBeanFactory.doResolveDependency(DefaultListableBeanFactory.java:1357)
+        at org.springframework.beans.factory.support.DefaultListableBeanFactory.resolveDependency(DefaultListableBeanFactory.java:1311)
+        at org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor$AutowiredFieldElement.resolveFieldValue(AutowiredAnnotationBeanPostProcessor.java:710)
+
+
+
+i have added
+<bean id="ldapProperties"
+   class="com.sbi.bcqi.ldap.LdapProperties">
+
+  <property name="authenticationEnabled" value="true"/>
+  <property name="url" value="${ldap.url}"/>
+  <property name="searchUrl" value="${ldap.searchUrl}"/>
+  <property name="bindUrl" value="${ldap.bindUrl}"/>
+  <property name="baseDn" value="${ldap.baseDn}"/>
+  <property name="userSearchFilter" value="${ldap.userSearchFilter}"/>
+  <property name="serviceAccountDn" value="${ldap.serviceAccountDn}"/>
+  <property name="serviceAccountPassword" value="${ldap.serviceAccountPassword}"/>
+
+  <property name="connectTimeout" value="5000"/>
+  <property name="readTimeout" value="5000"/>
+</bean>
+
+<bean id="ldapAuthService"
+   class="com.sbi.bcqi.ldap.LdapAuthService"
+   init-method="initialize">
+
+  <constructor-arg ref="ldapProperties"/>
+</bean>  
+
+in bcqi-util.xml
+
+should i reload it as i have rebuild teh project
