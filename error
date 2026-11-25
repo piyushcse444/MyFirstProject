@@ -1,0 +1,15 @@
+D:\piyush\new\bcqiv4\wlp\wlp\bin>server.bat debug defaultserver
+Listening for transport dt_socket at address: 7777
+Launching defaultServer (WebSphere Application Server 25.0.0.9/wlp-1.0.105.cl250920250821-1629) on Java HotSpot(TM) 64-Bit Server VM, version 17.0.17+8-LTS-360 (en_IN)
+[AUDIT   ] CWWKE0001I: The server defaultServer has been launched.
+[AUDIT   ] CWWKE0100I: This product is licensed for development, and limited production use. The full license terms can be viewed here: https://public.dhe.ibm.com/ibmdl/export/pub/software/websphere/wasdev/license/base_ilan/ilan/25.0.0.9/lafiles/en.html
+[AUDIT   ] CWWKZ0058I: Monitoring dropins for applications.
+[WARNING ] SRVE9967W: The manifest class path commons-fileupload.jar can not be found in jar file file:/D:/piyush/new/bcqiv4/bcqiopdv4.war/bcqiopdv4.war/WEB-INF/lib/struts.jar or its parent.
+[WARNING ] SRVE9967W: The manifest class path commons-validator.jar can not be found in jar file file:/D:/piyush/new/bcqiv4/bcqiopdv4.war/bcqiopdv4.war/WEB-INF/lib/struts.jar or its parent.
+[WARNING ] SRVE9967W: The manifest class path jakarta-oro.jar can not be found in jar file file:/D:/piyush/new/bcqiv4/bcqiopdv4.war/bcqiopdv4.war/WEB-INF/lib/struts.jar or its parent.
+[ERROR   ] CWWKZ0002E: An exception occurred while starting the application bcqiopd.war. The exception message was: com.ibm.ws.container.service.metadata.MetaDataException: com.ibm.wsspi.adaptable.module.UnableToAdaptException: SRVE9964E: Duplicate names spring_web are used in the web-fragment.xml files of WEB-INF/lib/spring-web-5.3.21.jar and WEB-INF/lib/spring-web-4.2.2.RELEASE.jar when using relative ordering.
+[AUDIT   ] CWWKF0012I: The server installed the following features: [el-3.0, jdbc-4.2, jndi-1.0, jpaContainer-2.2, jsp-2.3, localConnector-1.0, servlet-4.0].
+[AUDIT   ] CWWKF0011I: The defaultServer server is ready to run a smarter planet. The defaultServer server started in 9.497 seconds.
+
+
+
