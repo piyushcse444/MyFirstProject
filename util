@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://172.18.7.57/spring-beans.dtd">
+<beans>
+
+
+<bean id="mailSender" class="com.sbi.utils.MailSender">
+		<property name="host">
+	        <value>${mailHost}</value>
+	     </property>
+	     <property name="port">
+	        <value>${mailPort}</value>
+	     </property>
+	     <property name="fromemailID">
+	        <value>${fromemailID}</value>
+	     </property>
+	     <property name="password">
+	        <value>${password}</value>
+	     </property>
+	     <property name="smtpUserName">
+	        <value>${smtpUserName}</value>
+	     </property>
+		<!-- Added by suresh to remove hardcode password  -->
+		<property name="encDecyrptUtil" ref="encDecyrptUtil" />
+		<property name="privateKeyLoc"><value>${privateKeyLoc}</value></property>
+	</bean>
+	
+	
+	<bean id="logonValidator" class="com.sbi.utils.LogonValidator"/>
+	<!-- added for paladion change CR5256 -->
+	<bean id="textBoxValidator" class="com.sbi.utils.TextBoxValidator"/>
+	<!-- added for paladion change CR5256 -->
+	
+	<bean id="randomString" class="com.sbi.utils.RandomString"/>
+	
+	
+<!-- 	<bean id="sendSMS" class="com.sbi.utils.SendSMS" >
+		<property name="httpMessage" ref="httpMessage"/>
+		<property name="urlString" value="https://luna.a2wi.co.in/failsafe/HttpLink"/>
+		<property name="messageParms">
+			<props>
+				<prop key="00">aid</prop>
+				<prop key="01">501711</prop>
+				<prop key="10">pin</prop>
+				<prop key="11">sbi@1</prop>
+				<prop key="20">mnumber</prop>
+				<prop key="21">x</prop>
+				<prop key="30">message</prop>
+				<prop key="31">x</prop>
+				<prop key="40">signature</prop>
+				<prop key="41">SBIINB</prop>
+				
+			</props>
+		</property>
+		<property name="commonDAOImpl" ref="commonDAOImpl"/>
+	</bean> -->
+	
+	
+<!-- 	<bean id="httpMessage" class="com.sbi.utils.HttpMessage" >
+		<property name="keyValueDelim" value="="/>
+		<property name="encoding" value="application/x-www-form-urlencoded"/>
+		<property name="type" value="Content-Type"/>
+		<property name="key" value="0"/>
+		<property name="value" value="1"/>
+		<property name="urlEncode" value="UTF-8"/>
+	</bean> -->
+	<!--  Ended for Alerts -->
+	
+	<bean id="SHAEncryption" class="com.sbi.utils.SHAEncryption"></bean>
+	
+		<!-- comment by nitin -->
+	<!-- added  for BCQI changes begins
+	<!-- <bean id="bcqiUtils" class="com.sbi.utils.BcqiUtils">
+		<property name="createUserDaoImpl" ref="createUserDaoImpl" />
+	</bean> --> -->
+	
+	
+		<bean id="validateHandler" class="com.sbi.utils.ValidateHandler">	</bean>
+	
+	<bean id="validateModify" class="com.sbi.utils.ValidateModify">	</bean>
+	
+	<bean id="validateUserHandler" class="com.sbi.utils.ValidateUserHandler"></bean>
+	
+	<bean id="rndString" class="com.sbi.utils.RndString">	</bean>
+	<!-- added for password encryption start -->
+	<bean id="encDecyrptUtil" class="com.sbi.utils.EncDecyrptUtil">	
+		<property name="encryptpassword" ref="encryptpassword" />
+	</bean>
+
+	<bean id="encryptpassword" class="com.sbi.utils.Encryptpassword">
+		<property name="applicationContextProvder" ref="applicationContextProvder"/>
+	</bean>
+	<!-- added for password encryption stop -->
+
+
+	<!-- added  for BCQI changes ends-->
+</beans>
