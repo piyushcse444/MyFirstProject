@@ -1,0 +1,399 @@
+package com.bcqp.config;
+
+import java.util.HashMap;
+import java.util.Map;
+
+import com.sbi.ldap.LdapAuthService;
+import org.apache.logging.log4j.LogManager;
+
+import org.apache.logging.log4j.Logger;
+import org.directwebremoting.spring.DwrAnnotationPostProcessor;
+import org.directwebremoting.spring.DwrController;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.web.client.RestTemplate;
+import org.springframework.web.servlet.config.annotation.EnableWebMvc;
+import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+import org.springframework.web.servlet.handler.SimpleUrlHandlerMapping;
+import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter;
+import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
+import org.springframework.web.servlet.view.InternalResourceViewResolver;
+import org.springframework.web.servlet.view.tiles3.TilesConfigurer;
+import org.springframework.web.servlet.view.tiles3.TilesViewResolver;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.sbi.handler.CaptchaHandler;
+import com.sbi.handler.ForgotPasswordHandler;
+import com.sbi.interceptor.CustomRequestInterceptor;
+
+/**
+ * @author 8389845
+ *
+ */
+	
+@Configuration
+@EnableWebMvc
+@ComponentScan(basePackages = { "com.bcqp.config","com.sbi.edms.integration", "com.sbi.handler", "Log4j.init", "com.sbi.filter",
+        "com.sbi.dao", "com.sbi.utils", "com.sbi.service", "com.sbi.bp", "com.sbi.listener",
+        "com.sbi.interceptor", "com.sbi.model", "com.sbi.common.utils", "com.sbi.common.exception",
+        "com.sbi.exception","com.sbi.ldap" })
+public class ApplicationConfiguration implements WebMvcConfigurer {
+
+    @Autowired
+    CustomRequestInterceptor customRequestInterceptor;
+
+    protected static final Logger logger = LogManager.getLogger(ApplicationConfiguration.class);
+
+    @Bean
+    public TilesConfigurer tileConfigurer() {
+    	//System.out.println("------------------TilesConfigurer------------------");
+        TilesConfigurer tilesConfigurer = new TilesConfigurer();
+        tilesConfigurer.setDefinitions(new String[] { "/WEB-INF/xmlconfig/bcqi-tilesdefinition.xml" });
+        return tilesConfigurer;
+    }
+    
+    @Bean
+    public CaptchaHandler captchaHandler() {
+//        System.out.println("==========================================");
+//        System.out.println(">>> Creating CaptchaHandler Bean <<<");
+//        System.out.println("==========================================");
+        return new CaptchaHandler();
+    }
+
+
+    // Configure the Tiles view resolver with high priority
+    @Bean
+    public TilesViewResolver tilesViewResolver() {
+    	//System.out.println("------------------TilesViewResolver------------------");
+        TilesViewResolver resolver = new TilesViewResolver();
+        resolver.setOrder(1); // Set a low order value for high priority
+        return resolver;
+    }
+
+    // configure of ldap service
+    @Bean
+    public LdapAuthService ldapAuthService() {
+        //System.out.println("------------------TilesViewResolver------------------");
+        LdapAuthService ldapAuthService = new LdapAuthService();
+        resolver.setOrder(1); // Set a low order value for high priority
+        return resolver;
+    }
+
+    // Configure the InternalResourceViewResolver with lower priority
+    // It will be used as a fallback for standard JSPs
+    @Bean
+    public InternalResourceViewResolver internalResourceViewResolver() {
+    	//System.out.println("------------------internalResource------------------");
+        InternalResourceViewResolver resolver = new InternalResourceViewResolver();
+        resolver.setPrefix("/WEB-INF/jsp/"); 
+        resolver.setSuffix(".jsp"); 
+        resolver.setOrder(2); 
+        return resolver;
+        
+    }
+
+    @Bean
+    public static PropertySourcesPlaceholderConfigurer propertyConfigurer() {
+        PropertySourcesPlaceholderConfigurer configurer = new PropertySourcesPlaceholderConfigurer();
+        configurer.setLocation(new ClassPathResource("/WEB-INF/conf/config.properties"));
+        return configurer;
+    }
+
+    @Bean
+    public RequestMappingHandlerAdapter handlerAdapter() {
+        RequestMappingHandlerAdapter adapter = new RequestMappingHandlerAdapter();
+        return adapter;
+    }
+
+    @Bean
+    public RequestMappingHandlerMapping handlerMapping() {
+        RequestMappingHandlerMapping mapping = new RequestMappingHandlerMapping();
+        return mapping;
+    }
+
+    @Bean
+    public CustomRequestInterceptor customRequestInterceptor() {
+        return new CustomRequestInterceptor();
+    }
+
+    @Override
+    public void addInterceptors(InterceptorRegistry registry) {
+        registry.addInterceptor(customRequestInterceptor());
+    }
+    
+    @Bean
+    public RestTemplate restTemplate() {
+        return new RestTemplate();
+    }
+    
+    @Bean
+    public ObjectMapper objectMapper() {
+        return new ObjectMapper();
+    }
+        
+    @Bean
+    public DwrAnnotationPostProcessor dwrAnnotationPostProcessor() {
+        return new DwrAnnotationPostProcessor();
+    }  
+    
+    @Bean
+    public org.directwebremoting.spring.DwrSpringServlet dwrSpringServlet() {
+        return new org.directwebremoting.spring.DwrSpringServlet();
+    }
+}
+    
+
+
+
+
+//package com.bcqp.config;
+//
+//import org.apache.logging.log4j.LogManager;
+//
+//import org.apache.logging.log4j.Logger;
+//import org.springframework.beans.factory.annotation.Autowired;
+//import org.springframework.context.annotation.Bean;
+//import org.springframework.context.annotation.ComponentScan;
+//import org.springframework.context.annotation.Configuration;
+//import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
+//import org.springframework.core.io.ClassPathResource;
+//import org.springframework.web.client.RestTemplate;
+//import org.springframework.web.servlet.config.annotation.EnableWebMvc;
+//import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
+//import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+//import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter;
+//import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
+//import org.springframework.web.servlet.view.InternalResourceViewResolver;
+//import org.springframework.web.servlet.view.tiles3.TilesConfigurer;
+//import org.springframework.web.servlet.view.tiles3.TilesViewResolver;
+//import com.fasterxml.jackson.databind.ObjectMapper;
+//import com.sbi.handler.CaptchaHandler;
+//import com.sbi.interceptor.CustomRequestInterceptor;
+//
+///**
+// * @author 8389845
+// *
+// */
+//
+//@Configuration
+//@EnableWebMvc
+//@ComponentScan(basePackages = { "com.bcqp.config","com.sbi.edms.integration", "com.sbi.handler", "Log4j.init", "com.sbi.filter",
+//        "com.sbi.dao", "com.sbi.utils", "com.sbi.service", "com.sbi.bp", "com.sbi.listener",
+//        "com.sbi.interceptor", "com.sbi.model", "com.sbi.common.utils", "com.sbi.common.exception",
+//        "com.sbi.exception" })
+//public class ApplicationConfiguration implements WebMvcConfigurer {
+//
+//    @Autowired
+//    CustomRequestInterceptor customRequestInterceptor;
+//
+//    protected static final Logger logger = LogManager.getLogger(ApplicationConfiguration.class);
+//
+//    @Bean
+//    public TilesConfigurer tileConfigurer() {
+//    	System.out.println("------------------TilesConfigurer------------------");
+//        TilesConfigurer tilesConfigurer = new TilesConfigurer();
+//        tilesConfigurer.setDefinitions(new String[] { "/WEB-INF/xmlconfig/bcqi-tilesdefinition.xml" });
+//        return tilesConfigurer;
+//    }
+//    
+//    @Bean
+//    public CaptchaHandler captchaHandler() {
+//        System.out.println("==========================================");
+//        System.out.println(">>> Creating CaptchaHandler Bean <<<");
+//        System.out.println("==========================================");
+//        return new CaptchaHandler();
+//    }
+//
+//    // Configure the Tiles view resolver with high priority
+//    @Bean
+//    public TilesViewResolver tilesViewResolver() {
+//    	System.out.println("------------------TilesViewResolver------------------");
+//        TilesViewResolver resolver = new TilesViewResolver();
+//        resolver.setOrder(1); // Set a low order value for high priority
+//        return resolver;
+//    }
+//
+//    // Configure the InternalResourceViewResolver with lower priority
+//    // It will be used as a fallback for standard JSPs
+//    @Bean
+//    public InternalResourceViewResolver internalResourceViewResolver() {
+//    	System.out.println("------------------internalResource------------------");
+//        InternalResourceViewResolver resolver = new InternalResourceViewResolver();
+//        resolver.setPrefix("/WEB-INF/jsp/"); // Configure your JSP path
+//        resolver.setSuffix(".jsp"); // Configure your JSP file extension
+//        resolver.setOrder(2); // Set a high order value for low priority
+//        return resolver;
+//        
+//    }
+//
+//    @Bean
+//    public static PropertySourcesPlaceholderConfigurer propertyConfigurer() {
+//    	System.out.println("------------------config.properties------------------");
+//        PropertySourcesPlaceholderConfigurer configurer = new PropertySourcesPlaceholderConfigurer();
+//        configurer.setLocation(new ClassPathResource("/WEB-INF/conf/config.properties"));
+//        return configurer;
+//    }
+//
+//    @Bean
+//    public RequestMappingHandlerAdapter handlerAdapter() {
+//        RequestMappingHandlerAdapter adapter = new RequestMappingHandlerAdapter();
+//        return adapter;
+//    }
+//
+//    @Bean
+//    public RequestMappingHandlerMapping handlerMapping() {
+//        RequestMappingHandlerMapping mapping = new RequestMappingHandlerMapping();
+//        return mapping;
+//    }
+//
+//    @Bean
+//    public CustomRequestInterceptor customRequestInterceptor() {
+//        return new CustomRequestInterceptor();
+//    }
+//
+//    @Override
+//    public void addInterceptors(InterceptorRegistry registry) {
+//        registry.addInterceptor(customRequestInterceptor());
+//    }
+//    
+//    @Bean
+//    public RestTemplate restTemplate() {
+//        return new RestTemplate();
+//    }
+//    
+//    @Bean
+//    public ObjectMapper objectMapper() {
+//        return new ObjectMapper();
+//    }
+//    
+//    
+//}
+//    
+
+
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://172.18.7.57/spring-beans.dtd">
+<beans>
+
+
+    <bean id="mailSender" class="com.sbi.utils.MailSender">
+        <property name="host">
+            <value>${mailHost}</value>
+        </property>
+        <property name="port">
+            <value>${mailPort}</value>
+        </property>
+        <property name="fromemailID">
+            <value>${fromemailID}</value>
+        </property>
+        <property name="password">
+            <value>${password}</value>
+        </property>
+        <property name="smtpUserName">
+            <value>${smtpUserName}</value>
+        </property>
+        <!-- Added by suresh to remove hardcode password  -->
+        <property name="encDecyrptUtil" ref="encDecyrptUtil" />
+        <property name="privateKeyLoc"><value>${privateKeyLoc}</value></property>
+    </bean>
+
+
+    <bean id="logonValidator" class="com.sbi.utils.LogonValidator"/>
+    <!-- added for paladion change CR5256 -->
+    <bean id="textBoxValidator" class="com.sbi.utils.TextBoxValidator"/>
+    <!-- added for paladion change CR5256 -->
+
+    <bean id="randomString" class="com.sbi.utils.RandomString"/>
+
+
+    <!-- 	<bean id="sendSMS" class="com.sbi.utils.SendSMS" >
+            <property name="httpMessage" ref="httpMessage"/>
+            <property name="urlString" value="https://luna.a2wi.co.in/failsafe/HttpLink"/>
+            <property name="messageParms">
+                <props>
+                    <prop key="00">aid</prop>
+                    <prop key="01">501711</prop>
+                    <prop key="10">pin</prop>
+                    <prop key="11">sbi@1</prop>
+                    <prop key="20">mnumber</prop>
+                    <prop key="21">x</prop>
+                    <prop key="30">message</prop>
+                    <prop key="31">x</prop>
+                    <prop key="40">signature</prop>
+                    <prop key="41">SBIINB</prop>
+
+                </props>
+            </property>
+            <property name="commonDAOImpl" ref="commonDAOImpl"/>
+        </bean> -->
+
+
+    <!-- 	<bean id="httpMessage" class="com.sbi.utils.HttpMessage" >
+            <property name="keyValueDelim" value="="/>
+            <property name="encoding" value="application/x-www-form-urlencoded"/>
+            <property name="type" value="Content-Type"/>
+            <property name="key" value="0"/>
+            <property name="value" value="1"/>
+            <property name="urlEncode" value="UTF-8"/>
+        </bean> -->
+    <!--  Ended for Alerts -->
+
+    <bean id="SHAEncryption" class="com.sbi.utils.SHAEncryption"></bean>
+
+    <!-- comment by nitin -->
+    <!-- added  for BCQI changes begins
+    <!-- <bean id="bcqiUtils" class="com.sbi.utils.BcqiUtils">
+        <property name="createUserDaoImpl" ref="createUserDaoImpl" />
+    </bean> --> -->
+
+
+    <bean id="validateHandler" class="com.sbi.utils.ValidateHandler">	</bean>
+
+    <bean id="validateModify" class="com.sbi.utils.ValidateModify">	</bean>
+
+    <bean id="validateUserHandler" class="com.sbi.utils.ValidateUserHandler"></bean>
+
+    <bean id="rndString" class="com.sbi.utils.RndString">	</bean>
+    <!-- added for password encryption start -->
+    <bean id="encDecyrptUtil" class="com.sbi.utils.EncDecyrptUtil">
+        <property name="encryptpassword" ref="encryptpassword" />
+    </bean>
+
+    <bean id="encryptpassword" class="com.sbi.utils.Encryptpassword">
+        <property name="applicationContextProvder" ref="applicationContextProvder"/>
+    </bean>
+    <!-- added for password encryption stop -->
+
+<!--    ldap authentication start-->
+    <bean id="ldapProperties"
+          class="com.sbi.ldap.LdapProperties">
+
+        <property name="authenticationEnabled" value="true"/>
+        <property name="url" value="${ldap.url}"/>
+        <property name="searchUrl" value="${ldap.searchUrl}"/>
+        <property name="bindUrl" value="${ldap.bindUrl}"/>
+        <property name="baseDn" value="${ldap.baseDn}"/>
+        <property name="userSearchFilter" value="${ldap.userSearchFilter}"/>
+        <property name="serviceAccountDn" value="${ldap.serviceAccountDn}"/>
+        <property name="serviceAccountPassword" value="${ldap.serviceAccountPassword}"/>
+
+        <property name="connectTimeout" value="5000"/>
+        <property name="readTimeout" value="5000"/>
+    </bean>
+
+    <bean id="ldapAuthService"
+          class="com.sbi.ldap.LdapAuthService"
+          init-method="initialize">
+
+        <constructor-arg ref="ldapProperties"/>
+    </bean>
+<!--    ldap authentication end-->
+
+    <!-- added  for BCQI changes ends-->
+</beans>
+
+
