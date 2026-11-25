@@ -1,0 +1,257 @@
+package com.sbi.service;
+
+
+import java.util.HashMap;
+import java.util.Map;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.sbi.bp.BcqiBP;
+import com.sbi.dao.CommonDAO;
+import com.sbi.exception.ApplicationException;
+import com.sbi.exception.ApplicationResponse;
+import com.sbi.exception.DAOException;
+import com.sbi.model.User;
+import com.sbi.utils.Constants;
+import com.sbi.utils.LogonValidator;
+import com.sbi.utils.SHAEncryption;
+import com.sbi.utils.TextBoxValidator;
+
+@Service
+public class LogonService implements BaseService {
+
+    @Autowired
+    private LdapService ldapService;
+
+	@Autowired
+	private CommonDAO commonDAOImpl;
+	
+	protected static final Logger logger = LogManager.getLogger(LogonService.class);
+	@Autowired
+    private LogonValidator logonValidator;
+	@Autowired
+    private BcqiBP bcqiBP;
+    public BcqiBP getBcqiBP() {
+		return bcqiBP;
+	}
+	public void setBcqiBP(BcqiBP bcqiBP) {
+		this.bcqiBP = bcqiBP;
+	}
+	@Autowired
+	private TextBoxValidator textBoxValidator;
+	@Autowired
+	private  SHAEncryption SHAEncryption;
+	public Map execute(Map inParams) {
+		logger.info("execute(Map inParams) method begins");
+		Map outParams = new HashMap();
+		ApplicationResponse response = new ApplicationResponse(Constants.FAILURE);
+		String userName = (String)inParams.get(Constants.USER_NAME);	
+		String password = (String)inParams.get(Constants.PASSWORD);
+		String ipAddress = (String)inParams.get(Constants.IP_ADDRESS);
+		String key =(String)inParams.get("keyId");
+		String hrmsResponse="";
+		String lockCount="";
+		int loginCount=0;
+		String dbIp="";
+		int testFlag=0;
+		String functionType = (String)inParams.get("type");
+		try{
+			
+			
+			
+			logger.info("validating username and password::");
+			userName=textBoxValidator.isValidText(userName);
+			User user=new User();
+			if(userName != null){
+				
+			outParams=commonDAOImpl.getLoginUserRole(userName);
+			if(outParams.size()>0){
+				if(functionType.equalsIgnoreCase("forgetpassword")){
+					
+					if(null == (String)outParams.get("FORGOT_PWD_FLAG")){
+					
+					inParams.put("mobileNO", outParams.get("MOBILE_NO"));
+					
+//					outParams=	bcqiBP.generatePasswordPDF(inParams);;
+					}
+					else{
+						
+						response.setErrorCode("BC017");
+						response.setStatus(Constants.FAILURE);
+					}
+					
+				}
+				else{
+					
+				String Flag=(String) outParams.get("FORGOT_PWD_FLAG");
+				
+				if(null != Flag){
+					
+					String DBPass=commonDAOImpl.getNewDBDetails(userName);
+					
+					String dbPwd = SHAEncryption.hashingSHA2(DBPass+"#"+key) ;
+					
+					if((!"".equals(dbPwd) && password.equals(dbPwd))){
+						user = commonDAOImpl.findUser1(userName);
+						testFlag=commonDAOImpl.updateLoggedinResetFlag(userName);;
+						outParams.put("testFlag", testFlag);
+						outParams.put(Constants.USER, user);
+						response.setStatus(Constants.SUCCESS);
+						
+					}
+					else{
+						response.setErrorCode("BC017");
+						response.setStatus(Constants.FAILURE);;
+						outParams.put("testFlag",0);
+					}
+					
+				}
+				
+				else{
+					outParams.put("testFlag",0);
+					
+				String role=(String)outParams.get("user_group");
+				String dbPassword=(String)outParams.get("password");
+                // piyush -> removing double hash  because the password we get from frontend not hashed
+//				String dbPwd = SHAEncryption.hashingSHA2(dbPassword+"#"+key) ;
+//				logger.info("role::"+role+"dbPwd::::"+dbPwd);
+				
+			if(("325".equalsIgnoreCase(role) || "21".equalsIgnoreCase(role) || "22".equalsIgnoreCase(role) || "23".equalsIgnoreCase(role) || "24".equalsIgnoreCase(role)  || "81".equalsIgnoreCase(role)||"369".equalsIgnoreCase(role)||"370".equalsIgnoreCase(role) ||   "82".equalsIgnoreCase(role)) && (authenticate_password(userName,password,dbPassword)) ){
+				logger.info("password Validation ........success");
+				int loggedInCount =commonDAOImpl.getLoggedinCount(inParams);
+			
+				if(loggedInCount==0){
+					lockCount=(String) outParams.get("LOCK_COUNT");
+					   loginCount=Integer.parseInt(lockCount);
+						outParams.put("userName", userName);
+						if (loginCount <= 2) {
+							user = commonDAOImpl.findUser(userName);
+							commonDAOImpl.insertLoggidenUser(inParams);
+							user.setLoginPassword(password);
+							response.setStatus(Constants.SUCCESS);
+						} else {
+							response.setErrorCode("BC014");
+							response.setStatus(Constants.FAILURE);
+						}
+				
+				  outParams.put(Constants.USER, user);
+			  }
+				else {
+				response.setErrorCode("BC015");
+				response.setStatus(Constants.FAILURE);
+			}
+				 }else{
+					 lockCount=(String) outParams.get("LOCK_COUNT");
+					 loginCount=Integer.parseInt(lockCount)+1;
+					  if(loginCount<3 ){
+					    commonDAOImpl.updateLoginCount(loginCount,userName);
+						response.setErrorCode("BC001");
+						response.setStatus(Constants.FAILURE);
+				 }else{
+					   commonDAOImpl.updateLoginCount(loginCount,userName);
+						response.setErrorCode("BC014");
+						response.setStatus(Constants.FAILURE);
+					}
+					}
+			  }	}}else{ 
+					response.setErrorCode("BC003");
+					response.setStatus(Constants.FAILURE);
+				}
+			}
+			else{
+				response.setErrorCode("BC002");
+				response.setStatus(Constants.FAILURE);
+			}
+			
+		}catch(ApplicationException sbiEx){
+				logger.error("Exception Occured : " + sbiEx.getErrorCode());
+				response.setErrorCode(sbiEx.getErrorCode());
+			}catch(DAOException daoEx){
+				response.setErrorCode(daoEx.getErrorCode());
+			}catch (Exception e) {
+				logger.error("Exception Occured : " + e.getMessage(),e);
+				response.setErrorCode("BC001");
+			}
+		Object[] params = {"BC016",userName,ipAddress,response.getStatus(),"LOGIN","","","","","",""};
+		outParams.put(Constants.APPLICATION_RESPONSE, response);
+		logger.info("execute(Map inParams) method ends");
+		
+		return outParams;
+	}
+	
+//	public boolean isBulkEmailEnabled(){
+//		return commonDAOImpl.isBulkEmailEnabled();
+//	}
+
+    // piyush -> to authenticate using ldap
+    private boolean authenticate_password(
+            String userName,
+            String password,
+            String dbPassword,
+            String key) {
+
+        try {
+
+            // 1. Try LDAP authentication first.
+            boolean authenticated =
+                    ldapService.authenticate(userName, password);
+
+            if (authenticated) {
+
+                logger.info("LDAP authentication successful for user");
+
+                // 2. Update local DB password after successful LDAP login.
+                String hashedPassword =
+                        SHAEncryption.hashingSHA2(password);
+
+                commonDAOImpl.updateUserPassword(
+                        userName, hashedPassword);
+
+                return true;
+            }
+
+            // LDAP is available but credentials are incorrect.
+            logger.info("LDAP authentication failed");
+            return false;
+
+        } catch (LdapUnavailableException e) {
+
+            // 3. LDAP unavailable: use existing DB authentication.
+            logger.warn("LDAP unavailable. Using DB authentication.");
+
+            try {
+
+                String hashedPassword =
+                        SHAEncryption.hashingSHA2(password);
+
+                return hashedPassword.equals(dbPassword);
+
+            } catch (Exception ex) {
+
+                logger.error("DB password verification failed", ex);
+                return false;
+            }
+        }
+    }
+
+
+	public void setCommonDAOImpl(CommonDAO commonDAOImpl) {
+		this.commonDAOImpl = commonDAOImpl;
+	}
+	
+	
+	public void setLogonValidator(LogonValidator logonValidator) {
+		this.logonValidator = logonValidator;
+	}
+	public void setTextBoxValidator(TextBoxValidator textBoxValidator) {
+		this.textBoxValidator = textBoxValidator;
+	}
+	public void setSHAEncryption(SHAEncryption sHAEncryption) {
+		SHAEncryption = sHAEncryption;
+	}
+	
+
+}
