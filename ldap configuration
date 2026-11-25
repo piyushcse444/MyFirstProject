@@ -1,0 +1,153 @@
+package com.sbi.ldap;
+
+import org.springframework.stereotype.Service;
+
+
+public class LdapProperties {
+
+    private boolean authenticationEnabled;
+
+    private String url;
+    private String searchUrl;
+    private String bindUrl;
+    private String baseDn;
+    private String userSearchFilter;
+
+    private String serviceAccountDn;
+    private String serviceAccountPassword;
+
+    private int connectTimeout = 5000;
+    private int readTimeout = 5000;
+
+    private String truststorePath;
+    private String truststorePassword;
+    private String truststoreType = "JKS";
+
+    public boolean isAuthenticationEnabled() {
+        return authenticationEnabled;
+    }
+
+    public void setAuthenticationEnabled(boolean authenticationEnabled) {
+        this.authenticationEnabled = authenticationEnabled;
+    }
+
+    public String getUrl() {
+        return url;
+    }
+
+    public void setUrl(String url) {
+        this.url = url;
+    }
+
+    public String getSearchUrl() {
+        return hasText(searchUrl) ? searchUrl : url;
+    }
+
+    public void setSearchUrl(String searchUrl) {
+        this.searchUrl = searchUrl;
+    }
+
+    public String getBindUrl() {
+        return hasText(bindUrl) ? bindUrl : getSearchUrl();
+    }
+
+    public void setBindUrl(String bindUrl) {
+        this.bindUrl = bindUrl;
+    }
+
+    public String getBaseDn() {
+        return baseDn;
+    }
+
+    public void setBaseDn(String baseDn) {
+        this.baseDn = baseDn;
+    }
+
+    public String getUserSearchFilter() {
+        return userSearchFilter;
+    }
+
+    public void setUserSearchFilter(String userSearchFilter) {
+        this.userSearchFilter = userSearchFilter;
+    }
+
+    public String getServiceAccountDn() {
+        return serviceAccountDn;
+    }
+
+    public void setServiceAccountDn(String serviceAccountDn) {
+        this.serviceAccountDn = serviceAccountDn;
+    }
+
+    public String getServiceAccountPassword() {
+        return serviceAccountPassword;
+    }
+
+    public void setServiceAccountPassword(String serviceAccountPassword) {
+        this.serviceAccountPassword = serviceAccountPassword;
+    }
+
+    public int getConnectTimeout() {
+        return connectTimeout;
+    }
+
+    public void setConnectTimeout(int connectTimeout) {
+        this.connectTimeout = connectTimeout;
+    }
+
+    public int getReadTimeout() {
+        return readTimeout;
+    }
+
+    public void setReadTimeout(int readTimeout) {
+        this.readTimeout = readTimeout;
+    }
+
+    public String getTruststorePath() {
+        return truststorePath;
+    }
+
+    public void setTruststorePath(String truststorePath) {
+        this.truststorePath = truststorePath;
+    }
+
+    public String getTruststorePassword() {
+        return truststorePassword;
+    }
+
+    public void setTruststorePassword(String truststorePassword) {
+        this.truststorePassword = truststorePassword;
+    }
+
+    public String getTruststoreType() {
+        return truststoreType;
+    }
+
+    public void setTruststoreType(String truststoreType) {
+        this.truststoreType = truststoreType;
+    }
+
+    private boolean hasText(String value) {
+        return value != null && !value.trim().isEmpty();
+    }
+}
+|
+public class LdapAuthService {
+
+    private static final Logger LOG =
+            LoggerFactory.getLogger(LdapAuthService.class);
+
+    private LdapProperties ldapProperties;
+
+    public LdapAuthService(LdapProperties ldapProperties) {
+        this.ldapProperties = ldapProperties;
+    }
+
+so correct it 
+
+ @Bean
+    public LdapAuthService ldapAuthService() {
+       
+        LdapAuthService ldapAuthService = new LdapAuthService();
+       
+    }
