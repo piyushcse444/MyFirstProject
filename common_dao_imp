@@ -1,0 +1,2873 @@
+/*
+ * CommonDAOImpl.java
+ * Created on May 2, 2007
+ *
+ * Copyright (c) 2005 by SBI All Rights Reserved.
+ * $Header: $
+ */
+//History
+//May 2, 2007 JD37715 - Initial Creation
+
+package com.sbi.dao;
+
+import java.math.BigDecimal;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Types;
+import java.text.DecimalFormat;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+
+import javax.annotation.PostConstruct;
+import javax.sql.DataSource;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.dao.DataAccessException;
+import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.dao.IncorrectResultSizeDataAccessException;
+import org.springframework.jdbc.core.BeanPropertyRowMapper;
+import org.springframework.jdbc.core.RowMapper;
+import org.springframework.jdbc.core.support.JdbcDaoSupport;
+import org.springframework.stereotype.Component;
+import org.springframework.transaction.TransactionStatus;
+import org.springframework.transaction.support.TransactionCallback;
+import org.springframework.transaction.support.TransactionTemplate;
+
+import com.sbi.exception.DAOException;
+import com.sbi.model.RequestModel;
+import com.sbi.model.SellerRequestModel;
+import com.sbi.model.User;
+import com.sbi.utils.Constants;
+import com.sbi.utils.HVPCUtils;
+import com.sbi.utils.SHAEncryption;
+
+@Configuration
+@Component
+public class CommonDAOImpl extends JdbcDaoSupport implements CommonDAO {
+	private GTDModel gtdmodel;
+	@Autowired
+	private SHAEncryption SHAEncryption;
+	@Autowired
+	private TransactionTemplate transactionTemplate;
+	@Autowired
+	private DataSource dataSource;
+
+	@PostConstruct
+	private void initialize() {
+		setDataSource(dataSource);
+	}
+
+	protected static final Logger logger = LogManager.getLogger(CommonDAOImpl.class);
+	private static final String INSERT_SMS_ALERT_HISTORY_DETAILS = " insert into sbi_system_alert_history(ALERT_REFERENCE,RECEIVER_INFO,ALERT_ID,MOBILE_NO,MESSAGE,EMAIL_STATUS, "
+			+ " MOBILE_STATUS,CREATION_TIME,ALERT_SENT_STATUS,ALERT_SENT_TIME,REASON_FAILURE,ALERT_TYPE,ALERT_MODE) "
+			+ " values ('SBI'||lpad(SYSTEM_ALERT_REF_NO.NEXTVAL,8,'0'),?,?,?,?,'N','Y',sysdate,'Y',sysdate,'success','bcqi_sms','SMS')";
+
+	public User findUser(String userName) throws DAOException {
+		logger.info("findUser(String userName) method begins");
+		User user = new User();
+		Object[] params = { userName };
+		try {
+			user = (User) getJdbcTemplate().queryForObject(SQLConstants.FIND_USER_DETAILS, params, new UserRowMapper());
+			String UPDATE_LOGIN_COUNT = " UPDATE BCQI_USER_PROFILE SET lock_count='0',last_login_time=sysdate WHERE USER_ID =?";
+			getJdbcTemplate().update(UPDATE_LOGIN_COUNT, params);
+		} catch (IncorrectResultSizeDataAccessException exp) {
+			logger.error("Exception occured : " + exp.getMessage(), exp);
+			DAOException.throwException(exp, "BC001", params);
+		} catch (DataAccessException exp) {
+			logger.error("Exception occured : " + exp.getMessage(), exp);
+			DAOException.throwException(exp, "BC000", new Object[] { userName });
+		}
+		logger.info("findUser(String userName) method ends");
+		return user;
+	}
+
+	public User findUser1(String userName) throws DAOException {
+		logger.info("findUser(String userName) method begins");
+		User user = new User();
+		Object[] params = { userName };
+		try {
+			user = (User) getJdbcTemplate().queryForObject(SQLConstants.FIND_USER_DETAILS, params, new UserRowMapper());
+		} catch (DataAccessException exp) {
+			logger.error("Exception occured : " + exp.getMessage(), exp);
+			DAOException.throwException(exp, "BC000", new Object[] { userName });
+		}
+		logger.info("findUser(String userName) method ends");
+		return user;
+	}
+
+	public void insertSMSAlertHistoryDetails(String mobileNo, String message, String senderId, String receiverId)
+			throws DAOException {
+		logger.info(
+				"insertSMSAlertHistoryDetails(String mobileNo, String message,String senderId,String receiverId) method begin");
+		Object[] params = { receiverId, senderId, mobileNo, message };
+		try {
+			getJdbcTemplate().update(INSERT_SMS_ALERT_HISTORY_DETAILS, params);
+			// getJdbcTemplate().batchUpdate(new String[]{});
+		} catch (DataAccessException daoex) {
+			logger.error("Exception occured: " + daoex.getMessage());
+//        	 logger.error("receiverId: "+receiverId+" senderId:"+senderId+" mobileNo:"+mobileNo+" message:"+message);
+		}
+		logger.info(
+				"insertSMSAlertHistoryDetails(String mobileNo, String message,String senderId,String receiverId) method end");
+	}
+
+	public int updateTable(String userName, String newPassword) throws DAOException {
+		logger.info("updateTable method begin");
+		final String UPDATE_PASSWORD = "UPDATE BCQI_USER_PROFILE SET  PASSWORD=? WHERE USER_ID=?";
+		int noOfRow = 0;
+		try {
+			int[] type = { Types.VARCHAR, Types.VARCHAR };
+			final String encPassword = SHAEncryption.hashingSHA2(userName + "#" + newPassword);
+			Object[] param = new Object[] { encPassword, userName };
+
+			noOfRow = getJdbcTemplate().update(UPDATE_PASSWORD, param, type);
+
+			logger.info(noOfRow + " Rows Updated Successfully.");
+		} catch (DataAccessException exception) {
+			logger.error("Exception Occured : " + exception.getMessage(), exception);
+			DAOException.throwException("BC000");
+		}
+		logger.info("updateTable method end");
+		return noOfRow;
+	}
+
+	public void insertLoggidenUser(Map inParams) throws DAOException {
+		logger.info("insertLoggidenUser(Map inParams) method begins");
+		String userName = (String) inParams.get("userName");
+		String sessionId = (String) inParams.get("sessionId");
+		String ipAddress = (String) inParams.get(Constants.IP_ADDRESS);
+		// String UPDATE_LOGIN_COUNT="UPDATE BCQI_USER_PROFILE SET
+		// lock_count='0',last_login_time=sysdate,LOCK_TIME=sysdate WHERE USER_ID =?";
+		String UPDATE_LOGIN_COUNT = "UPDATE BCQI_USER_PROFILE SET lock_count='0',last_login_time=sysdate WHERE USER_ID =?";
+		Object[] param = { userName };
+		Object[] params = { userName, ipAddress, sessionId };
+		try {
+			int types[] = { Types.VARCHAR, Types.VARCHAR, Types.VARCHAR };
+			getJdbcTemplate().update(SQLConstants.INSERT_BCQI_LOGGED_IN_QUERY, params, types);
+			getJdbcTemplate().update(UPDATE_LOGIN_COUNT, param);
+		} catch (DataAccessException ex) {
+			logger.error("Exception Occured : " + ex.getMessage(), ex);
+		}
+		logger.info("insertLoggidenUser(Map inParams) method ends");
+	}
+
+	public void updateLoginCount(int loginCount, String user) throws DAOException {
+		logger.info("updateLoginCount(Map inParams) method begins");
+
+		Object[] params = { loginCount, user };
+		try {
+			getJdbcTemplate().update(SQLConstants.UPDATE_LOGIN_COUNT, params);
+		} catch (DataAccessException ex) {
+			logger.error("Exception Occured : " + ex.getMessage(), ex);
+		}
+		logger.info("updateLoginCount(Map inParams) method ends");
+	}
+
+	public void removeLoggdinUser(String user) throws DAOException {
+		logger.info("removeLoggdinUser(Map inParams) method begins");
+		Object[] param = { user };
+		try {
+			getJdbcTemplate().update(SQLConstants.DELETE_LOGIN_USER, param);
+		} catch (DataAccessException ex) {
+			logger.error("Exception Occured : " + ex.getMessage(), ex);
+		}
+		logger.info("removeLoggdinUser(Map inParams) method ends");
+	}
+
+	public int getLoggedinCount(Map inParams) throws DAOException {
+		logger.info("getLoggedinCount method begin");
+
+		int noOfRow = 0;
+		try {
+			String userName = (String) inParams.get("userName");
+			Object[] param = new Object[] { userName };
+
+			noOfRow = getJdbcTemplate().queryForObject(SQLConstants.LOGGEDIN_COUNT, param, Integer.class);
+
+//				logger.info(noOfRow + " Rows.");
+		} catch (DataAccessException exception) {
+			logger.error("Exception Occured : " + exception.getMessage(), exception);
+			DAOException.throwException("BC000");
+		}
+		logger.info("getLoggedinCount method end");
+		return noOfRow;
+	}
+
+	public String getIpAddr(Map inParams) throws DAOException {
+		logger.info("getLoggedinCount method begin");
+		String dbIp = "";
+		Map map;
+		try {
+			String userName = (String) inParams.get("userName");
+			Object[] param = new Object[] { userName };
+
+			map = getJdbcTemplate().queryForMap(SQLConstants.LOGGEDIN_IP, param);
+			dbIp = (String) map.get("IP_ADDRESS");
+//				logger.info(map + " map.");
+		} catch (DataAccessException exception) {
+			logger.error("Exception Occured : " + exception.getMessage(), exception);
+			DAOException.throwException("BC000");
+		}
+		logger.info("getLoggedinCount method end");
+		return dbIp;
+	}
+
+	public Map getLoginUserRole(String userName) throws DAOException {
+		logger.info("getLoginUserRole() method begins");
+		String role = "";
+		Map outParams = new HashMap();
+
+		Object[] params = new Object[] { userName };
+		try {
+			if (userName != null) {
+				outParams = (Map) getJdbcTemplate().queryForMap(SQLConstants.LOGIN_USER_ROLE, params);
+//			 logger.info("outParams::"+outParams);
+				outParams.put("UserExists", "YES");
+			}
+		} catch (DAOException ex) {
+			logger.error("Exception occured: " + ex.getMessage());
+			DAOException.throwException(ex, "BC001", params);
+		} catch (EmptyResultDataAccessException e) {
+			logger.error("Exception occured: " + e.getMessage());
+			outParams.put("UserExists", "NO");
+		}
+		logger.info("getLoginUserRole() method ends");
+		return outParams;
+
+	}
+
+	// Added for BCQI start
+
+	public List getStatus(String status) throws DAOException {
+		logger.info("getStatus(String status) method begins");
+		List statusList = null;
+		try {
+			Object[] params = { status };
+			statusList = getJdbcTemplate().queryForList(SQLConstants.FIND_STATUS);
+
+		} catch (DataAccessException exp) {
+			logger.info("Exception occured: " + exp.getMessage());
+			DAOException.throwException(exp, "BC000", new Object[] { status });
+		}
+		logger.info("getStatus(String status) method ends");
+		return statusList;
+	}
+
+	public List getDOList() throws DAOException {
+		logger.info("getDOList() method begins");
+		List statusList = null;
+		try {
+			Object[] params = {};
+			statusList = getJdbcTemplate().queryForList(SQLConstants.FIND_DO_BRANCH);
+
+		} catch (DataAccessException exp) {
+			logger.info("Exception occured: " + exp.getMessage());
+			DAOException.throwException(exp, "BC000", new Object[] {});
+		}
+		logger.info("getDOList() method ends");
+		return statusList;
+	}
+
+	public List getFOList() throws DAOException {
+		logger.info("getFOList() method begins");
+		List statusList = null;
+		try {
+			Object[] params = {};
+			statusList = getJdbcTemplate().queryForList(SQLConstants.FIND_FO_BRANCH);
+			logger.info("FO countries List :::");
+		} catch (DataAccessException exp) {
+			logger.info("Exception occured: " + exp.getMessage());
+			DAOException.throwException(exp, "BC000", new Object[] {});
+		}
+		logger.info("getFOList() method ends");
+		return statusList;
+	}
+
+	public List reportDetails(Map inParams) throws DAOException {
+		logger.info("reportDetails(String startDate, String endDate,String dept,String status) method begins");
+		List<Map<String, Object>> reportList = new ArrayList<Map<String, Object>>();
+		List<Map> reportList1 = new ArrayList<Map>();
+		String parameters = "";
+		String startDate = (String) inParams.get("startDate");
+		String endDate = (String) inParams.get("endDate");
+		String doUser = (String) inParams.get("doUser");
+		String foUser = (String) inParams.get("foUser");
+		String status = (String) inParams.get("status");
+		String userRole = (String) inParams.get("userRole");
+//           logger.info("loggedin user role -->"+ userRole);
+
+		try {
+
+			String GET_REPORTS_ALL = "  SELECT * FROM ( SELECT  A.REFERENCE_NO ,TO_CHAR(A.CREATION_TIME) CREATION_TIME,C.NAME_OF_IMPORTER,"
+					+ "  TO_CHAR(A.QUOTE_ACCEPTED_DATE)QUOTE_ACCEPTED_DATE, (SELECT VALUE FROM  BCQI_PROPERTIES WHERE  CONFIG_ID=C.CURRENCY ) CURRENCY,C.AMOUNT,C.BRANCH_NAME,TO_CHAR(a.REQ_APPROVED_DATE)REQ_APPROVED_DATE,NVL( E.QUOTE_ID ,'NOT APPLICABLE') QUOTE_ID,"
+					+ " NVL((SELECT D.VALUE FROM  BCQI_PROPERTIES D WHERE D.DESCRIPTION = 'QuotePeriod'  AND D.CONFIG_ID=E.PERIOD),'NOT APPLICABLE') PERIOD,"
+					+ " NVL( TO_CHAR(NVL(E.NEW_SPREAD,E.SPREAD_IN_BPS)) ,'NOT APPLICABLE') SPREAD_IN_BPS,NVL( TO_CHAR(NVL(E.NEW_RATE_OF_INTEREST,E.RATE_OF_INTEREST))"
+					+ " ,'NOT APPLICABLE') RATE_OF_INTEREST,(SELECT VALUE FROM  BCQI_PROPERTIES WHERE DESCRIPTION = 'Status' AND  CONFIG_ID=nvl(E.STATUS,A.STATUS) )  STATUS ,  e.other_charges OTHER_CHARGES , A.STATUS REQ_STATUS,C.BRANCH_CODE ,NVL((SELECT D.VALUE FROM  BCQI_PROPERTIES D WHERE D.DESCRIPTION = 'Country' AND D.CONFIG_ID = E.FO_USER_BRANCH ),'NOT APPLICABLE' )"
+					+ " FO_USER_BRANCH,E.FO_USER_BRANCH  E_FO_USER_BRANCH,NVL((SELECT D.VALUE FROM  BCQI_PROPERTIES D WHERE D.DESCRIPTION = 'QuoteBasis' AND D.CONFIG_ID =E.BASIS),'NOT APPLICABLE') BASIS,"
+					+ " E.STATUS E_STATUS FROM   BCQI_REQUEST A ,BCQI_REQUEST_DETAILS C ,BCQI_REQ_QUOTE_DETAILS E WHERE   A.REFERENCE_NO = C.REFERENCE_NO "
+					+
+					// " AND TRUNC(A.CREATION_TIME) BETWEEN TO_DATE(?,'dd-mm-yy') AND
+					// TO_DATE(?,'dd-mm-yy') AND A.REFERENCE_NO = E.REFERENCE_NO(+) ) where
+					// #TOBEREPLACED# NVL(E_STATUS,'*') NOT IN ('11','26','28') ORDER BY
+					// CREATION_TIME DESC ";
+
+					" AND TRUNC(A.CREATION_TIME) BETWEEN TO_DATE(?,'dd-mm-yy')  AND TO_DATE(?,'dd-mm-yy')  AND  A.REFERENCE_NO = E.REFERENCE_NO(+)  ) where  #TOBEREPLACED#";
+
+			if (!"".equals(status) && status != null && !"-1".equals(status) && !"".equals(doUser) && doUser != null
+					&& !"".equals(foUser) && foUser != null && !"-1".equals(doUser) && !"-1".equals(foUser)) {
+				if (("1").equals(status) || ("2").equals(status) || ("3").equals(status) || ("4").equals(status)
+						|| ("6").equals(status)) {
+					parameters = "  ( REQ_STATUS IN (?) AND BRANCH_CODE IN (?) AND E_FO_USER_BRANCH IN (?)  ) AND ";
+
+					Object[] inparams = { startDate, endDate, status, doUser, foUser };
+					String query = GET_REPORTS_ALL.replaceAll("#TOBEREPLACED#", parameters);
+
+					if (null != userRole) {
+						if (userRole.equalsIgnoreCase("21")) {// DO
+							query = query
+									+ "  NVL(E_STATUS,'*')  NOT IN ('11','26','28') ORDER BY CREATION_TIME  DESC ";
+						} else if (userRole.equalsIgnoreCase("22")) {// FO
+							query = query + "  NVL(E_STATUS,'*')  NOT IN ('11','27') ORDER BY CREATION_TIME  DESC ";
+						} else if (userRole.equalsIgnoreCase("23")) {// GTD
+							query = query + "  NVL(E_STATUS,'*')  NOT IN ('11') ORDER BY CREATION_TIME  DESC ";
+						}
+
+					}
+
+//             	 logger.info("reports query :: "+query);
+//             	 logger.info("GTDReportDetails params :: "+inparams);
+					reportList = getJdbcTemplate().queryForList(query, inparams);
+					;
+
+				}
+
+				else {
+					parameters = "  ( E_STATUS IN (?) AND BRANCH_CODE IN (?) AND E_FO_USER_BRANCH IN (?)  ) AND ";
+					Object[] inparams = { startDate, endDate, status, doUser, foUser };
+					String query = GET_REPORTS_ALL.replaceAll("#TOBEREPLACED#", parameters);
+
+					if (null != userRole) {
+						if (userRole.equalsIgnoreCase("21")) {// DO
+							query = query
+									+ "  NVL(E_STATUS,'*')  NOT IN ('11','26','28') ORDER BY CREATION_TIME  DESC ";
+						} else if (userRole.equalsIgnoreCase("22")) {// FO
+							query = query + "  NVL(E_STATUS,'*')  NOT IN ('11','27') ORDER BY CREATION_TIME  DESC ";
+						} else if (userRole.equalsIgnoreCase("23")) {// GTD
+							query = query + "  NVL(E_STATUS,'*')  NOT IN ('11') ORDER BY CREATION_TIME  DESC ";
+						}
+
+					}
+
+//             	 logger.info("reports query :: "+query);
+//             	 logger.info("GTDReportDetails params :: "+inparams);
+					reportList = getJdbcTemplate().queryForList(query, inparams);
+					;
+
+				}
+			} else if (!"".equals(status) && status != null && !"-1".equals(status) && !"".equals(doUser)
+					&& !"-1".equals(doUser) && doUser != null) {
+				if (("1").equals(status) || ("2").equals(status) || ("3").equals(status) || ("4").equals(status)
+						|| ("6").equals(status)) {
+					parameters = "  REQ_STATUS IN (?) AND BRANCH_CODE IN (?)  AND ";
+					Object[] inparams = { startDate, endDate, status, doUser };
+					String query = GET_REPORTS_ALL.replaceAll("#TOBEREPLACED#", parameters);
+
+					if (null != userRole) {
+						if (userRole.equalsIgnoreCase("21")) {// DO
+							query = query
+									+ "  NVL(E_STATUS,'*')  NOT IN ('11','26','28') ORDER BY CREATION_TIME  DESC ";
+						} else if (userRole.equalsIgnoreCase("22")) {// FO
+							query = query + "  NVL(E_STATUS,'*')  NOT IN ('11','27') ORDER BY CREATION_TIME  DESC ";
+						} else if (userRole.equalsIgnoreCase("23")) {// GTD
+							query = query + "  NVL(E_STATUS,'*')  NOT IN ('11') ORDER BY CREATION_TIME  DESC ";
+						}
+
+					}
+
+//               	 logger.info("reports query :: "+query);
+//               	 logger.info("GTDReportDetails params :: "+inparams);
+					reportList = getJdbcTemplate().queryForList(query, inparams);
+					;
+
+				} else {
+					parameters = "  E_STATUS IN (?) AND BRANCH_CODE IN (?)  AND ";
+					Object[] inparams = { startDate, endDate, status, doUser };
+
+					String query = GET_REPORTS_ALL.replaceAll("#TOBEREPLACED#", parameters);
+
+					if (null != userRole) {
+						if (userRole.equalsIgnoreCase("21")) {// DO
+							query = query
+									+ "  NVL(E_STATUS,'*')  NOT IN ('11','26','28') ORDER BY CREATION_TIME  DESC ";
+						} else if (userRole.equalsIgnoreCase("22")) {// FO
+							query = query + "  NVL(E_STATUS,'*')  NOT IN ('11','27') ORDER BY CREATION_TIME  DESC ";
+						} else if (userRole.equalsIgnoreCase("23")) {// GTD
+							query = query + "  NVL(E_STATUS,'*')  NOT IN ('11') ORDER BY CREATION_TIME  DESC ";
+						}
+
+					}
+
+//              	 logger.info("reports query :: "+query);
+//              	 logger.info("GTDReportDetails params :: "+inparams);
+					reportList = getJdbcTemplate().queryForList(query, inparams);
+					;
+
+				}
+			} else if (!"".equals(status) && status != null && !"-1".equals(status) && !"".equals(foUser)
+					&& !"-1".equals(foUser) && foUser != null) {
+				if (("1").equals(status) || ("2").equals(status) || ("3").equals(status) || ("4").equals(status)
+						|| ("6").equals(status)) {
+					parameters = " ( REQ_STATUS IN (?) AND  E_FO_USER_BRANCH IN (?)  ) AND ";
+					Object[] inparams = { startDate, endDate, status, foUser };
+					String query = GET_REPORTS_ALL.replaceAll("#TOBEREPLACED#", parameters);
+
+					if (null != userRole) {
+						if (userRole.equalsIgnoreCase("21")) {// DO
+							query = query
+									+ "  NVL(E_STATUS,'*')  NOT IN ('11','26','28') ORDER BY CREATION_TIME  DESC ";
+						} else if (userRole.equalsIgnoreCase("22")) {// FO
+							query = query + "  NVL(E_STATUS,'*')  NOT IN ('11','27') ORDER BY CREATION_TIME  DESC ";
+						} else if (userRole.equalsIgnoreCase("23")) {// GTD
+							query = query + "  NVL(E_STATUS,'*')  NOT IN ('11') ORDER BY CREATION_TIME  DESC ";
+						}
+
+					}
+
+//	               	 logger.info("reports query :: "+query);
+//	               	 logger.info("GTDReportDetails params :: "+inparams);
+					reportList = getJdbcTemplate().queryForList(query, inparams);
+					;
+
+				} else {
+
+					parameters = " ( E_STATUS IN (?) AND  E_FO_USER_BRANCH IN (?)  ) AND ";
+					Object[] inparams = { startDate, endDate, status, foUser };
+					String query = GET_REPORTS_ALL.replaceAll("#TOBEREPLACED#", parameters);
+
+					if (null != userRole) {
+						if (userRole.equalsIgnoreCase("21")) {// DO
+							query = query
+									+ "  NVL(E_STATUS,'*')  NOT IN ('11','26','28') ORDER BY CREATION_TIME  DESC ";
+						} else if (userRole.equalsIgnoreCase("22")) {// FO
+							query = query + "  NVL(E_STATUS,'*')  NOT IN ('11','27') ORDER BY CREATION_TIME  DESC ";
+						} else if (userRole.equalsIgnoreCase("23")) {// GTD
+							query = query + "  NVL(E_STATUS,'*')  NOT IN ('11') ORDER BY CREATION_TIME  DESC ";
+						}
+
+					}
+
+//	               	 logger.info("reports query :: "+query);
+//	               	 logger.info("GTDReportDetails params :: "+inparams);
+					reportList = getJdbcTemplate().queryForList(query, inparams);
+					;
+
+				}
+			} else if (!"".equals(doUser) && doUser != null && !"-1".equals(doUser) && !"".equals(foUser)
+					&& foUser != null && !"-1".equals(foUser)) {
+				parameters = " ( BRANCH_CODE IN (?) AND  E_FO_USER_BRANCH IN (?) ) AND ";
+				Object[] inparams = { startDate, endDate, doUser, foUser };
+
+				String query = GET_REPORTS_ALL.replaceAll("#TOBEREPLACED#", parameters);
+
+				if (null != userRole) {
+					if (userRole.equalsIgnoreCase("21")) {// DO
+						query = query + "  NVL(E_STATUS,'*')  NOT IN ('11','26','28') ORDER BY CREATION_TIME  DESC ";
+					} else if (userRole.equalsIgnoreCase("22")) {// FO
+						query = query + "  NVL(E_STATUS,'*')  NOT IN ('11','27') ORDER BY CREATION_TIME  DESC ";
+					} else if (userRole.equalsIgnoreCase("23")) {// GTD
+						query = query + "  NVL(E_STATUS,'*')  NOT IN ('11') ORDER BY CREATION_TIME  DESC ";
+					}
+
+				}
+
+//              	 logger.info("reports query :: "+query);
+//              	 logger.info("GTDReportDetails params :: "+inparams);
+				reportList = getJdbcTemplate().queryForList(query, inparams);
+				;
+
+			} else if (!"".equals(doUser) && doUser != null && !"-1".equals(doUser)) {
+				parameters = " BRANCH_CODE IN (?) AND ";
+				Object[] inparams = { startDate, endDate, doUser };
+				String query = GET_REPORTS_ALL.replaceAll("#TOBEREPLACED#", parameters);
+
+				if (null != userRole) {
+					if (userRole.equalsIgnoreCase("21")) {// DO
+						query = query + "  NVL(E_STATUS,'*')  NOT IN ('11','26','28') ORDER BY CREATION_TIME  DESC ";
+					} else if (userRole.equalsIgnoreCase("22")) {// FO
+						query = query + "  NVL(E_STATUS,'*')  NOT IN ('11','27') ORDER BY CREATION_TIME  DESC ";
+					} else if (userRole.equalsIgnoreCase("23")) {// GTD
+						query = query + "  NVL(E_STATUS,'*')  NOT IN ('11') ORDER BY CREATION_TIME  DESC ";
+					}
+
+				}
+
+//	          	 logger.info("reports query :: "+query);
+//	          	 logger.info("GTDReportDetails params :: "+inparams);
+				reportList = getJdbcTemplate().queryForList(query, inparams);
+				;
+
+			} else if (!"".equals(foUser) && foUser != null && !"-1".equals(foUser)) {
+				parameters = " E_FO_USER_BRANCH IN (?) AND ";
+				Object[] inparams = { startDate, endDate, foUser };
+				String query = GET_REPORTS_ALL.replaceAll("#TOBEREPLACED#", parameters);
+
+				if (null != userRole) {
+					if (userRole.equalsIgnoreCase("21")) {// DO
+						query = query + "  NVL(E_STATUS,'*')  NOT IN ('11','26','28') ORDER BY CREATION_TIME  DESC ";
+					} else if (userRole.equalsIgnoreCase("22")) {// FO
+						query = query + "  NVL(E_STATUS,'*')  NOT IN ('11','27') ORDER BY CREATION_TIME  DESC ";
+					} else if (userRole.equalsIgnoreCase("23")) {// GTD
+						query = query + "  NVL(E_STATUS,'*')  NOT IN ('11') ORDER BY CREATION_TIME  DESC ";
+					}
+
+				}
+
+//	          	 logger.info("reports query :: "+query);
+//	          	 logger.info("GTDReportDetails params :: "+inparams);
+				reportList = getJdbcTemplate().queryForList(query, inparams);
+				;
+			} else if (!"".equals(status) && status != null && !"-1".equals(status)) {
+				if (("1").equals(status) || ("2").equals(status) || ("3").equals(status) || ("4").equals(status)
+						|| ("6").equals(status)) {
+					parameters = " REQ_STATUS IN (?)  AND ";
+					Object[] inparams = { startDate, endDate, status };
+					String query = GET_REPORTS_ALL.replaceAll("#TOBEREPLACED#", parameters);
+
+					if (null != userRole) {
+						if (userRole.equalsIgnoreCase("21")) {// DO
+							query = query
+									+ "  NVL(E_STATUS,'*')  NOT IN ('11','26','28') ORDER BY CREATION_TIME  DESC ";
+						} else if (userRole.equalsIgnoreCase("22")) {// FO
+							query = query + "  NVL(E_STATUS,'*')  NOT IN ('11','27') ORDER BY CREATION_TIME  DESC ";
+						} else if (userRole.equalsIgnoreCase("23")) {// GTD
+							query = query + "  NVL(E_STATUS,'*')  NOT IN ('11') ORDER BY CREATION_TIME  DESC ";
+						}
+
+					}
+
+//	             	 logger.info("reports query :: "+query);
+//	             	 logger.info("GTDReportDetails params :: "+inparams);
+					reportList = getJdbcTemplate().queryForList(query, inparams);
+					;
+
+				} else {
+					parameters = " E_STATUS IN (?)  AND ";
+					Object[] inparams = { startDate, endDate, status };
+					String query = GET_REPORTS_ALL.replaceAll("#TOBEREPLACED#", parameters);
+
+					if (null != userRole) {
+						if (userRole.equalsIgnoreCase("21")) {// DO
+							query = query
+									+ "  NVL(E_STATUS,'*')  NOT IN ('11','26','28') ORDER BY CREATION_TIME  DESC ";
+						} else if (userRole.equalsIgnoreCase("22")) {// FO
+							query = query + "  NVL(E_STATUS,'*')  NOT IN ('11','27') ORDER BY CREATION_TIME  DESC ";
+						} else if (userRole.equalsIgnoreCase("23")) {// GTD
+							query = query + "  NVL(E_STATUS,'*')  NOT IN ('11') ORDER BY CREATION_TIME  DESC ";
+						}
+
+					}
+
+//	              	 logger.info("reports query :: "+query);
+//	              	 logger.info("GTDReportDetails params :: "+inparams);
+					reportList = getJdbcTemplate().queryForList(query, inparams);
+					;
+
+				}
+			}
+			if (parameters.equals("")) {
+				Object[] inparams = { startDate, endDate };
+				String query = GET_REPORTS_ALL.replaceAll("#TOBEREPLACED#", parameters);
+
+				if (null != userRole) {
+					if (userRole.equalsIgnoreCase("21")) {// DO
+						query = query + "  NVL(E_STATUS,'*')  NOT IN ('11','26','28') ORDER BY CREATION_TIME  DESC ";
+					} else if (userRole.equalsIgnoreCase("22")) {// FO
+						query = query + "  NVL(E_STATUS,'*')  NOT IN ('11','27') ORDER BY CREATION_TIME  DESC ";
+					} else if (userRole.equalsIgnoreCase("23")) {// GTD
+						query = query + "  NVL(E_STATUS,'*')  NOT IN ('11') ORDER BY CREATION_TIME  DESC ";
+					}
+
+				}
+
+//        	 logger.info("reports query :: "+query);
+//        	 logger.info("GTDReportDetails params :: "+inparams);
+				reportList = getJdbcTemplate().queryForList(query, inparams);
+				;
+			}
+			if (reportList.size() > 0) {
+
+				for (Map<String, Object> recoerdMap : reportList) {
+
+					String refNo = (String) recoerdMap.get("REFERENCE_NO");
+					Object params1[] = { refNo };
+
+					String sql = "SELECT min(comments) from BCQI_QUOTE_COMMENTS WHERE REFERENCE_NO=? order by creation_time ";
+
+					String Comment = (String) getJdbcTemplate().queryForObject(sql, params1, String.class);
+					recoerdMap.put("Fo_Commen", Comment);
+
+					reportList1.add(recoerdMap);
+				}
+
+			}
+
+		} catch (DataAccessException daoex) {
+			logger.error("Exception occured: " + daoex.getMessage());
+			// DAOException.throwException(daoex,"BC000",inparams);
+		}
+		logger.info(
+				"reportDetails(String startDate, String endDate,String Approver,String dept,String status) method ends");
+		return reportList;
+	}
+
+	public List doReportDetails(Map inParams) throws DAOException {
+		logger.info("doReportDetails(Map inParams)  method begins");
+		List<Map<String, Object>> reportList = new ArrayList<Map<String, Object>>();
+		List<Map> reportList1 = new ArrayList<Map>();
+		String parameters = "";
+		String startDate = (String) inParams.get("startDate");
+		String endDate = (String) inParams.get("endDate");
+		String foUser = (String) inParams.get("foUser");
+		String status = (String) inParams.get("status");
+		String userId = (String) inParams.get("userId");
+		String branchCode = (String) inParams.get("branchCode");
+		List<Object> paramList = new ArrayList<Object>();
+		List<Object> paramList1 = new ArrayList<Object>();
+
+		if (!"".equals(status) && status != null && !"-1".equalsIgnoreCase(status) && !"".equals(foUser)
+				&& foUser != null && !"-1".equalsIgnoreCase(foUser)) {
+			if (("1").equals(status) || ("2").equals(status) || ("3").equals(status) || ("4").equals(status)
+					|| ("6").equals(status)) {
+				parameters = "  REQ_STATUS IN(?) and   E_FO_USER_BRANCH IN (?)  AND ";
+				paramList1.add(status);
+				paramList1.add(foUser);
+			} else {
+				parameters = "  E_STATUS IN(?) and   E_FO_USER_BRANCH IN (?)  AND ";
+
+				paramList1.add(status);
+				paramList1.add(foUser);
+			}
+		} else if (!"".equals(status) && status != null && !"-1".equalsIgnoreCase(status)) {
+			/*
+			 * if(("1").equals(status) || ("2").equals(status) || ("3").equals(status) ||
+			 * ("4").equals(status) || ("6").equals(status)){ paramList1.add(status); }
+			 * else{ parameters="  E_STATUS  IN (?)  AND "; paramList1.add(status);
+			 * 
+			 * }
+			 */
+
+			parameters = "  REQ_STATUS  IN (?)  AND ";
+			paramList1.add(status);
+
+		} else if (!"".equals(foUser) && foUser != null && !"-1".equalsIgnoreCase(foUser)) {
+			parameters = "  E_FO_USER_BRANCH IN (?) And ";
+
+			paramList1.add(foUser);
+		}
+
+		paramList.add(startDate);
+		paramList.add(endDate);
+		// paramList.add(userId);
+		// paramList.add(userId);
+		paramList.add(branchCode);
+
+		for (int i = 0; i < paramList1.size(); i++) {
+
+			paramList.add(paramList1.get(i));
+		}
+
+		Object paramArr[] = paramList.toArray();
+
+		String GET_DO_REPORTS = "SELECT * FROM ( SELECT  A.REFERENCE_NO ,TO_CHAR(A.CREATION_TIME) CREATION_TIME,C.NAME_OF_IMPORTER,C.AMOUNT,"
+				+ "(SELECT VALUE FROM  BCQI_PROPERTIES WHERE  CONFIG_ID=C.CURRENCY ) CURRENCY,TO_CHAR(a.REQ_APPROVED_DATE)REQ_APPROVED_DATE,NVL( E.QUOTE_ID ,'NOT APPLICABLE') QUOTE_ID,"
+				+ "NVL((SELECT D.VALUE FROM  BCQI_PROPERTIES D WHERE D.DESCRIPTION = 'QuoteBasis' AND D.CONFIG_ID =E.BASIS),'NOT APPLICABLE') BASIS,"
+				+ "NVL((SELECT D.VALUE FROM  BCQI_PROPERTIES D WHERE D.DESCRIPTION = 'QuotePeriod'  AND D.CONFIG_ID=E.PERIOD),'NOT APPLICABLE') PERIOD,"
+				+ "NVL( TO_CHAR(NVL(E.NEW_SPREAD,E.SPREAD_IN_BPS)) ,'NOT APPLICABLE') SPREAD_IN_BPS,NVL( TO_CHAR(NVL(E.NEW_RATE_OF_INTEREST,E.RATE_OF_INTEREST)),'NOT APPLICABLE') RATE_OF_INTEREST,FO_USER_BRANCH E_FO_USER_BRANCH,"
+				+ "(SELECT VALUE FROM  BCQI_PROPERTIES WHERE DESCRIPTION = 'Status' AND CONFIG_ID=nvl(E.STATUS,A.STATUS) )  STATUS , A.STATUS REQ_STATUS,A.DO_MAKER_USER_ID,NVL((SELECT D.VALUE FROM  BCQI_PROPERTIES D WHERE D.DESCRIPTION = 'Country' AND D.CONFIG_ID = E.FO_USER_BRANCH ),'NOT APPLICABLE' ) FO_USER_BRANCH,"
+				+ "E.STATUS E_STATUS ,E.OTHER_CHARGES OTHER_CHARGES,A.DO_CHECKER_USER_ID FROM   BCQI_REQUEST A ,BCQI_REQUEST_DETAILS C ,BCQI_REQ_QUOTE_DETAILS E WHERE   A.REFERENCE_NO = C.REFERENCE_NO "
+				+ "AND TRUNC(A.CREATION_TIME) BETWEEN TO_DATE(?,'dd-mm-yy')  AND TO_DATE(?,'dd-mm-yy')  AND C.BRANCH_CODE=?"
+				+ "AND  A.REFERENCE_NO = E.REFERENCE_NO(+)  ) where  #TOBEREPLACED#  NVL(E_STATUS,'*')  NOT IN ('11','26','28') ORDER BY CREATION_TIME  DESC";
+
+		try {
+			String query = GET_DO_REPORTS.replaceAll("#TOBEREPLACED#", parameters);
+			logger.info("FOReport query :: " + query);
+//            	 logger.info("FOReport params :: "+paramArr);
+			reportList = getJdbcTemplate().queryForList(query, paramArr);
+
+			if (reportList.size() > 0) {
+
+				for (Map<String, Object> recoerdMap : reportList) {
+
+					String refNo = (String) recoerdMap.get("REFERENCE_NO");
+					Object params1[] = { refNo };
+
+					String sql = "SELECT min(comments) from BCQI_QUOTE_COMMENTS WHERE REFERENCE_NO=? order by creation_time ";
+
+					String Comment = (String) getJdbcTemplate().queryForObject(sql, params1, String.class);
+					recoerdMap.put("Fo_Commen", Comment);
+					BigDecimal AMOUNT1 = (BigDecimal) recoerdMap.get("AMOUNT");
+					String AMOUNT = AMOUNT1.toPlainString();
+					DecimalFormat formatter = new DecimalFormat("#,###");
+					AMOUNT = formatter.format(Double.parseDouble(AMOUNT));
+					recoerdMap.put("AMOUNT", AMOUNT);
+
+					reportList1.add(recoerdMap);
+				}
+
+			}
+		} catch (DataAccessException daoex) {
+			logger.error("Exception occured: " + daoex.getMessage());
+		}
+		logger.info("doReportDetails(Map inParams) method ends");
+		return reportList1;
+	}
+
+	public List doSellerReportDetails(Map inParams) throws DAOException {
+		logger.info("doSellerReportDetails(Map inParams)  method begins");
+		List<Map<String, Object>> reportList = new ArrayList<Map<String, Object>>();
+		List<Map> reportList1 = new ArrayList<Map>();
+		String parameters = "";
+		String startDate = (String) inParams.get("startDate");
+		String endDate = (String) inParams.get("endDate");
+		String foUser = (String) inParams.get("foUser");
+		String status = (String) inParams.get("status");
+		String userId = (String) inParams.get("userId");
+		String branchCode = (String) inParams.get("branchCode");
+		List<Object> paramList = new ArrayList<Object>();
+		List<Object> paramList1 = new ArrayList<Object>();
+
+		if (!"".equals(status) && status != null && !"-1".equalsIgnoreCase(status) && !"".equals(foUser)
+				&& foUser != null && !"-1".equalsIgnoreCase(foUser)) {
+			if (("1").equals(status) || ("2").equals(status) || ("3").equals(status) || ("4").equals(status)
+					|| ("6").equals(status)) {
+				parameters = "  REQ_STATUS IN(?) and   E_FO_USER_BRANCH IN (?)  AND ";
+				paramList1.add(status);
+				paramList1.add(foUser);
+			} else {
+				parameters = "  E_STATUS IN(?) and   E_FO_USER_BRANCH IN (?)  AND ";
+
+				paramList1.add(status);
+				paramList1.add(foUser);
+			}
+		} else if (!"".equals(status) && status != null && !"-1".equalsIgnoreCase(status)) {
+			/*
+			 * if(("1").equals(status) || ("2").equals(status) || ("3").equals(status) ||
+			 * ("4").equals(status) || ("6").equals(status)){ paramList1.add(status); }
+			 * else{ parameters="  E_STATUS  IN (?)  AND "; paramList1.add(status);
+			 * 
+			 * }
+			 */
+
+			parameters = "  REQ_STATUS  IN (?)  AND ";
+			paramList1.add(status);
+
+		} else if (!"".equals(foUser) && foUser != null && !"-1".equalsIgnoreCase(foUser)) {
+			parameters = "  E_FO_USER_BRANCH IN (?) And ";
+
+			paramList1.add(foUser);
+		}
+
+		paramList.add(startDate);
+		paramList.add(endDate);
+		// paramList.add(userId);
+		// paramList.add(userId);
+		paramList.add(branchCode);
+
+		for (int i = 0; i < paramList1.size(); i++) {
+
+			paramList.add(paramList1.get(i));
+		}
+
+		Object paramArr[] = paramList.toArray();
+
+		String GET_SELLER_DO_REPORTS = "SELECT * FROM ( SELECT  A.REFERENCE_NO ,TO_CHAR(A.CREATION_TIME,'dd/MM/yyyy') CREATION_TIME,C.APPL_NAME_ADDRESS,C.LETTER_OF_CREDIT_AMOUNT,C.SUPPLIER_CREDIT_AMOUNT,"
+				+ " (SELECT VALUE FROM  BCQI_PROPERTIES WHERE  CONFIG_ID=C.LC_CURRENCY ) CURRENCY,TO_CHAR(a.REQ_APPROVED_DATE)REQ_APPROVED_DATE,NVL( E.QUOTE_ID ,'NOT APPLICABLE') QUOTE_ID,"
+				+ " NVL((SELECT D.VALUE FROM  BCQI_PROPERTIES D WHERE D.DESCRIPTION = 'QuoteBasis' AND D.CONFIG_ID =E.BASIS),'NOT APPLICABLE') BASIS,"
+				+ " NVL((SELECT D.VALUE FROM  BCQI_PROPERTIES D WHERE D.DESCRIPTION = 'QuotePeriod'  AND D.CONFIG_ID=E.PERIOD),'NOT APPLICABLE') PERIOD,"
+				+ " NVL( TO_CHAR(NVL(E.NEW_SPREAD,E.SPREAD_IN_BPS)) ,'NOT APPLICABLE') SPREAD_IN_BPS,NVL( TO_CHAR(NVL(E.NEW_RATE_OF_INTEREST,E.RATE_OF_INTEREST)),'NOT APPLICABLE') RATE_OF_INTEREST,FO_USER_BRANCH E_FO_USER_BRANCH,"
+				+ " (SELECT VALUE FROM  BCQI_PROPERTIES WHERE DESCRIPTION = 'Status' AND CONFIG_ID=nvl(E.STATUS,A.STATUS) )  STATUS , A.STATUS REQ_STATUS,A.DO_MAKER_USER_ID,NVL((SELECT D.VALUE FROM  BCQI_PROPERTIES D WHERE D.DESCRIPTION = 'Country' AND D.CONFIG_ID = E.FO_USER_BRANCH ),'NOT APPLICABLE' ) FO_USER_BRANCH,"
+				+ " E.STATUS E_STATUS , E.OTHER_CHARGES,E.SUPPLIER_CHARGES,E.ADVISING_CHARGES,E.DOC_HANDLING_CHARGES,A.DO_CHECKER_USER_ID FROM   BCQI_SELLER_REQUEST A ,BCQI_SELLER_REQUEST_DETAILS C ,BCQI_SELLER_REQ_QUOTE_DETAILS E WHERE   A.REFERENCE_NO = C.REFERENCE_NO "
+				+ " AND TRUNC(A.CREATION_TIME) BETWEEN TO_DATE(?,'dd/MM/yyyy')  AND TO_DATE(?,'dd/MM/yyyy')  AND C.BRANCH_CODE=? "
+				+ " AND  A.REFERENCE_NO = E.REFERENCE_NO(+)  ) where  #TOBEREPLACED#  NVL(E_STATUS,'*')  NOT IN ('11','26','28') ORDER BY CREATION_TIME  DESC";
+
+		try {
+			String query = GET_SELLER_DO_REPORTS.replaceAll("#TOBEREPLACED#", parameters);
+//            	 logger.info("FOReport query :: "+query);
+//            	 logger.info("FOReport params :: "+paramArr);
+			reportList = getJdbcTemplate().queryForList(query, paramArr);
+
+			if (reportList.size() > 0) {
+
+				for (Map<String, Object> recoerdMap : reportList) {
+
+					String refNo = (String) recoerdMap.get("REFERENCE_NO");
+					Object params1[] = { refNo };
+
+					String sql = "SELECT min(comments) from BCQI_QUOTE_COMMENTS WHERE REFERENCE_NO=? order by creation_time ";
+
+					String Comment = (String) getJdbcTemplate().queryForObject(sql, params1, String.class);
+					recoerdMap.put("Fo_Commen", Comment);
+					BigDecimal AMOUNT1 = (BigDecimal) recoerdMap.get("SUPPLIER_CREDIT_AMOUNT");
+					String AMOUNT = AMOUNT1.toPlainString();
+					DecimalFormat formatter = new DecimalFormat("#,###");
+					AMOUNT = formatter.format(Double.parseDouble(AMOUNT));
+					recoerdMap.put("AMOUNT", AMOUNT);
+
+					reportList1.add(recoerdMap);
+				}
+
+			}
+
+		} catch (DataAccessException daoex) {
+			logger.error("Exception occured: " + daoex.getMessage());
+		}
+		logger.info("doSellerReportDetails(Map inParams) method ends");
+
+		return reportList1;
+	}
+
+	public List foReportDetails(Map inParams) throws DAOException {
+		logger.info("foReportDetails(Map inParams) method begins");
+		List<Map<String, Object>> reportList = new ArrayList<Map<String, Object>>();
+		List<Map> reportList1 = new ArrayList<Map>();
+
+		String parameters = "";
+		String startDate = (String) inParams.get("startDate");
+		String endDate = (String) inParams.get("endDate");
+		String doUser = (String) inParams.get("doUser");
+		String status = (String) inParams.get("status");
+		String userId = (String) inParams.get("userId");
+		List<Object> paramList = new ArrayList<Object>();
+		List<Object> paramList1 = new ArrayList<Object>();
+
+		if (!"".equals(status) && status != null && !"-1".equals(status) && !"".equals(doUser) && doUser != null
+				&& !"-1".equals(doUser)) {
+			if (("1").equals(status) || ("2").equals(status) || ("3").equals(status) || ("4").equals(status)
+					|| ("6").equals(status)) {
+				parameters = " REQ_STATUS IN (?) AND BRANCH_CODE IN (?) AND ";
+				paramList1.add(status);
+				paramList1.add(doUser);
+
+			} else {
+				parameters = " E_STATUS IN (?) AND BRANCH_CODE IN (?) AND ";
+				paramList1.add(status);
+				paramList1.add(doUser);
+
+			}
+		} else if (!"".equals(status) && status != null && !"-1".equals(status)) {
+			if (("1").equals(status) || ("2").equals(status) || ("3").equals(status) || ("4").equals(status)
+					|| ("6").equals(status)) {
+				parameters = " REQ_STATUS IN  (?) AND ";
+				paramList1.add(status);
+
+			} else {
+				parameters = " E_STATUS IN  (?) AND ";
+				paramList1.add(status);
+			}
+		} else if (!"".equals(doUser) && doUser != null && !"-1".equals(doUser)) {
+			parameters = " BRANCH_CODE IN (?) AND ";
+			paramList1.add(doUser);
+
+		}
+
+		paramList.add(startDate);
+		paramList.add(endDate);
+		paramList.add(userId);
+
+		for (int i = 0; i < paramList1.size(); i++) {
+
+			paramList.add(paramList1.get(i));
+		}
+
+		Object paramArr[] = paramList.toArray();
+
+		try {
+			String query = SQLConstants.GET_FO_REPORTS.replaceAll("#TOBEREPLACED#", parameters);
+//      	 logger.info("FOReport query :: "+query);
+//      	 logger.info("FOReport params :: "+paramArr);
+			reportList = getJdbcTemplate().queryForList(query, paramArr);
+
+			if (reportList.size() > 0) {
+
+				for (Map<String, Object> recoerdMap : reportList) {
+
+					String refNo = (String) recoerdMap.get("REFERENCE_NO");
+					Object params1[] = { refNo };
+
+					String sql = "SELECT min(comments) from BCQI_QUOTE_COMMENTS WHERE REFERENCE_NO=? order by creation_time ";
+
+					String Comment = (String) getJdbcTemplate().queryForObject(sql, params1, String.class);
+					recoerdMap.put("Fo_Commen", Comment);
+					reportList1.add(recoerdMap);
+				}
+
+			}
+
+		} catch (DataAccessException daoex) {
+			logger.error("Exception occured: " + daoex.getMessage());
+			DAOException.throwException(daoex, "BC000", paramArr);
+		}
+		logger.info("foReportDetails(Map inParams) method ends");
+		return reportList1;
+	}
+
+	/*
+	 * public List reportDetails(Map inParams) throws DAOException { logger.
+	 * info("reportDetails(String startDate, String endDate,String dept,String status) method begins"
+	 * ); List reportList = null; String parameters=""; String startDate =
+	 * (String)inParams.get("startDate"); String endDate =
+	 * (String)inParams.get("endDate"); String doUser =
+	 * (String)inParams.get("doUser"); String foUser =
+	 * (String)inParams.get("foUser"); String status =
+	 * (String)inParams.get("status");
+	 * 
+	 * if(!"".equals(status) && status!=null && !"-1".equals(status) &&
+	 * !"".equals(doUser) && doUser!=null && !"".equals(foUser) && foUser!=null &&
+	 * !"-1".equals(doUser) && !"-1".equals(foUser)){ if(("1").equals(status) ||
+	 * ("2").equals(status) || ("3").equals(status) || ("4").equals(status) ||
+	 * ("6").equals(status))
+	 * parameters="  ( REQ_STATUS IN ('"+status+"') AND BRANCH_CODE IN ('"
+	 * +doUser+"') AND E_FO_USER_BRANCH IN ('"+foUser+"')  ) AND "; else
+	 * parameters="  ( E_STATUS IN ('"+status+"') AND BRANCH_CODE IN ('"
+	 * +doUser+"') AND E_FO_USER_BRANCH IN ('"+foUser+"')  ) AND "; } else
+	 * if(!"".equals(status) && status!=null && !"-1".equals(status) &&
+	 * !"".equals(doUser) && !"-1".equals(doUser) && doUser!=null){
+	 * if(("1").equals(status) || ("2").equals(status) || ("3").equals(status) ||
+	 * ("4").equals(status) || ("6").equals(status))
+	 * parameters="  REQ_STATUS IN ('"+status+"') AND BRANCH_CODE IN ('"
+	 * +doUser+"')  AND "; else
+	 * parameters="  E_STATUS IN ('"+status+"') AND BRANCH_CODE IN ('"
+	 * +doUser+"')  AND "; } else if(!"".equals(status) && status!=null &&
+	 * !"-1".equals(status) && !"".equals(foUser) && !"-1".equals(foUser) &&
+	 * foUser!=null){ if(("1").equals(status) || ("2").equals(status) ||
+	 * ("3").equals(status) || ("4").equals(status) || ("6").equals(status))
+	 * parameters=" ( REQ_STATUS IN ('"+status+"') AND  E_FO_USER_BRANCH IN ('"
+	 * +foUser+"')  ) AND "; else
+	 * parameters=" ( E_STATUS IN ('"+status+"') AND  E_FO_USER_BRANCH IN ('"
+	 * +foUser+"')  ) AND "; } else if(!"".equals(doUser) && doUser!=null &&
+	 * !"-1".equals(doUser) && !"".equals(foUser) && foUser!=null &&
+	 * !"-1".equals(foUser) ){
+	 * parameters=" ( BRANCH_CODE IN ('"+doUser+"') AND  E_FO_USER_BRANCH IN ('"
+	 * +foUser+"') ) AND "; } else if(!"".equals(doUser) && doUser!=null &&
+	 * !"-1".equals(doUser) ){ parameters=" BRANCH_CODE IN ('"+doUser+"') AND "; }
+	 * else if(!"".equals(foUser) && foUser!=null && !"-1".equals(foUser)){
+	 * parameters=" E_FO_USER_BRANCH IN ('"+foUser+"') AND "; } else
+	 * if(!"".equals(status) && status!=null && !"-1".equals(status) ){
+	 * if(("1").equals(status) || ("2").equals(status) || ("3").equals(status) ||
+	 * ("4").equals(status) || ("6").equals(status))
+	 * parameters=" REQ_STATUS IN ('"+status+"')  AND "; else
+	 * parameters=" E_STATUS IN ('"+status+"')  AND "; } Object
+	 * params[]={startDate,endDate}; try{ String query =
+	 * SQLConstants.GET_REPORTS_ALL.replaceAll("#TOBEREPLACED#",parameters);
+	 * logger.info("reports query :: "+query);
+	 * logger.info("GTDReportDetails params :: "+params); reportList =
+	 * getJdbcTemplate().queryForList(query,params); }catch(DataAccessException
+	 * daoex){ logger.error("Exception occured: "+daoex.getMessage());
+	 * DAOException.throwException(daoex,"BC000",params); } logger.
+	 * info("reportDetails(String startDate, String endDate,String Approver,String dept,String status) method ends"
+	 * ); return reportList; }
+	 */
+
+	/*
+	 * public List doReportDetails(Map inParams) throws DAOException { logger.
+	 * info("doReportDetails(String startDate, String endDate,String dept,String status) method begins"
+	 * ); List reportList = null; String parameters=""; String startDate =
+	 * (String)inParams.get("startDate"); String endDate =
+	 * (String)inParams.get("endDate"); String foUser =
+	 * (String)inParams.get("foUser"); String status =
+	 * (String)inParams.get("status"); String userId =
+	 * (String)inParams.get("userId");
+	 * 
+	 * if(!"".equals(status) && status!=null && !"-1".equalsIgnoreCase(status) &&
+	 * !"".equals(foUser) && foUser!=null && !"-1".equalsIgnoreCase(foUser) ){
+	 * if(("1").equals(status) || ("2").equals(status) || ("3").equals(status) ||
+	 * ("4").equals(status) || ("6").equals(status))
+	 * parameters="  REQ_STATUS IN('"+status+"') and   E_FO_USER_BRANCH IN ('"
+	 * +foUser+"')  AND "; else
+	 * parameters="  E_STATUS IN('"+status+"') and   E_FO_USER_BRANCH IN ('"
+	 * +foUser+"')  AND "; } else if(!"".equals(status) && status!=null &&
+	 * !"-1".equalsIgnoreCase(status) ){ if(("1").equals(status) ||
+	 * ("2").equals(status) || ("3").equals(status) || ("4").equals(status) ||
+	 * ("6").equals(status)) parameters="  REQ_STATUS  IN ('"+status+"')  AND ";
+	 * else parameters="  E_STATUS  IN ('"+status+"')  AND "; } else
+	 * if(!"".equals(foUser) && foUser!=null && !"-1".equalsIgnoreCase(foUser)){
+	 * parameters="  E_FO_USER_BRANCH IN ('"+foUser+"') And "; }
+	 * 
+	 * 
+	 * Object
+	 * params[]={startDate.trim(),endDate.trim(),userId.trim(),userId.trim()}; try{
+	 * String query = SQLConstants.GET_DO_REPORTS.replaceAll("#TOBEREPLACED#",
+	 * parameters); logger.info("DOReport query :: "+query);
+	 * logger.info("DOReport params :: "+params); reportList =
+	 * getJdbcTemplate().queryForList(query,params); }catch(DataAccessException
+	 * daoex){ logger.error("Exception occured: "+daoex.getMessage());
+	 * DAOException.throwException(daoex,"BC000",params); } logger.
+	 * info("doReportDetails(String startDate, String endDate,String Approver,String dept,String status) method ends"
+	 * ); return reportList; }
+	 */
+	/*
+	 * public List foReportDetails(Map inParams) throws DAOException { logger.
+	 * info("foReportDetails(String startDate, String endDate,String dept,String status) method begins"
+	 * ); List reportList = null; String parameters=""; String startDate =
+	 * (String)inParams.get("startDate"); String endDate =
+	 * (String)inParams.get("endDate"); String doUser =
+	 * (String)inParams.get("doUser"); String status =
+	 * (String)inParams.get("status"); String userId =
+	 * (String)inParams.get("userId");
+	 * 
+	 * if(!"".equals(status) && status!=null && !"-1".equals(status) &&
+	 * !"".equals(doUser) && doUser!=null && !"-1".equals(doUser) ){
+	 * if(("1").equals(status) || ("2").equals(status) || ("3").equals(status) ||
+	 * ("4").equals(status) || ("6").equals(status))
+	 * parameters=" REQ_STATUS IN ('"+status+"') AND BRANCH_CODE IN ('"
+	 * +doUser+"') AND "; else
+	 * parameters=" E_STATUS IN ('"+status+"') AND BRANCH_CODE IN ('"
+	 * +doUser+"') AND "; } else if(!"".equals(status) && status!=null &&
+	 * !"-1".equals(status)){ if(("1").equals(status) || ("2").equals(status) ||
+	 * ("3").equals(status) || ("4").equals(status) || ("6").equals(status))
+	 * parameters=" REQ_STATUS IN  ('"+status+"') AND "; else
+	 * parameters=" E_STATUS IN  ('"+status+"') AND "; } else if(!"".equals(doUser)
+	 * && doUser!=null && !"-1".equals(doUser)){
+	 * parameters=" BRANCH_CODE IN ('"+doUser+"') AND "; }
+	 * 
+	 * Object params[]={startDate,endDate,userId}; try{ String query =
+	 * SQLConstants.GET_FO_REPORTS.replaceAll("#TOBEREPLACED#", parameters);
+	 * logger.info("FOReport query :: "+query);
+	 * logger.info("FOReport params :: "+params); reportList =
+	 * getJdbcTemplate().queryForList(query,params); }catch(DataAccessException
+	 * daoex){ logger.error("Exception occured: "+daoex.getMessage());
+	 * DAOException.throwException(daoex,"BC000",params); } logger.
+	 * info("foReportDetails(String startDate, String endDate,String Approver,String dept,String status) method ends"
+	 * ); return reportList; }
+	 */
+	public List doReportTabDetails(Map inParams) throws DAOException {
+		logger.info("doReportTabDetails(method begins");
+		List reportTabList = new ArrayList();
+		final String referenceNo = (String) inParams.get("referenceNo");
+		Object[] params = { referenceNo };
+		// reportTabList=getJdbcTemplate().queryForList(SQLConstants.GET_REPORTS_DETAILS,params);
+		logger.info("reportTabList::");
+		logger.info("doReportTabDetails(method end");
+		return reportTabList;
+	}
+
+	public List excelDowload(Map inParams) throws DAOException {
+		logger.info("excelDowload(method begins");
+		List inList = new ArrayList();
+		StringBuffer bufferstring = new StringBuffer();
+		Map outMap = new HashMap();
+		bufferstring = (StringBuffer) inParams.get("buffParam");
+		String SbString = bufferstring.toString();
+//         logger.info("SbString"+SbString.subSequence(0,SbString.length()-1 ));
+		String refNo = (String) SbString.subSequence(0, SbString.length() - 1);
+
+		String parameters = "  A.REFERENCE_NO in (" + refNo + ") ";
+		try {
+			Object[] params = { refNo };
+			String query = SQLConstants.GET_REPORTS_DETAILS_NEW.replaceAll("#TOBEREPLACED#", parameters);
+//    	 logger.info("query::"+query);
+			inList = getJdbcTemplate().query(query, new NewRequestModelRowMap());
+			logger.info("reportTabList::");
+
+		} catch (DataAccessException e) {
+			logger.error("ERRORRR>>>" + e.getMessage());
+		}
+
+		logger.info("excelDowload() method end");
+		return inList;
+	}
+
+	class NewRequestModelRowMap implements RowMapper {
+		List list = new ArrayList();
+
+		public Object mapRow(ResultSet resultSet, int index) throws SQLException {
+			logger.info("REFERENCE_NO in rowmapper");
+
+			RequestModel user = new RequestModel();
+
+			user.setMaker(resultSet.getString("do_maker_user_id"));
+			user.setChecker(resultSet.getString("do_checker_user_id"));
+
+			user.setReferenceNo(resultSet.getString("REFERENCE_NO"));
+			user.setDate(resultSet.getString("REQ_CREATED_DATE_NAME"));
+			user.setBranchCode(resultSet.getString("BRANCH_CODE"));
+			user.setBranchName(resultSet.getString("BRANCH_NAME"));
+			user.setPeriorTenorDays(resultSet.getString("PERIOD_TENOR_DAYS"));
+			user.setExpDrawDawnDate(resultSet.getString("EXP_DRAWDOWN_DATE_NAME"));
+			user.setCountryOfOrigin(resultSet.getString("COUNTRY_OF_ORIGIN_NAME"));
+			user.setDescOfGoods(resultSet.getString("DESCRIPTION_OF_GOODS"));
+			user.setRestructured(resultSet.getString("RESTRUCTURED_NAME"));
+			user.setNameOfImporter(resultSet.getString("NAME_OF_IMPORTER"));
+			user.setCurrency(resultSet.getString("CURRENCY_NAME"));
+			user.setShipmentFrom(resultSet.getString("SHIPMENT_FROM_NAME"));
+			user.setShipmentTo(resultSet.getString("SHIPMENT_TO_NAME"));
+			user.setExpCreditRatingAgency(resultSet.getString("EXT_CREDIT_RATING_AGENCY"));
+			user.setCreditRatingAuditeBal(resultSet.getString("CR_AUDITED_BAL_DATE_NAME"));
+			user.setCifNoApplicantImp(resultSet.getString("CIF_NO_APPLICANT_IMP"));
+			user.setAddressOfImporter(resultSet.getString("ADDRESS_OF_IMPORTER"));
+			user.setImpPublicSector(resultSet.getString("IMP_PUBLIC_SECTOR_NAME"));
+			user.setNameAddressExporter(resultSet.getString("NAME_ADDRESS_EXPORTER"));
+			String shippingAirLine = resultSet.getString("SHIPPING_AIRLINE_NAME");
+			if (shippingAirLine == null) {
+				user.setShippingAirlineName(" ");
+			} else {
+				user.setShippingAirlineName(shippingAirLine);
+			}
+			user.setCharterPartyBl(resultSet.getString("CHARTER_PARTY_BL_NAME"));
+			String vesselNameImoNo = resultSet.getString("VESSEL_NAME_IMO_NO");
+
+			if (vesselNameImoNo == null) {
+				user.setVesselNameImoNo(" ");
+			} else {
+				user.setVesselNameImoNo(vesselNameImoNo);
+			}
+
+			String billLadingAirwayNo = resultSet.getString("BILL_LADING_AIRWAY_NO");
+			if (billLadingAirwayNo == null) {
+				user.setBillLadingAirwayNo(" ");
+			} else {
+				user.setBillLadingAirwayNo(billLadingAirwayNo);
+			}
+			user.setShipmentDate(resultSet.getString("SHIPMENT_DATE_NAME"));
+			user.setRollOverTransaction(resultSet.getString("ROLLOVER_TRANSACTION_NAME"));
+			user.setCretedDate(resultSet.getString("CREATION_TIME_NAME"));
+			user.setShipmentPortFrom(resultSet.getString("SHIPMENT_PORT_FROM"));
+			user.setShipmentPortTo(resultSet.getString("SHIPMENT_PORT_TO"));
+			user.setIracStatusImp(resultSet.getString("IRAC_STATUS_IMP"));
+			user.setCapitalGoods(resultSet.getString("CAPITAL_GOODS_NAME"));
+			user.setExpCreditRatingValid(resultSet.getString("EXT_CREDIT_RATING_VALID_NAME"));
+			user.setAmount(resultSet.getString("AMOUNT"));
+			user.setExpCreditRatingImp(resultSet.getString("EXT_CREDIT_RATING_IMP"));
+			user.setCreditRatingImporter(resultSet.getString("CREDIT_RATING_IMPORTER"));
+			user.setExpectedSpread(resultSet.getString("EXPECTED_SPREAD"));
+			user.setStatus(resultSet.getString("STATUS_NAME"));
+			user.setQuoteDate(resultSet.getString("CREATION_QUOTE_TIME"));
+			user.setQuoteBasis(resultSet.getString("BASIS_NAME"));
+			user.setReferenceRate(resultSet.getString("PERIOD_NAME"));
+			user.setSpreadInBps(resultSet.getString("SPREAD_IN_BPS"));
+			user.setRateOfInterest(resultSet.getString("RATE_OF_INTEREST"));
+			user.setNewSpreadInBps(resultSet.getString("NEW_SPREAD"));
+			user.setNewRateOfInterest(resultSet.getString("NEW_RATE_OF_INTEREST"));
+			user.setFoUser(resultSet.getString("FO_USER_BRANCH_NAME"));
+//	    			logger.info("FO Name in excel ::"+resultSet.getString("FO_USER_BRANCH_NAME"));
+			return user;
+		}
+
+	}
+
+	class SellerRequestModelRowMap implements RowMapper {
+		List list = new ArrayList();
+
+		public Object mapRow(ResultSet resultSet, int index) throws SQLException {
+			logger.info("REFERENCE_NO in rowmapper");
+
+			SellerRequestModel user = new SellerRequestModel();
+			user.setReferenceNo(resultSet.getString("REFERENCE_NO"));
+			user.setDate(resultSet.getString("REQ_CREATED_DATE_NAME"));
+			user.setBranchCode(resultSet.getString("BRANCH_CODE"));
+			user.setBranchName(resultSet.getString("BRANCH_NAME"));
+			user.setExpDrawDawnDate(resultSet.getString("EXP_DRAWDOWN_DATE_NAME"));
+			user.setCountryOfOrigin(resultSet.getString("COUNTRY_OF_ORIGIN_NAME"));
+			user.setDescOfGoods(resultSet.getString("DESCRIPTION_OF_GOODS"));
+			user.setRestructured(resultSet.getString("RESTRUCTURED_NAME"));
+			user.setCurrency(resultSet.getString("CURRENCY_NAME"));
+			user.setLC_TYPE_NAME(resultSet.getString("LC_TYPE_NAME"));
+			user.setShipmentFrom(resultSet.getString("SHIPMENT_FROM_NAME"));
+			user.setShipmentTo(resultSet.getString("SHIPMENT_TO_NAME"));
+			user.setCreditRatingAuditeBal(resultSet.getString("CR_AUDITED_BAL_DATE_NAME"));
+			user.setCifNoApplicantImp(resultSet.getString("CIF_NO_APPLICANT_IMP"));
+			user.setStatus(resultSet.getString("STATUS_NAME"));
+			user.setCretedDate(resultSet.getString("CREATION_TIME_NAME"));
+			user.setLAST_MOD_TIME_NAME(resultSet.getString("LAST_MOD_TIME_NAME"));
+			user.setShipmentPortFrom(resultSet.getString("SHIPMENT_PORT_FROM"));
+			user.setShipmentPortTo(resultSet.getString("SHIPMENT_PORT_TO"));
+			user.setIracStatusImp(resultSet.getString("IRAC_STATUS_IMP"));
+			user.setCapitalGoods(resultSet.getString("CAPITAL_GOODS_NAME"));
+			user.setExpCreditRatingValid(resultSet.getString("EXT_CREDIT_RATING_VALID_NAME"));
+			user.setAmount(resultSet.getString("SUPPLIER_CREDIT_AMOUNT"));
+			user.setCreditRatingImporter(resultSet.getString("CREDIT_RATING_IMPORTER"));
+			user.setExpectedSpread(resultSet.getString("EXPECTED_SPREAD"));
+			user.setExpCreditRatingAgency(resultSet.getString("EXT_CREDIT_RATING_AGENCY"));
+			user.setPeriorTenorDays(resultSet.getString("PERIOD_TENOR_DAYS"));
+			user.setCORPORATE_CONTACT_NO(resultSet.getString("CORPORATE_CONTACT_NO"));
+			user.setLC_AVAILABLE_BY(resultSet.getString("LC_AVAILABLE_BY"));
+			user.setEXT_CREDIT_RATING_APPL(resultSet.getString("EXT_CREDIT_RATING_APPL"));
+			user.setBEN_NAME_ADDRESS(resultSet.getString("BEN_NAME_ADDRESS"));
+
+			user.setLC_CREDIT_PERIOD_AVL_DAYS_FROM(resultSet.getString("LC_CREDIT_PERIOD_AVL_DAYS_FROM"));
+
+			user.setLC_ISSUED(resultSet.getString("LC_ISSUED"));
+			user.setLC_ISSUED_DATE(resultSet.getString("LC_ISSUED_DATE"));
+
+			user.setLC_CREDIT_PERIOD_AVL(resultSet.getString("LC_CREDIT_PERIOD_AVL"));
+
+			user.setDOM_BRANCH_CONTACT_NO(resultSet.getString("DOM_BRANCH_CONTACT_NO"));
+			user.setLC_EXPIRY_DATE(resultSet.getString("LC_EXPIRY_DATE"));
+			user.setAPPL_NAME_ADDRESS(resultSet.getString("APPL_NAME_ADDRESS"));
+			user.setLC_AVAILABLE_WITH(resultSet.getString("LC_AVAILABLE_WITH"));
+			user.setLC_AVAILABLE_BY_NAME(resultSet.getString("LC_AVAILABLE_BY_NAME"));
+			user.setLC_NO(resultSet.getString("LC_NO"));
+			user.setLC_EXPIRY_PLACE(resultSet.getString("LC_EXPIRY_PLACE"));
+			user.setPERIOD_TENOR_DAYS_FROM(resultSet.getString("PERIOD_TENOR_DAYS_FROM"));
+
+			user.setPERIOD_TENOR_DAYS_FROM_OTHER(resultSet.getString("PERIOD_TENOR_DAYS_FROM_OTHER"));
+			user.setPERIOD_TENOR_DAYS_FROM_NAME(resultSet.getString("PERIOD_TENOR_DAYS_FROM_NAME"));
+
+			user.setLAST_DATE_FOR_QUOTE(resultSet.getString("LAST_DATE_FOR_QUOTE"));
+
+			user.setOTHER_CHARGES(resultSet.getString("OTHER_CHARGES"));
+			user.setSUPPLIER_CHARGES(resultSet.getString("SUPPLIER_CHARGES"));
+			user.setADVISING_CHARGES(resultSet.getString("ADVISING_CHARGES"));
+			user.setDOC_HANDLING_CHARGES(resultSet.getString("DOC_HANDLING_CHARGES"));
+
+			user.setQuoteDate(resultSet.getString("CREATION_QUOTE_TIME"));
+			user.setQuoteBasis(resultSet.getString("BASIS_NAME"));
+			user.setReferenceRate(resultSet.getString("PERIOD_NAME"));
+			user.setSpreadInBps(resultSet.getString("SPREAD_IN_BPS"));
+			user.setRateOfInterest(resultSet.getString("RATE_OF_INTEREST"));
+			user.setNewSpreadInBps(resultSet.getString("NEW_SPREAD"));
+			user.setNewRateOfInterest(resultSet.getString("NEW_RATE_OF_INTEREST"));
+			user.setFoUser(resultSet.getString("FO_USER_BRANCH_NAME"));
+			user.setMaker(resultSet.getString("do_maker_user_id"));
+			user.setChecker(resultSet.getString("do_checker_user_id"));
+			user.setLETTER_OF_CREDIT_AMOUNT(resultSet.getString("LETTER_OF_CREDIT_AMOUNT"));
+
+			return user;
+		}
+
+	}
+
+	public void updateUser(Map inParams) throws DAOException {
+		logger.info("updateUser(Map inParams) method begins");
+		String userName = (String) inParams.get("userName");
+		String sessionId = (String) inParams.get("sessionId");
+		String ipAddress = (String) inParams.get(Constants.IP_ADDRESS);
+		String UPDATE_LOGIN_COUNT = "DELETE FROM BCQI_LOGGEDIN_USERS WHERE USER_NAME=? AND IP_ADDRESS=?";
+		Object[] param = { userName, ipAddress };
+
+		try {
+			int types[] = { Types.VARCHAR, Types.VARCHAR };
+
+			getJdbcTemplate().update(UPDATE_LOGIN_COUNT, param);
+		} catch (DataAccessException ex) {
+			logger.error("Exception Occured : " + ex.getMessage(), ex);
+		}
+		logger.info("updateUser(Map inParams) method ends");
+
+	}
+
+	// Added for BCQI end
+	public void setSHAEncryption(SHAEncryption sHAEncryption) {
+		SHAEncryption = sHAEncryption;
+	}
+
+	// Added by Dhanunjay for resetPassword user Details
+
+	public Map resetPasswordUserDetails(String userId) throws DAOException {
+		logger.info("resetPasswordUserDetails method begin");
+		final String UPDATE_PASSWORD_USER_DETAILS = "SELECT EMAIL_ID,NAME,USER_ID from BCQI_USER_PROFILE where USER_ID=?";
+		Map passwordContactMap = new HashMap();
+		try {
+			int[] type = { Types.VARCHAR };
+			Object[] param = new Object[] { userId };
+
+			passwordContactMap = getJdbcTemplate().queryForMap(UPDATE_PASSWORD_USER_DETAILS, param, type);
+
+//			logger.info(passwordContactMap + " Rows Selected Successfully.");
+		} catch (DataAccessException exception) {
+			logger.error("Exception Occured : " + exception.getMessage(), exception);
+			DAOException.throwException("BC000");
+		}
+		logger.info("resetPasswordUserDetails method end");
+		return passwordContactMap;
+	}
+
+	public int insertBCQIMail(String userId, String mailsubject, String mailID) throws DAOException {
+		logger.info("insertBCQIMail(String userId,String mailsubject,String contactName,String mailID) method begins");
+		int count = 0;
+		final Object[] params = { userId, mailsubject, mailID };
+		count = (Integer) transactionTemplate.execute(new TransactionCallback() {
+			int count1 = 0;
+
+			public Object doInTransaction(TransactionStatus transactionStatus) {
+				try {
+					count1 = getJdbcTemplate().update(SQLConstants.INSERT_MAIL, params);
+				} catch (DataAccessException e) {
+					logger.info("Exception From Multiple insertion" + e.getMessage());
+					transactionStatus.setRollbackOnly();
+				}
+				return count1;
+			}
+		});
+		logger.info("insertBCQIMail(String userId,String mailsubject,String contactName,String mailID) method ends");
+		return count;
+	}
+
+	public List reportDetails1(Map inParams) throws DAOException {
+
+		logger.info("reportDetails1(Map inParams) method begins");
+		List inList = new ArrayList();
+		;
+		String parameters = "";
+		String startDate = (String) inParams.get("startDate");
+		String endDate = (String) inParams.get("endDate");
+		String doUser = (String) inParams.get("doUser");
+		String foUser = (String) inParams.get("foUser");
+		String status = (String) inParams.get("status");
+		String userId = (String) inParams.get("userId");
+		String branchCode = (String) inParams.get("branchCode");
+		String userRole = (String) inParams.get("userRole");
+//	             logger.info("loggedin user role -->"+ userRole);
+
+		List<Object> paramList = new ArrayList<Object>();
+		List<Object> paramList1 = new ArrayList<Object>();
+
+		if (!"".equals(status) && status != null && !"-1".equals(status) && !"".equals(doUser) && doUser != null
+				&& !"".equals(foUser) && foUser != null && !"-1".equals(doUser) && !"-1".equals(foUser)) {
+			if (("1").equals(status) || ("2").equals(status) || ("3").equals(status) || ("4").equals(status)
+					|| ("6").equals(status)) {
+//	                      parameters="  AND ( A.STATUS IN ('"+status+"') AND C.BRANCH_CODE IN ('"+doUser+"') AND E.FO_USER_BRANCH  IN ('"+foUser+"')  )  ";
+				parameters = "  AND ( A.STATUS IN (?) AND C.BRANCH_CODE IN (?) AND E.FO_USER_BRANCH  IN (?)  )  ";
+
+				paramList1.add(status);
+				paramList1.add(doUser);
+				paramList1.add(foUser);
+
+			} else {
+				// parameters=" AND ( E.STATUS IN ('"+status+"') AND C.BRANCH_CODE IN
+				// ('"+doUser+"') AND E.FO_USER_BRANCH IN ('"+foUser+"') ) ";
+				parameters = " AND  ( E.STATUS IN (?) AND C.BRANCH_CODE IN (?) AND E.FO_USER_BRANCH  IN (?)  )  ";
+				paramList1.add(status);
+				paramList1.add(doUser);
+				paramList1.add(foUser);
+			}
+		} else if (!"".equals(status) && status != null && !"-1".equals(status) && !"".equals(doUser)
+				&& !"-1".equals(doUser) && doUser != null) {
+			if (("1").equals(status) || ("2").equals(status) || ("3").equals(status) || ("4").equals(status)
+					|| ("6").equals(status)) {
+				// parameters=" AND A.STATUS IN ('"+status+"') AND C.BRANCH_CODE IN
+				// ('"+doUser+"') ";
+				parameters = "  AND A.STATUS IN (?) AND C.BRANCH_CODE IN (?)   ";
+				paramList1.add(status);
+				paramList1.add(doUser);
+			}
+
+			else {
+				// parameters=" AND E.STATUS IN ('"+status+"') AND C.BRANCH_CODE IN
+				// ('"+doUser+"') ";
+				parameters = " AND E.STATUS IN (?) AND C.BRANCH_CODE IN (?)   ";
+				paramList1.add(status);
+				paramList1.add(doUser);
+			}
+
+		} else if (!"".equals(status) && status != null && !"-1".equals(status) && !"".equals(foUser)
+				&& !"-1".equals(foUser) && foUser != null) {
+			if (("1").equals(status) || ("2").equals(status) || ("3").equals(status) || ("4").equals(status)
+					|| ("6").equals(status)) {
+				// parameters=" AND ( A.STATUS IN ('"+status+"') AND E.FO_USER_BRANCH IN
+				// ('"+foUser+"') ) ";
+				parameters = " AND ( A.STATUS IN (?) AND  E.FO_USER_BRANCH  IN (?)  )  ";
+				paramList1.add(status);
+				paramList1.add(foUser);
+			}
+
+			else {
+				// parameters=" AND ( E.STATUS IN ('"+status+"') AND E.FO_USER_BRANCH IN
+				// ('"+foUser+"') ) ";
+				parameters = " AND ( E.STATUS IN (?) AND  E.FO_USER_BRANCH  IN (?)  )  ";
+				paramList1.add(status);
+				paramList1.add(foUser);
+
+			}
+		} else if (!"".equals(doUser) && doUser != null && !"-1".equals(doUser) && !"".equals(foUser) && foUser != null
+				&& !"-1".equals(foUser)) {
+			// parameters=" AND ( C.BRANCH_CODE IN ('"+doUser+"') AND E.FO_USER_BRANCH IN
+			// ('"+foUser+"') ) ";
+			parameters = " AND ( C.BRANCH_CODE IN (?) AND  E.FO_USER_BRANCH  IN (?) )  ";
+			paramList1.add(doUser);
+			paramList1.add(foUser);
+
+		} else if (!"".equals(doUser) && doUser != null && !"-1".equals(doUser)) {
+			// parameters=" AND C.BRANCH_CODE IN ('"+doUser+"') ";
+			parameters = " AND C.BRANCH_CODE IN (?)  ";
+			paramList1.add(doUser);
+
+		} else if (!"".equals(foUser) && foUser != null && !"-1".equals(foUser)) {
+			// parameters=" AND E.FO_USER_BRANCH IN ('"+foUser+"') ";
+			parameters = " AND E.FO_USER_BRANCH IN (?)  ";
+			paramList1.add(foUser);
+		} else if (!"".equals(status) && status != null && !"-1".equals(status)) {
+			if (("1").equals(status) || ("2").equals(status) || ("3").equals(status) || ("4").equals(status)
+					|| ("6").equals(status)) {
+				// parameters=" AND A.STATUS IN ('"+status+"') ";
+				parameters = " AND A.STATUS IN (?)   ";
+				paramList1.add(status);
+			} else {
+				parameters = " AND E.STATUS IN (?)   ";
+				paramList1.add(status);
+
+			}
+
+		}
+		String params1 = "";
+		if (foUser != "" && foUser != null && doUser != "" && doUser != null) {
+			// params1="TO_DATE('"+startDate+"','dd-mm-yy') AND
+			// TO_DATE('"+endDate+"','dd-mm-yy')";
+			params1 = "TO_DATE(?,'dd-mm-yy')  AND TO_DATE(?,'dd-mm-yy')";
+			paramList.add(startDate);
+			paramList.add(endDate);
+		} else if (foUser == null || foUser == "") {
+			// params1="TO_DATE('"+startDate+"','dd-mm-yy') AND
+			// TO_DATE('"+endDate+"','dd-mm-yy') AND E.FO_USER_ID='"+userId+"'";
+			params1 = "TO_DATE(?,'dd-mm-yy')  AND TO_DATE(?,'dd-mm-yy') AND E.FO_USER_ID=?";
+			paramList.add(startDate);
+			paramList.add(endDate);
+			paramList.add(userId);
+
+		} else if (doUser == null || doUser == "") {
+			// params1="TO_DATE('"+startDate+"','dd-mm-yy') AND
+			// TO_DATE('"+endDate+"','dd-mm-yy') AND ( A.DO_MAKER_USER_ID='"+userId+"' OR
+			// A.DO_CHECKER_USER_ID='"+userId+"' )";
+
+			params1 = "TO_DATE(?,'dd-mm-yy')  AND TO_DATE(?,'dd-mm-yy') AND C.BRANCH_CODE=?";
+			paramList.add(startDate);
+			paramList.add(endDate);
+			paramList.add(branchCode);
+			// paramList.add(userId);
+			// paramList.add(userId);
+
+		}
+
+		for (int i = 0; i < paramList1.size(); i++) {
+
+			paramList.add(paramList1.get(i));
+
+		}
+
+		Object paramArr[] = paramList.toArray();
+
+		// Object params[]={startDate,endDate};
+
+		String GET_REPORTS_ALL1 = " SELECT * FROM ( SELECT  C.REFERENCE_NO,TO_CHAR(C.REQ_CREATED_DATE) REQ_CREATED_DATE_NAME,C.BRANCH_CODE,C.BRANCH_NAME,TO_CHAR(C.EXP_DRAWDOWN_DATE) EXP_DRAWDOWN_DATE_NAME,(SELECT VALUE  FROM BCQI_PROPERTIES D  WHERE DESCRIPTION = 'SHIPMENT'  AND CONFIG_ID=C.COUNTRY_OF_ORIGIN ) COUNTRY_OF_ORIGIN_NAME, "
+				+ " C.DESCRIPTION_OF_GOODS,(SELECT VALUE  FROM BCQI_PROPERTIES D  WHERE DESCRIPTION = 'Options'  AND CONFIG_ID=C.RESTRUCTURED  ) RESTRUCTURED_NAME,C.NAME_OF_IMPORTER, (SELECT VALUE  FROM BCQI_PROPERTIES D  WHERE DESCRIPTION = 'Currency'  AND CONFIG_ID=C.CURRENCY  )CURRENCY_NAME, "
+				+ " (SELECT VALUE  FROM BCQI_PROPERTIES D  WHERE DESCRIPTION = 'SHIPMENT'  AND CONFIG_ID= C.SHIPMENT_FROM  )SHIPMENT_FROM_NAME,(SELECT VALUE  FROM BCQI_PROPERTIES D  WHERE DESCRIPTION = 'SHIPMENT'  AND CONFIG_ID=C.SHIPMENT_TO  )SHIPMENT_TO_NAME,TO_CHAR(C.CR_AUDITED_BAL_DATE) CR_AUDITED_BAL_DATE_NAME, "
+				+ " C.CIF_NO_APPLICANT_IMP,C.ADDRESS_OF_IMPORTER,(SELECT VALUE  FROM BCQI_PROPERTIES D  WHERE DESCRIPTION = 'Options'  AND CONFIG_ID=C.IMP_PUBLIC_SECTOR  )IMP_PUBLIC_SECTOR_NAME,C.NAME_ADDRESS_EXPORTER,C.SHIPPING_AIRLINE_NAME, (SELECT VALUE FROM  BCQI_PROPERTIES D WHERE DESCRIPTION = 'Status' AND CONFIG_ID = NVL(E.STATUS,A.STATUS))STATUS_NAME,"
+				+ " (SELECT VALUE  FROM BCQI_PROPERTIES D  WHERE DESCRIPTION = 'Options'  AND CONFIG_ID= C.CHARTER_PARTY_BL  )CHARTER_PARTY_BL_NAME,TO_CHAR(C.SHIPMENT_DATE) SHIPMENT_DATE_NAME,(SELECT VALUE  FROM BCQI_PROPERTIES D  WHERE DESCRIPTION = 'Options'  AND CONFIG_ID=C.ROLLOVER_TRANSACTION  )ROLLOVER_TRANSACTION_NAME, "
+				+ " TO_CHAR(C.CREATION_TIME) CREATION_TIME_NAME,TO_CHAR(C.LAST_MOD_TIME) LAST_MOD_TIME_NAME,C.SHIPMENT_PORT_FROM,C.SHIPMENT_PORT_TO,C.IRAC_STATUS_IMP,(SELECT VALUE  FROM BCQI_PROPERTIES D  WHERE DESCRIPTION = 'Options'  AND CONFIG_ID=C.CAPITAL_GOODS )CAPITAL_GOODS_NAME,TO_CHAR(C.EXT_CREDIT_RATING_VALID) EXT_CREDIT_RATING_VALID_NAME, "
+				+ " C.AMOUNT,C.EXT_CREDIT_RATING_IMP,C.CREDIT_RATING_IMPORTER,C.EXPECTED_SPREAD,C.EXT_CREDIT_RATING_AGENCY,C.PERIOD_TENOR_DAYS,C.VESSEL_NAME_IMO_NO,C.BILL_LADING_AIRWAY_NO, NVL( TO_CHAR(E.CREATION_TIME),'NOT APPLICABLE')CREATION_QUOTE_TIME,NVL((SELECT VALUE FROM BCQI_PROPERTIES WHERE CONFIG_ID=E.BASIS),'NOT APPLICABLE')BASIS_NAME,"
+				+ " NVL( (SELECT VALUE FROM BCQI_PROPERTIES WHERE CONFIG_ID=E.PERIOD),'NOT APPLICABLE')PERIOD_NAME,NVL( TO_CHAR(E.SPREAD_IN_BPS) ,'NOT APPLICABLE') SPREAD_IN_BPS,NVL( TO_CHAR(E.NEW_SPREAD) ,'NOT APPLICABLE') NEW_SPREAD,NVL( TO_CHAR(E.RATE_OF_INTEREST),'NOT APPLICABLE') RATE_OF_INTEREST,NVL( TO_CHAR(E.NEW_RATE_OF_INTEREST),'NOT APPLICABLE')  NEW_RATE_OF_INTEREST,NVL((SELECT VALUE FROM BCQI_PROPERTIES D WHERE D.DESCRIPTION='Country' AND D.CONFIG_ID=E.FO_USER_BRANCH),'NOT APPLICABLE')FO_USER_BRANCH_NAME,E.STATUS E_STATUS,a.do_maker_user_id,a.do_checker_user_id FROM  BCQI_REQUEST A , BCQI_REQUEST_DETAILS C ,BCQI_REQ_QUOTE_DETAILS E WHERE   A.REFERENCE_NO = C.REFERENCE_NO   "
+				+
+				// " AND TRUNC(A.CREATION_TIME) BETWEEN #HASTOBEREPLACED# AND A.REFERENCE_NO =
+				// E.REFERENCE_NO(+) #TOBEREPLACED# ) where NVL(E_STATUS,'*') NOT IN
+				// ('11','26','28')";
+
+				" AND TRUNC(A.CREATION_TIME) BETWEEN #HASTOBEREPLACED# AND  A.REFERENCE_NO = E.REFERENCE_NO(+)  #TOBEREPLACED# ";
+
+		try {
+			String query = GET_REPORTS_ALL1.replaceAll("#TOBEREPLACED#", parameters);
+			query = query.replaceAll("#HASTOBEREPLACED#", params1);
+
+			if (null != userRole) {
+				if (userRole.equalsIgnoreCase("21")) {// DO
+					query = query + "  ) where NVL(E_STATUS,'*')  NOT IN ('11','26','28')";
+				} else if (userRole.equalsIgnoreCase("22")) {// FO
+					query = query + "  ) where NVL(E_STATUS,'*')  NOT IN ('11','27') ";
+				} else if (userRole.equalsIgnoreCase("23")) {// GTD
+					query = query + "   ) where NVL(E_STATUS,'*')  NOT IN ('11') ";
+				}
+
+			}
+
+//	            	 logger.info("reports query :: "+query);
+//	            	 logger.info("GTDReportDetails params :: "+paramArr);
+			inList = getJdbcTemplate().query(query, new NewRequestModelRowMap(), paramArr);
+		} catch (DataAccessException daoex) {
+			logger.error("Exception occured: " + daoex.getMessage());
+			DAOException.throwException(daoex, "BC000", paramArr);
+		}
+		logger.info("reportDetails1(Map inParams) method ends");
+		return inList;
+
+	}
+
+	public List reportDetails1Seller(Map inParams) throws DAOException {
+
+		logger.info("reportDetails1Seller(Map inParams) method begins");
+		List inList = new ArrayList();
+		;
+		String parameters = "";
+		String startDate = (String) inParams.get("startDate");
+		String endDate = (String) inParams.get("endDate");
+		String doUser = (String) inParams.get("doUser");
+		String foUser = (String) inParams.get("foUser");
+		String status = (String) inParams.get("status");
+		String userId = (String) inParams.get("userId");
+		String branchCode = (String) inParams.get("branchCode");
+		String userRole = (String) inParams.get("userRole");
+//	             logger.info("loggedin user role -->"+ userRole);
+
+		List<Object> paramList = new ArrayList<Object>();
+		List<Object> paramList1 = new ArrayList<Object>();
+
+		if (!"".equals(status) && status != null && !"-1".equals(status) && !"".equals(doUser) && doUser != null
+				&& !"".equals(foUser) && foUser != null && !"-1".equals(doUser) && !"-1".equals(foUser)) {
+			if (("1").equals(status) || ("2").equals(status) || ("3").equals(status) || ("4").equals(status)
+					|| ("6").equals(status)) {
+//	                      parameters="  AND ( A.STATUS IN ('"+status+"') AND C.BRANCH_CODE IN ('"+doUser+"') AND E.FO_USER_BRANCH  IN ('"+foUser+"')  )  ";
+				parameters = "  AND ( A.STATUS IN (?) AND C.BRANCH_CODE IN (?) AND E.FO_USER_BRANCH  IN (?)  )  ";
+
+				paramList1.add(status);
+				paramList1.add(doUser);
+				paramList1.add(foUser);
+
+			} else {
+				// parameters=" AND ( E.STATUS IN ('"+status+"') AND C.BRANCH_CODE IN
+				// ('"+doUser+"') AND E.FO_USER_BRANCH IN ('"+foUser+"') ) ";
+				parameters = " AND  ( E.STATUS IN (?) AND C.BRANCH_CODE IN (?) AND E.FO_USER_BRANCH  IN (?)  )  ";
+				paramList1.add(status);
+				paramList1.add(doUser);
+				paramList1.add(foUser);
+			}
+		} else if (!"".equals(status) && status != null && !"-1".equals(status) && !"".equals(doUser)
+				&& !"-1".equals(doUser) && doUser != null) {
+			if (("1").equals(status) || ("2").equals(status) || ("3").equals(status) || ("4").equals(status)
+					|| ("6").equals(status)) {
+				// parameters=" AND A.STATUS IN ('"+status+"') AND C.BRANCH_CODE IN
+				// ('"+doUser+"') ";
+				parameters = "  AND A.STATUS IN (?) AND C.BRANCH_CODE IN (?)   ";
+				paramList1.add(status);
+				paramList1.add(doUser);
+			}
+
+			else {
+				// parameters=" AND E.STATUS IN ('"+status+"') AND C.BRANCH_CODE IN
+				// ('"+doUser+"') ";
+				parameters = " AND E.STATUS IN (?) AND C.BRANCH_CODE IN (?)   ";
+				paramList1.add(status);
+				paramList1.add(doUser);
+			}
+
+		} else if (!"".equals(status) && status != null && !"-1".equals(status) && !"".equals(foUser)
+				&& !"-1".equals(foUser) && foUser != null) {
+			if (("1").equals(status) || ("2").equals(status) || ("3").equals(status) || ("4").equals(status)
+					|| ("6").equals(status)) {
+				// parameters=" AND ( A.STATUS IN ('"+status+"') AND E.FO_USER_BRANCH IN
+				// ('"+foUser+"') ) ";
+				parameters = " AND ( A.STATUS IN (?) AND  E.FO_USER_BRANCH  IN (?)  )  ";
+				paramList1.add(status);
+				paramList1.add(foUser);
+			}
+
+			else {
+				// parameters=" AND ( E.STATUS IN ('"+status+"') AND E.FO_USER_BRANCH IN
+				// ('"+foUser+"') ) ";
+				parameters = " AND ( E.STATUS IN (?) AND  E.FO_USER_BRANCH  IN (?)  )  ";
+				paramList1.add(status);
+				paramList1.add(foUser);
+
+			}
+		} else if (!"".equals(doUser) && doUser != null && !"-1".equals(doUser) && !"".equals(foUser) && foUser != null
+				&& !"-1".equals(foUser)) {
+			// parameters=" AND ( C.BRANCH_CODE IN ('"+doUser+"') AND E.FO_USER_BRANCH IN
+			// ('"+foUser+"') ) ";
+			parameters = " AND ( C.BRANCH_CODE IN (?) AND  E.FO_USER_BRANCH  IN (?) )  ";
+			paramList1.add(doUser);
+			paramList1.add(foUser);
+
+		} else if (!"".equals(doUser) && doUser != null && !"-1".equals(doUser)) {
+			// parameters=" AND C.BRANCH_CODE IN ('"+doUser+"') ";
+			parameters = " AND C.BRANCH_CODE IN (?)  ";
+			paramList1.add(doUser);
+
+		} else if (!"".equals(foUser) && foUser != null && !"-1".equals(foUser)) {
+			// parameters=" AND E.FO_USER_BRANCH IN ('"+foUser+"') ";
+			parameters = " AND E.FO_USER_BRANCH IN (?)  ";
+			paramList1.add(foUser);
+		} else if (!"".equals(status) && status != null && !"-1".equals(status)) {
+			if (("1").equals(status) || ("2").equals(status) || ("3").equals(status) || ("4").equals(status)
+					|| ("6").equals(status)) {
+				// parameters=" AND A.STATUS IN ('"+status+"') ";
+				parameters = " AND A.STATUS IN (?)   ";
+				paramList1.add(status);
+			} else {
+				parameters = " AND E.STATUS IN (?)   ";
+				paramList1.add(status);
+
+			}
+
+		}
+		String params1 = "";
+		if (foUser != "" && foUser != null && doUser != "" && doUser != null) {
+			// params1="TO_DATE('"+startDate+"','dd-mm-yy') AND
+			// TO_DATE('"+endDate+"','dd-mm-yy')";
+			params1 = "TO_DATE(?,'dd/MM/yyyy')  AND TO_DATE(?,'dd/MM/yyyy')";
+			paramList.add(startDate);
+			paramList.add(endDate);
+		} else if (foUser == null || foUser == "") {
+			// params1="TO_DATE('"+startDate+"','dd-mm-yy') AND
+			// TO_DATE('"+endDate+"','dd-mm-yy') AND E.FO_USER_ID='"+userId+"'";
+			params1 = "TO_DATE(?,'dd/MM/yyyy')  AND TO_DATE(?,'dd/MM/yyyy') AND E.FO_USER_ID=?";
+			paramList.add(startDate);
+			paramList.add(endDate);
+			paramList.add(userId);
+
+		} else if (doUser == null || doUser == "") {
+			// params1="TO_DATE('"+startDate+"','dd-mm-yy') AND
+			// TO_DATE('"+endDate+"','dd-mm-yy') AND ( A.DO_MAKER_USER_ID='"+userId+"' OR
+			// A.DO_CHECKER_USER_ID='"+userId+"' )";
+
+			params1 = "TO_DATE(?,'dd/MM/yyyy')  AND TO_DATE(?,'dd/MM/yyyy') AND C.BRANCH_CODE=?";
+			paramList.add(startDate);
+			paramList.add(endDate);
+			paramList.add(branchCode);
+			// paramList.add(userId);
+			// paramList.add(userId);
+
+		}
+
+		for (int i = 0; i < paramList1.size(); i++) {
+
+			paramList.add(paramList1.get(i));
+
+		}
+
+		Object paramArr[] = paramList.toArray();
+
+		// Object params[]={startDate,endDate};
+
+		String GET_REPORTS_ALL1 = " SELECT * FROM ( SELECT C.REFERENCE_NO,  TO_CHAR(C.REQ_CREATED_DATE,'dd/MM/yyyy') REQ_CREATED_DATE_NAME,  C.BRANCH_CODE,  C.BRANCH_NAME,   TO_CHAR(C.EXP_DRAWDOWN_DATE,'dd/MM/yyyy') EXP_DRAWDOWN_DATE_NAME,  (SELECT VALUE  FROM BCQI_PROPERTIES D  WHERE DESCRIPTION = 'SHIPMENT'  AND CONFIG_ID     =C.COUNTRY_OF_ORIGIN  ) COUNTRY_OF_ORIGIN_NAME,  C.DESCRIPTION_OF_GOODS,  (SELECT VALUE  FROM BCQI_PROPERTIES D  WHERE DESCRIPTION = 'Options'  AND CONFIG_ID     =C.RESTRUCTURED  ) RESTRUCTURED_NAME,  (SELECT VALUE  FROM BCQI_PROPERTIES D  WHERE DESCRIPTION = 'Currency'  AND CONFIG_ID     =C.LC_CURRENCY  )CURRENCY_NAME,  (SELECT VALUE  FROM BCQI_PROPERTIES D  WHERE DESCRIPTION = 'LC_TYPE'  AND CONFIG_ID     =C.LC_TYPE  )LC_TYPE_NAME,  (SELECT VALUE  FROM BCQI_PROPERTIES D  WHERE DESCRIPTION = 'SHIPMENT'  AND CONFIG_ID     = C.SHIPMENT_FROM  )SHIPMENT_FROM_NAME,  (SELECT VALUE  FROM BCQI_PROPERTIES D  WHERE DESCRIPTION = 'SHIPMENT'  AND CONFIG_ID     =C.SHIPMENT_TO  )SHIPMENT_TO_NAME,    TO_CHAR(C.CR_AUDITED_BAL_DATE,'dd/MM/yyyy') CR_AUDITED_BAL_DATE_NAME,  C.CIF_NO_APPLICANT_IMP,  (SELECT VALUE  FROM BCQI_PROPERTIES D  WHERE DESCRIPTION = 'Status'  AND CONFIG_ID     = NVL(E.STATUS,A.STATUS)  )STATUS_NAME,     TO_CHAR(C.CREATION_TIME,'dd/MM/yyyy') CREATION_TIME_NAME,  TO_CHAR(C.LAST_MOD_TIME,'dd/MM/yyyy') LAST_MOD_TIME_NAME,  C.SHIPMENT_PORT_FROM,  C.SHIPMENT_PORT_TO,  C.IRAC_STATUS_IMP,  (SELECT VALUE  FROM BCQI_PROPERTIES D  WHERE DESCRIPTION = 'Options'  AND CONFIG_ID     =C.CAPITAL_GOODS  )CAPITAL_GOODS_NAME,  TO_CHAR(C.EXT_CREDIT_RATING_VALID_UP_TO,'dd/MM/yyyy') EXT_CREDIT_RATING_VALID_NAME,  C.SUPPLIER_CREDIT_AMOUNT, C.LETTER_OF_CREDIT_AMOUNT,  C.CREDIT_RATING_IMPORTER,  C.EXPECTED_SPREAD,  C.EXT_CREDIT_RATING_AGENCY,  C.PERIOD_TENOR_DAYS,  C.CORPORATE_CONTACT_NO ,C.LC_AVAILABLE_BY ,C.EXT_CREDIT_RATING_APPL ,C.BEN_NAME_ADDRESS ,C.LC_CREDIT_PERIOD_AVL_DAYS_FROM ,C.LC_ISSUED ,TO_CHAR(C.LC_ISSUED_DATE,'dd/MM/yyyy') LC_ISSUED_DATE ,C.LC_CREDIT_PERIOD_AVL ,C.DOM_BRANCH_CONTACT_NO ,TO_CHAR(C.LC_EXPIRY_DATE,'dd/MM/yyyy') LC_EXPIRY_DATE ,C.APPL_NAME_ADDRESS ,C.LC_AVAILABLE_WITH,C.LC_AVAILABLE_BY_NAME ,C.LC_NO ,C.LC_EXPIRY_PLACE ,C.PERIOD_TENOR_DAYS_FROM,C.PERIOD_TENOR_DAYS_FROM_NAME,C.PERIOD_TENOR_DAYS_FROM_OTHER, TO_CHAR(C.LAST_DATE_FOR_QUOTE,'dd/MM/yyyy') LAST_DATE_FOR_QUOTE ,   NVL( TO_CHAR(E.CREATION_TIME,'dd/MM/yyyy'),'NOT APPLICABLE')CREATION_QUOTE_TIME,  NVL(  (SELECT VALUE FROM BCQI_PROPERTIES WHERE CONFIG_ID=E.BASIS  ),'NOT APPLICABLE')BASIS_NAME,  NVL(  (SELECT VALUE FROM BCQI_PROPERTIES WHERE CONFIG_ID=E.PERIOD  ),'NOT APPLICABLE')PERIOD_NAME,  NVL( TO_CHAR(E.SPREAD_IN_BPS) ,'NOT APPLICABLE') SPREAD_IN_BPS,  NVL( TO_CHAR(E.NEW_SPREAD) ,'NOT APPLICABLE') NEW_SPREAD,  NVL( TO_CHAR(E.RATE_OF_INTEREST),'NOT APPLICABLE') RATE_OF_INTEREST,  NVL( TO_CHAR(E.NEW_RATE_OF_INTEREST),'NOT APPLICABLE') NEW_RATE_OF_INTEREST,  NVL(  (SELECT VALUE  FROM BCQI_PROPERTIES D  WHERE D.DESCRIPTION='Country'  AND D.CONFIG_ID    =E.FO_USER_BRANCH  ),'NOT APPLICABLE')FO_USER_BRANCH_NAME,  E.STATUS E_STATUS,  a.do_maker_user_id,  a.do_checker_user_id,E.OTHER_CHARGES,E.SUPPLIER_CHARGES,E.ADVISING_CHARGES,E.DOC_HANDLING_CHARGES FROM BCQI_SELLER_REQUEST A ,  BCQI_SELLER_REQUEST_DETAILS C ,  BCQI_SELLER_REQ_QUOTE_DETAILS E  WHERE   A.REFERENCE_NO = C.REFERENCE_NO   "
+				+
+				// " AND TRUNC(A.CREATION_TIME) BETWEEN #HASTOBEREPLACED# AND A.REFERENCE_NO =
+				// E.REFERENCE_NO(+) #TOBEREPLACED# ) where NVL(E_STATUS,'*') NOT IN
+				// ('11','26','28')";
+
+				" AND TRUNC(A.CREATION_TIME) BETWEEN #HASTOBEREPLACED# AND  A.REFERENCE_NO = E.REFERENCE_NO(+)  #TOBEREPLACED# ";
+
+		try {
+			String query = GET_REPORTS_ALL1.replaceAll("#TOBEREPLACED#", parameters);
+			query = query.replaceAll("#HASTOBEREPLACED#", params1);
+
+			if (null != userRole) {
+				if (userRole.equalsIgnoreCase("21")) {// DO
+					query = query + "  ) where NVL(E_STATUS,'*')  NOT IN ('11','26','28')";
+				} else if (userRole.equalsIgnoreCase("22")) {// FO
+					query = query + "  ) where NVL(E_STATUS,'*')  NOT IN ('11','27') ";
+				} else if (userRole.equalsIgnoreCase("23")) {// GTD
+					query = query + "   ) where NVL(E_STATUS,'*')  NOT IN ('11') ";
+				}
+
+			}
+
+//	            	 logger.info("reports query :: "+query);
+//	            	 logger.info("GTDReportDetails params :: "+paramArr);
+			inList = getJdbcTemplate().query(query, new SellerRequestModelRowMap(), paramArr);
+		} catch (DataAccessException daoex) {
+			logger.error("Exception occured: " + daoex.getMessage());
+			DAOException.throwException(daoex, "BC000", paramArr);
+		}
+		logger.info("reportDetails1Seller(Map inParams) method ends");
+		return inList;
+
+	}
+
+	public TransactionTemplate getTransactionTemplate() {
+		return transactionTemplate;
+	}
+
+	public void setTransactionTemplate(TransactionTemplate transactionTemplate) {
+		this.transactionTemplate = transactionTemplate;
+	}
+
+	@Override
+	public String getNewDBDetails(String userName) {
+		String password = "";
+		try {
+			Object params[] = { userName };
+
+			password = getJdbcTemplate().queryForObject(
+					"select ENC_PASSWORD_SENT_IN_MAIL from BCQI_USER_FORGOT_PWD where USER_ID=? and REQ_STATE='OPEN'",
+					params, String.class);
+		} catch (DataAccessException e) {
+			logger.info(e.getMessage());
+
+		}
+
+		return password;
+	}
+
+	@Override
+	public int updateLoggedinResetFlag(String userID) {
+		// TODO Auto-generated method stub
+
+		int flag = 0;
+		try {
+			Object param[] = { userID };
+			flag = getJdbcTemplate().update("update BCQI_USER_profile set FORGOT_PWD_FLAG='' where user_Id=?", param);
+
+		} catch (DataAccessException e) {
+
+			logger.info(e.getMessage());
+
+		}
+		return flag;
+
+	}
+
+	@Override
+	public List getHVPCStatus(String userRole) {
+
+		logger.info("public List getHVPCStatus(String userRole) method begins");
+		List statusList = null;
+		try {
+			String sql = "";
+
+			// if(userRole.trim().equalsIgnoreCase("325") ||
+			// userRole.trim().equalsIgnoreCase("22") ){
+			/*
+			 * if(userRole.trim().equalsIgnoreCase("22") ){
+			 * sql="select status_id, status_value value from hvpc_message_statuses where applicable_to_fo_or_gmuk='Y' order by status_id desc"
+			 * ; }else{
+			 * sql="select status_id, status_value value from hvpc_message_statuses order by status_id desc"
+			 * ; }
+			 */
+			sql = "select status_id, status_value value from hvpc_message_statuses order by status_id desc";
+			statusList = getJdbcTemplate().queryForList(sql);
+
+		} catch (DataAccessException exp) {
+			logger.info("Exception occured: " + exp.getMessage());
+			DAOException.throwException(exp, "BC000", new Object[] { userRole });
+		}
+		logger.info("public List getHVPCStatus(String userRole) method ends");
+		return statusList;
+
+	}
+
+	@Override
+	public List hvpcdoReportDetails(Map inParams) {
+		logger.info("public List hvpcdoReportDetails(Map inParams) method begins");
+		List inList = new ArrayList();
+		;
+		StringBuffer parameters = new StringBuffer(new String(""));
+		String startDate = (String) inParams.get("datepicker");
+		String endDate = (String) inParams.get("datepicker1");
+		String foUser = (String) inParams.get("foUser");
+		String status = (String) inParams.get("status");
+		String userId = (String) inParams.get("userId");
+		String userBranchCode = "";
+//         StringBuilder sb = new StringBuilder();
+		if (null != inParams.get("userBranchCode")) {
+			userBranchCode = (String) inParams.get("userBranchCode");
+		}
+
+		String userRole = (String) inParams.get("userRole");
+
+		List<Object> paramList = new ArrayList<Object>();
+		String User = (String) inParams.get("user");
+		List paramList1 = new ArrayList();
+		paramList.add(startDate.trim());
+		paramList.add(endDate.trim());
+//    	 sb.append("startDate|"+startDate);
+//    	 sb.append("|endDate|"+endDate);
+
+		if (User.equals("DO")) {
+			/*
+			 * paramList.add(userId.trim()); paramList.add(userId.trim());
+			 * parameters.append(" and (approver= ? or maker= ?) ");
+			 */
+//    		 sb.append("|userBranchCode|"+userBranchCode);
+			paramList.add(userBranchCode.trim());
+			parameters.append(" and MAKER_BRANCH_CODE = ? ");
+		}
+		if (User.equals("FO")) {
+
+			if (!status.equals("-1")) {
+				if (status.equals("8") || (status.equals("9") || (status.equals("13")))) {
+					paramList.add(userId.trim());
+
+					// 8 MARKING_IN_PROGRESS
+					// 9 MARKED_OFF
+					if (status.equals("8")) {
+						parameters.append(" and MARKING_IN_PROGRESS_DONE_BY=? ");
+					} else if (status.equals("9")) {
+						parameters.append(" and markoff_user=? ");
+					} else if (status.equals("13")) {
+						parameters.append(" and FOORGMU_ACTION_TAKEN_BY_USER=? ");
+					}
+
+				} /*
+					 * else{ paramList.add(foUser); parameters.
+					 * append(" and state_branch_name in(select value from bcqi_properties where config_id=?) "
+					 * ); }
+					 */
+			} else {
+				// paramList.add(foUser);
+				// parameters.append(" and state_branch_name in(select value from
+				// bcqi_properties where config_id=?) ");
+
+				parameters.append(" and (assigned_to_fo='Y' or assigned_to_fo='D')");
+			}
+
+		}
+
+		/*
+		 * if(null!=userRole){ if(userRole.equals("325")){
+		 * 
+		 * if(!status.equals("-1")){ if(status.equals("8") || (status.equals("9") ||
+		 * (status.equals("14")))){ paramList.add(userId.trim());
+		 * 
+		 * //8 MARKING_IN_PROGRESS //9 MARKED_OFF if(status.equals("8")){
+		 * parameters.append(" and MARKING_IN_PROGRESS_DONE_BY=? "); } else
+		 * if(status.equals("9")){ parameters.append(" and markoff_user=? "); } else
+		 * if(status.equals("14")){
+		 * parameters.append(" and FOORGMU_ACTION_TAKEN_BY_USER=? "); } }
+		 * 
+		 * }
+		 * 
+		 * 
+		 * parameters.append(" and assigned_to_fo='N' ");
+		 * 
+		 * parameters.append(" and state_branch_name is null "); } }
+		 */
+
+		/*
+		 * if(User.equals("GTD")){
+		 * 
+		 * }
+		 */
+
+		if (!foUser.equals("-1")) {
+			paramList.add(foUser.trim());
+			parameters.append(" and state_branch_name in(select value from bcqi_properties where config_id=?)  ");
+		}
+
+		if (!status.equals("-1")) {
+//        	 sb.append("status|"+status);
+			paramList.add(status.trim());
+			parameters.append(
+					" and status in (select status_value from hvpc_message_statuses where status_id=?)  order by creation_date_time desc");
+		}
+		if (status.equals("-1")) {
+
+			parameters.append("  order by creation_date_time desc");
+		}
+
+		String connect = parameters.toString();
+		String sql = " select FO_OR_GMU_REMARKS,FOORGMU_ACTION_TAKEN_BY_USER,FOORGMU_ACTION_TAKEN_DT_TIME,APPROVER_ACTION_DATE_TIME,REFERENCE_NO,MESSAGE_REFERENCE_NUMBER,MESSAGE_SEQUENCE_NUMBER,SENDER_BIC_CODE,BRANCH_NAME,MESSAGE_TYPE,CURRENCY,CORRESPONDENT  as GRID_CORRESPONDENT,AMOUNT,BENEFICIARY_ACCOUNT_NUMBER,STATUS,RECEIVER_BIC_CODE,APPROVER,ASSIGNED_TO_FO,MARKOFF_USER,VALUE_DATE,REMARKS,CREATION_DATE_TIME,MODIFICATION_DATE_TIME,STATE_BRANCH_NAME,MAKER,MARKOFF_DATE_TIME,MAKER_BRANCH_CODE,MESSAGE_TYPE_ID,CURRENCY_ID,CORRESPONDENT_ID,APPROVER_ID,nvl(MARKING_IN_PROGRESS_DONE_BY,''),MARKING_IN_PROGRESS_DATE_TIME,(select ('+'||COUNTRY_CODE||' -  '|| MOBILE_NO) from BCQI_USER_PROFILE where USER_ID = APPROVER_ID) approver_phone_number  from hvpc_messages where trunc(creation_date_time) between TO_DATE(?,'dd-mm-yy')  AND TO_DATE(?,'dd-mm-yy') "
+				+ connect;
+//         logger.info("final sql -->"+sql);
+		try {
+			Object[] params = paramList.toArray();
+//  			for(int i=0;i<params.length;i++){
+//  				logger.info(i+"-->"+params[i]+"<--");
+//  			}
+			paramList1 = getJdbcTemplate().query(sql, params, new BeanPropertyRowMapper<HVPCUtils>(HVPCUtils.class));
+
+			System.out.println("check------" + paramList1);
+
+//			sb.append("splcorres|"+"");
+//			sb.append("|flowSelection|"+"");
+
+			/*
+			 * inList= getJdbcTemplate().queryForList(sql,params);
+			 * logger.info("reportTabList::"+inList.size());
+			 * 
+			 */
+
+		} catch (DataAccessException exp) {
+			logger.info("Exception occured: " + exp.getMessage());
+			DAOException.throwException(exp, "BC000", new Object[] { status });
+		}
+		logger.info("public List hvpcdoReportDetails(Map inParams) method ends");
+		return paramList1;
+	}
+
+	@Override
+	public Map gtdActedQuoteDetails(Map inParams) throws DAOException {
+		logger.info("gtdActedQuoteDetails  method begins");
+		Map outMap = new HashMap();
+		List requestOrQuotesList = new ArrayList();
+		String startDate = (String) inParams.get("startDate");
+		String endDate = (String) inParams.get("endDate");
+
+		String referenceNo = "";
+
+		if (null != inParams.get("referenceNo")) {
+			referenceNo = (String) inParams.get("referenceNo");
+		}
+
+		boolean dateFlag = false;
+		if (!(startDate.equals("") && endDate.equals(""))) {
+			dateFlag = true;
+
+		}
+
+		boolean referencenoflag = false;
+		if (!referenceNo.equals("")) {
+			referencenoflag = true;
+
+		}
+		String sql = "";
+		if (dateFlag && referencenoflag) {
+			logger.info("date and reference no ..both are entered for searching..");
+			sql = "SELECT A.QUOTE_GIVEN,  A.REFERENCE_NO ,  NVL( E.QUOTE_ID ,'NOT APPLICABLE') QUOTE_ID,  TO_CHAR(A.QUOTE_ACCEPTED_DATE)QUOTE_ACCEPTED_DATE,  C.BRANCH_NAME,  C.NAME_OF_IMPORTER,  (SELECT VALUE  FROM BCQI_PROPERTIES  WHERE CONFIG_ID=C.CURRENCY  ) CURRENCY,  TO_CHAR(C.AMOUNT,'999,999,999,999.99') amount,  C.PERIOD_TENOR_DAYS,  TO_CHAR(A.CREATION_TIME) REQ_CREATED_DATE,  TO_CHAR(a.REQ_APPROVED_DATE)REQ_APPROVED_DATE,  NVL(  (SELECT D.VALUE  FROM BCQI_PROPERTIES D  WHERE D.DESCRIPTION = 'QuotePeriod'  AND D.CONFIG_ID     =E.PERIOD  ),'NOT APPLICABLE') PERIOD,  NVL( TO_CHAR(NVL(E.NEW_SPREAD,E.SPREAD_IN_BPS)) ,'NOT APPLICABLE') SPREAD_IN_BPS,  NVL( TO_CHAR(NVL(E.NEW_RATE_OF_INTEREST,E.RATE_OF_INTEREST)) ,'NOT APPLICABLE') RATE_OF_INTEREST,  (SELECT VALUE  FROM BCQI_PROPERTIES  WHERE DESCRIPTION = 'Status'  AND CONFIG_ID     =E.STATUS  ) STATUS_DESC ,  e.other_charges OTHER_CHARGES ,  A.STATUS REQ_STATUS,  C.BRANCH_CODE ,  NVL(  (SELECT D.VALUE  FROM BCQI_PROPERTIES D  WHERE D.DESCRIPTION = 'Country'  AND D.CONFIG_ID     = E.FO_USER_BRANCH  ),'NOT APPLICABLE' ) FO_USER_BRANCH,  E.FO_USER_BRANCH E_FO_USER_BRANCH,  NVL(  (SELECT D.VALUE  FROM BCQI_PROPERTIES D  WHERE D.DESCRIPTION = 'QuoteBasis'  AND D.CONFIG_ID     =E.BASIS  ),'NOT APPLICABLE') BASIS,  E.STATUS FROM BCQI_REQUEST A ,  BCQI_REQUEST_DETAILS C ,  BCQI_REQ_QUOTE_DETAILS E WHERE A.REFERENCE_NO = C.REFERENCE_NO  AND A.REFERENCE_NO        = E.REFERENCE_NO(+) AND A.GTD_ACTION_REQUIRED ='Y' AND A.GTD_ACTED           ='Y' AND E.GTD_ACTED_ON_QUOTE  = 'Y' AND E.STATUS             IN ('7','8')"
+					+ " AND TRUNC(A.CREATION_TIME) BETWEEN TO_DATE(?,'dd-mm-yy') AND TO_DATE(?,'dd-mm-yy')  AND A.REFERENCE_NO=? ORDER BY a.CREATION_TIME DESC";
+			try {
+				logger.info(
+						"**************************************FROM NOW ON ...ONLY VISIBILITY ENABLED FOS WILL BE ABLE TO SEE MESSAGES SENT BY DO****************");
+
+//		        	  logger.info("sql-->"+sql);
+				Object[] inparams = { startDate, endDate, referenceNo };
+				requestOrQuotesList = getJdbcTemplate().queryForList(sql, inparams);
+
+				logger.info("requestOrQuotesList list size::");
+
+			} catch (DataAccessException e) {
+				logger.error("exception occured :" + e.getMessage());
+				DAOException.throwException("BC000");
+			}
+
+		} else if (dateFlag == true && referencenoflag == false) {
+			logger.info("Only Date is entered for searching..");
+			sql = "SELECT A.QUOTE_GIVEN,  A.REFERENCE_NO ,  NVL( E.QUOTE_ID ,'NOT APPLICABLE') QUOTE_ID,  TO_CHAR(A.QUOTE_ACCEPTED_DATE)QUOTE_ACCEPTED_DATE,  C.BRANCH_NAME,  C.NAME_OF_IMPORTER,  (SELECT VALUE  FROM BCQI_PROPERTIES  WHERE CONFIG_ID=C.CURRENCY  ) CURRENCY,  TO_CHAR(C.AMOUNT,'999,999,999,999.99') amount,  C.PERIOD_TENOR_DAYS,  TO_CHAR(A.CREATION_TIME) REQ_CREATED_DATE,  TO_CHAR(a.REQ_APPROVED_DATE)REQ_APPROVED_DATE,  NVL(  (SELECT D.VALUE  FROM BCQI_PROPERTIES D  WHERE D.DESCRIPTION = 'QuotePeriod'  AND D.CONFIG_ID     =E.PERIOD  ),'NOT APPLICABLE') PERIOD,  NVL( TO_CHAR(NVL(E.NEW_SPREAD,E.SPREAD_IN_BPS)) ,'NOT APPLICABLE') SPREAD_IN_BPS,  NVL( TO_CHAR(NVL(E.NEW_RATE_OF_INTEREST,E.RATE_OF_INTEREST)) ,'NOT APPLICABLE') RATE_OF_INTEREST,  (SELECT VALUE  FROM BCQI_PROPERTIES  WHERE DESCRIPTION = 'Status'  AND CONFIG_ID     =E.STATUS  ) STATUS_DESC ,  e.other_charges OTHER_CHARGES ,  A.STATUS REQ_STATUS,  C.BRANCH_CODE ,  NVL(  (SELECT D.VALUE  FROM BCQI_PROPERTIES D  WHERE D.DESCRIPTION = 'Country'  AND D.CONFIG_ID     = E.FO_USER_BRANCH  ),'NOT APPLICABLE' ) FO_USER_BRANCH,  E.FO_USER_BRANCH E_FO_USER_BRANCH,  NVL(  (SELECT D.VALUE  FROM BCQI_PROPERTIES D  WHERE D.DESCRIPTION = 'QuoteBasis'  AND D.CONFIG_ID     =E.BASIS  ),'NOT APPLICABLE') BASIS,  E.STATUS FROM BCQI_REQUEST A ,  BCQI_REQUEST_DETAILS C ,  BCQI_REQ_QUOTE_DETAILS E WHERE A.REFERENCE_NO = C.REFERENCE_NO  AND A.REFERENCE_NO        = E.REFERENCE_NO(+) AND A.GTD_ACTION_REQUIRED ='Y' AND A.GTD_ACTED           ='Y' AND E.GTD_ACTED_ON_QUOTE  = 'Y' AND E.STATUS             IN ('7','8')"
+					+ " AND TRUNC(A.CREATION_TIME) BETWEEN TO_DATE(?,'dd-mm-yy') AND TO_DATE(?,'dd-mm-yy') ORDER BY a.CREATION_TIME DESC";
+			try {
+				logger.info(
+						"**************************************FROM NOW ON ...ONLY VISIBILITY ENABLED FOS WILL BE ABLE TO SEE MESSAGES SENT BY DO****************");
+
+//	  		        	  logger.info("sql-->"+sql);
+				Object[] inparams = { startDate, endDate };
+				requestOrQuotesList = getJdbcTemplate().queryForList(sql, inparams);
+
+				logger.info("requestOrQuotesList list size::");
+
+			} catch (DataAccessException e) {
+				logger.error("exception occured :" + e.getMessage());
+				DAOException.throwException("BC000");
+			}
+
+		} else if (dateFlag == false && referencenoflag == true) {
+			logger.info("Only Reference no is entered for searching..");
+
+			sql = "SELECT A.QUOTE_GIVEN,  A.REFERENCE_NO ,  NVL( E.QUOTE_ID ,'NOT APPLICABLE') QUOTE_ID,  TO_CHAR(A.QUOTE_ACCEPTED_DATE)QUOTE_ACCEPTED_DATE,  C.BRANCH_NAME,  C.NAME_OF_IMPORTER,  (SELECT VALUE  FROM BCQI_PROPERTIES  WHERE CONFIG_ID=C.CURRENCY  ) CURRENCY,  TO_CHAR(C.AMOUNT,'999,999,999,999.99') amount,  C.PERIOD_TENOR_DAYS,  TO_CHAR(A.CREATION_TIME) REQ_CREATED_DATE,  TO_CHAR(a.REQ_APPROVED_DATE)REQ_APPROVED_DATE,  NVL(  (SELECT D.VALUE  FROM BCQI_PROPERTIES D  WHERE D.DESCRIPTION = 'QuotePeriod'  AND D.CONFIG_ID     =E.PERIOD  ),'NOT APPLICABLE') PERIOD,  NVL( TO_CHAR(NVL(E.NEW_SPREAD,E.SPREAD_IN_BPS)) ,'NOT APPLICABLE') SPREAD_IN_BPS,  NVL( TO_CHAR(NVL(E.NEW_RATE_OF_INTEREST,E.RATE_OF_INTEREST)) ,'NOT APPLICABLE') RATE_OF_INTEREST,  (SELECT VALUE  FROM BCQI_PROPERTIES  WHERE DESCRIPTION = 'Status'  AND CONFIG_ID     =E.STATUS  ) STATUS_DESC ,  e.other_charges OTHER_CHARGES ,  A.STATUS REQ_STATUS,  C.BRANCH_CODE ,  NVL(  (SELECT D.VALUE  FROM BCQI_PROPERTIES D  WHERE D.DESCRIPTION = 'Country'  AND D.CONFIG_ID     = E.FO_USER_BRANCH  ),'NOT APPLICABLE' ) FO_USER_BRANCH,  E.FO_USER_BRANCH E_FO_USER_BRANCH,  NVL(  (SELECT D.VALUE  FROM BCQI_PROPERTIES D  WHERE D.DESCRIPTION = 'QuoteBasis'  AND D.CONFIG_ID     =E.BASIS  ),'NOT APPLICABLE') BASIS,  E.STATUS FROM BCQI_REQUEST A ,  BCQI_REQUEST_DETAILS C ,  BCQI_REQ_QUOTE_DETAILS E WHERE A.REFERENCE_NO = C.REFERENCE_NO  AND A.REFERENCE_NO        = E.REFERENCE_NO(+) AND A.GTD_ACTION_REQUIRED ='Y' AND A.GTD_ACTED           ='Y' AND E.GTD_ACTED_ON_QUOTE  = 'Y' AND E.STATUS             IN ('7','8')"
+					+ "  AND A.REFERENCE_NO=? ORDER BY a.CREATION_TIME DESC";
+			try {
+				logger.info(
+						"**************************************FROM NOW ON ...ONLY VISIBILITY ENABLED FOS WILL BE ABLE TO SEE MESSAGES SENT BY DO****************");
+
+//		  		        	  logger.info("sql-->"+sql);
+				Object[] inparams = { referenceNo };
+				requestOrQuotesList = getJdbcTemplate().queryForList(sql, inparams);
+
+				logger.info("requestOrQuotesList list size::");
+
+			} catch (DataAccessException e) {
+				logger.error("exception occured :" + e.getMessage());
+				DAOException.throwException("BC000");
+			}
+
+		} else if (dateFlag == false && referencenoflag == false) {
+			logger.info("nothing entered for searching");
+
+			sql = "SELECT A.QUOTE_GIVEN,  A.REFERENCE_NO ,  NVL( E.QUOTE_ID ,'NOT APPLICABLE') QUOTE_ID,  TO_CHAR(A.QUOTE_ACCEPTED_DATE)QUOTE_ACCEPTED_DATE,  C.BRANCH_NAME,  C.NAME_OF_IMPORTER,  (SELECT VALUE  FROM BCQI_PROPERTIES  WHERE CONFIG_ID=C.CURRENCY  ) CURRENCY,  TO_CHAR(C.AMOUNT,'999,999,999,999.99') amount,  C.PERIOD_TENOR_DAYS,  TO_CHAR(A.CREATION_TIME) REQ_CREATED_DATE,  TO_CHAR(a.REQ_APPROVED_DATE)REQ_APPROVED_DATE,  NVL(  (SELECT D.VALUE  FROM BCQI_PROPERTIES D  WHERE D.DESCRIPTION = 'QuotePeriod'  AND D.CONFIG_ID     =E.PERIOD  ),'NOT APPLICABLE') PERIOD,  NVL( TO_CHAR(NVL(E.NEW_SPREAD,E.SPREAD_IN_BPS)) ,'NOT APPLICABLE') SPREAD_IN_BPS,  NVL( TO_CHAR(NVL(E.NEW_RATE_OF_INTEREST,E.RATE_OF_INTEREST)) ,'NOT APPLICABLE') RATE_OF_INTEREST,  (SELECT VALUE  FROM BCQI_PROPERTIES  WHERE DESCRIPTION = 'Status'  AND CONFIG_ID     =E.STATUS  ) STATUS_DESC ,  e.other_charges OTHER_CHARGES ,  A.STATUS REQ_STATUS,  C.BRANCH_CODE ,  NVL(  (SELECT D.VALUE  FROM BCQI_PROPERTIES D  WHERE D.DESCRIPTION = 'Country'  AND D.CONFIG_ID     = E.FO_USER_BRANCH  ),'NOT APPLICABLE' ) FO_USER_BRANCH,  E.FO_USER_BRANCH E_FO_USER_BRANCH,  NVL(  (SELECT D.VALUE  FROM BCQI_PROPERTIES D  WHERE D.DESCRIPTION = 'QuoteBasis'  AND D.CONFIG_ID     =E.BASIS  ),'NOT APPLICABLE') BASIS,  E.STATUS FROM BCQI_REQUEST A ,  BCQI_REQUEST_DETAILS C ,  BCQI_REQ_QUOTE_DETAILS E WHERE A.REFERENCE_NO = C.REFERENCE_NO  AND A.REFERENCE_NO        = E.REFERENCE_NO(+) AND A.GTD_ACTION_REQUIRED ='Y' AND A.GTD_ACTED           ='Y' AND E.GTD_ACTED_ON_QUOTE  = 'Y' AND E.STATUS             IN ('7','8')"
+					+ "  ORDER BY a.CREATION_TIME DESC";
+			try {
+				logger.info(
+						"**************************************FROM NOW ON ...ONLY VISIBILITY ENABLED FOS WILL BE ABLE TO SEE MESSAGES SENT BY DO****************");
+
+//		  		        	  logger.info("sql-->"+sql);
+
+				requestOrQuotesList = getJdbcTemplate().queryForList(sql);
+
+				logger.info("requestOrQuotesList list size::");
+
+			} catch (DataAccessException e) {
+				logger.error("exception occured :" + e.getMessage());
+				DAOException.throwException("BC000");
+			}
+
+		}
+
+		outMap.put("requestOrQuotesList", requestOrQuotesList);
+
+		logger.info("gtdActedQuoteDetails  method ends");
+		return outMap;
+
+	}
+
+	@Override
+	public Map gtdActedQuotesStatusRefDetails(Map inParams) throws DAOException {
+		logger.info("gtdActedQuotesStatusRefDetails  method begins");
+		Map outMap = new HashMap();
+		List requestOrQuotesList = new ArrayList();
+		String startDate = (String) inParams.get("startDate");
+		String endDate = (String) inParams.get("endDate");
+
+		String referenceNo = "";
+
+		if (null != inParams.get("referenceNo")) {
+			referenceNo = (String) inParams.get("referenceNo");
+		}
+
+		boolean dateFlag = false;
+		if (!(startDate.equals("") && endDate.equals(""))) {
+			dateFlag = true;
+
+		}
+
+		boolean referencenoflag = false;
+		if (!referenceNo.equals("")) {
+			referencenoflag = true;
+
+		}
+		String sql = "";
+		if (dateFlag && referencenoflag) {
+			logger.info("date and reference no ..both are entered for searching..");
+			sql = "SELECT A.REFERENCE_NO,   C.BRANCH_NAME,  TO_CHAR(a.CREATION_TIME) CREATION_TIME,  C.NAME_OF_IMPORTER,  (SELECT VALUE FROM BCQI_PROPERTIES WHERE CONFIG_ID=C.CURRENCY  ) CURRENCY, TO_CHAR(C.AMOUNT,'999,999,999,999.99') amount,  C.PERIOD_TENOR_DAYS,  (SELECT VALUE  FROM BCQI_PROPERTIES  WHERE DESCRIPTION = 'Status'  AND CONFIG_ID     =A.STATUS  ) STATUS_DESC,  A.STATUS FROM BCQI_REQUEST A ,  BCQI_REQUEST_DETAILS C WHERE A.REFERENCE_NO      = C.REFERENCE_NO AND A.GTD_ACTION_REQUIRED ='Y' AND a.STATUS             IN ('5','7','8','9','11','20','25','26','27','28')"
+					+ " AND TRUNC(A.CREATION_TIME) BETWEEN TO_DATE(?,'dd-mm-yy') AND TO_DATE(?,'dd-mm-yy')  AND A.REFERENCE_NO=? ORDER BY a.CREATION_TIME DESC";
+			try {
+				logger.info(
+						"**************************************FROM NOW ON ...ONLY VISIBILITY ENABLED FOS WILL BE ABLE TO SEE MESSAGES SENT BY DO****************");
+
+//		        	  logger.info("sql-->"+sql);
+				Object[] inparams = { startDate, endDate, referenceNo };
+				requestOrQuotesList = getJdbcTemplate().queryForList(sql, inparams);
+
+				logger.info("requestOrQuotesList list size::");
+
+			} catch (DataAccessException e) {
+				logger.error("exception occured :" + e.getMessage());
+				DAOException.throwException("BC000");
+			}
+
+		} else if (dateFlag == true && referencenoflag == false) {
+			logger.info("Only Date is entered for searching..");
+			sql = "SELECT A.REFERENCE_NO,   C.BRANCH_NAME,  TO_CHAR(a.CREATION_TIME) CREATION_TIME,  C.NAME_OF_IMPORTER,  (SELECT VALUE FROM BCQI_PROPERTIES WHERE CONFIG_ID=C.CURRENCY  ) CURRENCY,  TO_CHAR(C.AMOUNT,'999,999,999,999.99') amount,  C.PERIOD_TENOR_DAYS,  (SELECT VALUE  FROM BCQI_PROPERTIES  WHERE DESCRIPTION = 'Status'  AND CONFIG_ID     =A.STATUS  ) STATUS_DESC,  A.STATUS FROM BCQI_REQUEST A ,  BCQI_REQUEST_DETAILS C WHERE A.REFERENCE_NO      = C.REFERENCE_NO AND A.GTD_ACTION_REQUIRED ='Y' AND a.STATUS             IN ('5','7','8','9','11','20','25','26','27','28')"
+					+ " AND TRUNC(A.CREATION_TIME) BETWEEN TO_DATE(?,'dd-mm-yy') AND TO_DATE(?,'dd-mm-yy') ORDER BY a.CREATION_TIME DESC";
+			try {
+				logger.info(
+						"**************************************FROM NOW ON ...ONLY VISIBILITY ENABLED FOS WILL BE ABLE TO SEE MESSAGES SENT BY DO****************");
+
+//	  		        	  logger.info("sql-->"+sql);
+				Object[] inparams = { startDate, endDate };
+				requestOrQuotesList = getJdbcTemplate().queryForList(sql, inparams);
+
+				logger.info("requestOrQuotesList list size::");
+
+			} catch (DataAccessException e) {
+				logger.error("exception occured :" + e.getMessage());
+				DAOException.throwException("BC000");
+			}
+
+		} else if (dateFlag == false && referencenoflag == true) {
+			logger.info("Only Reference no is entered for searching..");
+
+			sql = "SELECT A.REFERENCE_NO,   C.BRANCH_NAME,  TO_CHAR(a.CREATION_TIME) CREATION_TIME,  C.NAME_OF_IMPORTER,  (SELECT VALUE FROM BCQI_PROPERTIES WHERE CONFIG_ID=C.CURRENCY  ) CURRENCY,  TO_CHAR(C.AMOUNT,'999,999,999,999.99') amount,  C.PERIOD_TENOR_DAYS,  (SELECT VALUE  FROM BCQI_PROPERTIES  WHERE DESCRIPTION = 'Status'  AND CONFIG_ID     =A.STATUS  ) STATUS_DESC,  A.STATUS FROM BCQI_REQUEST A ,  BCQI_REQUEST_DETAILS C WHERE A.REFERENCE_NO      = C.REFERENCE_NO AND A.GTD_ACTION_REQUIRED ='Y' AND a.STATUS             IN ('5','7','8','9','11','20','25','26','27','28') AND A.REFERENCE_NO        =? ORDER BY a.CREATION_TIME DESC";
+			try {
+				logger.info(
+						"**************************************FROM NOW ON ...ONLY VISIBILITY ENABLED FOS WILL BE ABLE TO SEE MESSAGES SENT BY DO****************");
+
+//		  		        	  logger.info("sql-->"+sql);
+				Object[] inparams = { referenceNo };
+				requestOrQuotesList = getJdbcTemplate().queryForList(sql, inparams);
+
+				logger.info("requestOrQuotesList list size::");
+
+			} catch (DataAccessException e) {
+				logger.error("exception occured :" + e.getMessage());
+				DAOException.throwException("BC000");
+			}
+
+		} else if (dateFlag == false && referencenoflag == false) {
+			logger.info("nothing entered for searching");
+
+			sql = "SELECT A.REFERENCE_NO,   C.BRANCH_NAME,   TO_CHAR(a.CREATION_TIME) CREATION_TIME,  C.NAME_OF_IMPORTER,  (SELECT VALUE FROM BCQI_PROPERTIES WHERE CONFIG_ID=C.CURRENCY  ) CURRENCY,  TO_CHAR(C.AMOUNT,'999,999,999,999.99') amount,  C.PERIOD_TENOR_DAYS,  (SELECT VALUE  FROM BCQI_PROPERTIES  WHERE DESCRIPTION = 'Status'  AND CONFIG_ID     =A.STATUS  ) STATUS_DESC,  A.STATUS FROM BCQI_REQUEST A ,  BCQI_REQUEST_DETAILS C WHERE A.REFERENCE_NO      = C.REFERENCE_NO AND A.GTD_ACTION_REQUIRED ='Y' AND a.STATUS             IN ('5','7','8','9','11','20','25','26','27','28')"
+					+ "  ORDER BY a.CREATION_TIME DESC";
+			try {
+				logger.info(
+						"**************************************FROM NOW ON ...ONLY VISIBILITY ENABLED FOS WILL BE ABLE TO SEE MESSAGES SENT BY DO****************");
+
+//		  		        	  logger.info("sql-->"+sql);
+
+				requestOrQuotesList = getJdbcTemplate().queryForList(sql);
+
+				logger.info("requestOrQuotesList list size::");
+
+			} catch (DataAccessException e) {
+				logger.error("exception occured :" + e.getMessage());
+				DAOException.throwException("BC000");
+			}
+
+		}
+
+		outMap.put("requestOrQuotesList", requestOrQuotesList);
+
+		logger.info("gtdActedQuotesStatusRefDetails  method ends");
+		return outMap;
+
+	}
+
+	@Override
+	public Map gtdQuoteReportConsolidatedDetails(Map inParams) throws DAOException {
+		logger.info("gtdQuoteReportConsolidatedDetails  method begins");
+
+		String startDate = (String) inParams.get("startDate");
+		String endDate = (String) inParams.get("endDate");
+
+		String referenceNo = "";
+
+		if (null != inParams.get("referenceNo")) {
+			referenceNo = (String) inParams.get("referenceNo");
+		}
+
+		boolean dateFlag = false;
+		if (!(startDate.equals("") && endDate.equals(""))) {
+			dateFlag = true;
+
+		}
+
+		boolean referencenoflag = false;
+		if (!referenceNo.equals("")) {
+			referencenoflag = true;
+
+		}
+
+		Map outMap = new HashMap();
+
+		List gtdActedConsolidatedReferenceDetailsList = null;
+		String gtd_consolidated_quote_details_sql = "";
+
+		if (dateFlag && referencenoflag) {
+			logger.info("date and reference no ..both are entered for searching..");
+			gtd_consolidated_quote_details_sql = "SELECT TO_CHAR(a.quote_accepted_date) quote_accepted_date,A.REFERENCE_NO,C.BRANCH_NAME,C.NAME_OF_IMPORTER, (SELECT VALUE  FROM BCQI_PROPERTIES  WHERE CONFIG_ID=C.CURRENCY  ) CURRENCY, TO_CHAR(C.AMOUNT,'999,999,999,999.99') amount, C.PERIOD_TENOR_DAYS FROM BCQI_REQUEST A , BCQI_REQUEST_DETAILS C  WHERE A.REFERENCE_NO = C.REFERENCE_NO  AND A.GTD_ACTION_REQUIRED ='Y' AND A.STATUS IN ('7','8') AND TRUNC(A.CREATION_TIME) BETWEEN TO_DATE(?,'dd-mm-yy') AND TO_DATE(?,'dd-mm-yy')  AND A.REFERENCE_NO=? ORDER BY a.CREATION_TIME DESC";
+			try {
+
+				Object[] inparams = { startDate, endDate, referenceNo };
+				gtdActedConsolidatedReferenceDetailsList = getJdbcTemplate()
+						.queryForList(gtd_consolidated_quote_details_sql, inparams);
+
+				logger.info("gtdActedConsolidatedReferenceDetailsList list size::");
+
+			} catch (DataAccessException e) {
+				logger.error("exception occured :" + e.getMessage());
+				DAOException.throwException("BC000");
+			}
+
+		} else if (dateFlag == true && referencenoflag == false) {
+			logger.info("Only Date is entered for searching..");
+
+			gtd_consolidated_quote_details_sql = "SELECT TO_CHAR(a.quote_accepted_date) quote_accepted_date,A.REFERENCE_NO,C.BRANCH_NAME,C.NAME_OF_IMPORTER, (SELECT VALUE  FROM BCQI_PROPERTIES  WHERE CONFIG_ID=C.CURRENCY  ) CURRENCY, TO_CHAR(C.AMOUNT,'999,999,999,999.99') amount, C.PERIOD_TENOR_DAYS FROM BCQI_REQUEST A , BCQI_REQUEST_DETAILS C  WHERE A.REFERENCE_NO = C.REFERENCE_NO  AND A.GTD_ACTION_REQUIRED ='Y' AND A.STATUS IN ('7','8') AND TRUNC(A.CREATION_TIME) BETWEEN TO_DATE(?,'dd-mm-yy') AND TO_DATE(?,'dd-mm-yy')  ORDER BY a.CREATION_TIME DESC";
+			try {
+
+				Object[] inparams = { startDate, endDate };
+				gtdActedConsolidatedReferenceDetailsList = getJdbcTemplate()
+						.queryForList(gtd_consolidated_quote_details_sql, inparams);
+
+				logger.info("gtdActedConsolidatedReferenceDetailsList list size::");
+
+			} catch (DataAccessException e) {
+				logger.error("exception occured :" + e.getMessage());
+				DAOException.throwException("BC000");
+			}
+		} else if (dateFlag == false && referencenoflag == true) {
+			logger.info("Only Reference no is entered for searching..");
+
+			gtd_consolidated_quote_details_sql = "SELECT TO_CHAR(a.quote_accepted_date) quote_accepted_date,A.REFERENCE_NO,C.BRANCH_NAME,C.NAME_OF_IMPORTER, (SELECT VALUE  FROM BCQI_PROPERTIES  WHERE CONFIG_ID=C.CURRENCY  ) CURRENCY, TO_CHAR(C.AMOUNT,'999,999,999,999.99') amount, C.PERIOD_TENOR_DAYS FROM BCQI_REQUEST A , BCQI_REQUEST_DETAILS C  WHERE A.REFERENCE_NO = C.REFERENCE_NO  AND A.GTD_ACTION_REQUIRED ='Y' AND A.STATUS IN ('7','8')   AND A.REFERENCE_NO=? ORDER BY a.CREATION_TIME DESC";
+			try {
+
+				Object[] inparams = { referenceNo };
+				gtdActedConsolidatedReferenceDetailsList = getJdbcTemplate()
+						.queryForList(gtd_consolidated_quote_details_sql, inparams);
+
+				logger.info("gtdActedConsolidatedReferenceDetailsList list size::");
+
+			} catch (DataAccessException e) {
+				logger.error("exception occured :" + e.getMessage());
+				DAOException.throwException("BC000");
+			}
+
+		} else if (dateFlag == false && referencenoflag == false) {
+			logger.info("nothing entered for searching");
+
+			gtd_consolidated_quote_details_sql = "SELECT TO_CHAR(a.quote_accepted_date) quote_accepted_date,A.REFERENCE_NO,C.BRANCH_NAME,C.NAME_OF_IMPORTER, (SELECT VALUE  FROM BCQI_PROPERTIES  WHERE CONFIG_ID=C.CURRENCY  ) CURRENCY, TO_CHAR(C.AMOUNT,'999,999,999,999.99') amount, C.PERIOD_TENOR_DAYS FROM BCQI_REQUEST A , BCQI_REQUEST_DETAILS C  WHERE A.REFERENCE_NO = C.REFERENCE_NO  AND A.GTD_ACTION_REQUIRED ='Y' AND A.STATUS IN ('7','8')   ORDER BY a.CREATION_TIME DESC";
+			try {
+
+				gtdActedConsolidatedReferenceDetailsList = getJdbcTemplate()
+						.queryForList(gtd_consolidated_quote_details_sql);
+
+				logger.info("gtdActedConsolidatedReferenceDetailsList list size::");
+
+			} catch (DataAccessException e) {
+				logger.error("exception occured :" + e.getMessage());
+				DAOException.throwException("BC000");
+			}
+		}
+
+		try {
+
+			List lowestquotedetail = null;
+			Map lowestquotedetailmap = null;
+			Map collectrefnolowquotedetails = new HashMap();
+
+			logger.info(" Entering gtdActedConsolidatedReferenceDetailsList loop");
+			for (int i = 0; i < gtdActedConsolidatedReferenceDetailsList.size(); i++) {
+				Map gtdactedreferencenodetail = (Map) gtdActedConsolidatedReferenceDetailsList.get(i);
+				String refNo = (String) gtdactedreferencenodetail.get("REFERENCE_NO");
+
+				String quotesstore_sql = "select quote_id,SPREAD_IN_BPS from (SELECT quote_id,NVL(decode(NEW_SPREAD, 0, NULL, NEW_SPREAD),SPREAD_IN_BPS) AS SPREAD_IN_BPS  FROM BCQI_REQUEST A ,    BCQI_REQ_QUOTE_DETAILS E  WHERE A.REFERENCE_NO        = E.REFERENCE_NO(+)  AND A.GTD_ACTION_REQUIRED ='Y'  and a.REFERENCE_NO=?)";
+
+//				 logger.info("query for quote detail::::-->");
+				Object[] partmp = { refNo };
+				List quotesstorelist = getJdbcTemplate().query(quotesstore_sql, partmp, new QuotesStoreMapper());
+
+				Collections.sort(quotesstorelist, new SpreadInBpsComparator());
+//				    logger.info(quotesstorelist);
+
+				String quotetocheck = ((QuotesStoreUtil) quotesstorelist.get(0)).getQuote_id().toString();
+//					 logger.info("LOWEST VALUE QUOTE -->"+quotetocheck);
+				String spbps = ((QuotesStoreUtil) quotesstorelist.get(0)).getSPREAD_IN_BPS().toString();
+//					 logger.info("LOWEST VALUE QUOTE BPS-->");
+
+				String tempqids = "";
+				List sortedquoteslist = new ArrayList();
+				for (int f = 0; f < quotesstorelist.size(); f++) {
+					if (((QuotesStoreUtil) quotesstorelist.get(f)).getSPREAD_IN_BPS().toString().equals(spbps)) {
+						tempqids = tempqids + " , "
+								+ ((QuotesStoreUtil) quotesstorelist.get(f)).getQuote_id().toString();
+						sortedquoteslist.add(((QuotesStoreUtil) quotesstorelist.get(f)).getQuote_id().toString());
+					}
+				}
+
+				String templowspreadinbps = "";
+//					 logger.info("query for quote detail::::-->");
+				if (sortedquoteslist.size() > 0) {
+					for (int h = 0; h < sortedquoteslist.size(); h++) {
+						// String lowest_quote_details_sql="SELECT (FO_USER_BRANCH ||' | '
+						// ||SPREAD_IN_BPS ||' bps') LOWEST_PERIOD_SPREAD_DESC FROM (SELECT NVL( (SELECT
+						// D.VALUE FROM BCQI_PROPERTIES D WHERE D.DESCRIPTION = 'Country' AND
+						// D.CONFIG_ID = E.FO_USER_BRANCH ),'NOT APPLICABLE' ) FO_USER_BRANCH, NVL(
+						// (SELECT D.VALUE FROM BCQI_PROPERTIES D WHERE D.DESCRIPTION = 'QuotePeriod'
+						// AND D.CONFIG_ID =E.PERIOD ),'NOT APPLICABLE') PERIOD, NVL( (SELECT D.VALUE
+						// FROM BCQI_PROPERTIES D WHERE D.DESCRIPTION = 'QuoteBasis' AND D.CONFIG_ID
+						// =E.BASIS ),'NOT APPLICABLE') BASIS, NVL(decode(E.NEW_SPREAD, 0, NULL,
+						// E.NEW_SPREAD),E.SPREAD_IN_BPS) SPREAD_IN_BPS FROM BCQI_REQUEST A ,
+						// BCQI_REQUEST_DETAILS C , BCQI_REQ_QUOTE_DETAILS E WHERE A.REFERENCE_NO =
+						// C.REFERENCE_NO AND A.REFERENCE_NO = E.REFERENCE_NO(+) AND
+						// A.GTD_ACTION_REQUIRED ='Y' AND e.QUOTE_ID in (SELECT QUOTE_ID FROM (SELECT
+						// b.* FROM (SELECT MIN(NVL(decode(NEW_SPREAD, 0, NULL,
+						// NEW_SPREAD),SPREAD_IN_BPS)) AS SPREAD_IN_BPS FROM BCQI_REQ_QUOTE_DETAILS
+						// WHERE reference_no=? )A JOIN (SELECT MIN(NVL(decode(NEW_SPREAD, 0, NULL,
+						// NEW_SPREAD),SPREAD_IN_BPS)) AS SPREAD_IN_BPS, QUOTE_ID FROM
+						// BCQI_REQ_QUOTE_DETAILS WHERE reference_no=? GROUP BY QUOTE_ID )B ON
+						// A.spread_in_bps=B.spread_in_bps ) ) )";
+						String lowest_quote_details_sql = "SELECT (FO_USER_BRANCH  ||' | '  ||SPREAD_IN_BPS  ||' bps') LOWEST_PERIOD_SPREAD_DESC FROM  (SELECT NVL(    (SELECT D.VALUE    FROM BCQI_PROPERTIES D    WHERE D.DESCRIPTION = 'Country'    AND D.CONFIG_ID     = E.FO_USER_BRANCH    ),'NOT APPLICABLE' ) FO_USER_BRANCH,    NVL(    (SELECT D.VALUE    FROM BCQI_PROPERTIES D    WHERE D.DESCRIPTION = 'QuotePeriod'    AND D.CONFIG_ID     =E.PERIOD    ),'NOT APPLICABLE') PERIOD,    NVL(    (SELECT D.VALUE    FROM BCQI_PROPERTIES D    WHERE D.DESCRIPTION = 'QuoteBasis'    AND D.CONFIG_ID     =E.BASIS   ),'NOT APPLICABLE') BASIS,    NVL(decode(E.NEW_SPREAD, 0, NULL, E.NEW_SPREAD),E.SPREAD_IN_BPS) SPREAD_IN_BPS  FROM BCQI_REQUEST A ,    BCQI_REQUEST_DETAILS C ,    BCQI_REQ_QUOTE_DETAILS E  WHERE A.REFERENCE_NO      = C.REFERENCE_NO  AND A.REFERENCE_NO        = E.REFERENCE_NO(+)  AND A.GTD_ACTION_REQUIRED ='Y'  AND e.QUOTE_ID            =?)";
+						// Object [] par1={refNo,refNo};
+
+						Object[] par1 = { ((QuotesStoreUtil) quotesstorelist.get(h)).getQuote_id().toString() };
+
+						lowestquotedetail = getJdbcTemplate().queryForList(lowest_quote_details_sql, par1);
+
+						for (int k = 0; k < lowestquotedetail.size(); k++) {
+							lowestquotedetailmap = (Map) lowestquotedetail.get(k);
+							for (Iterator j = lowestquotedetailmap.entrySet().iterator(); j.hasNext();) {
+								Entry e = (Entry) j.next();
+//							   logger.info("KEY-->"+e.getKey()+" VALUE-->"+e.getValue()); 
+								templowspreadinbps = templowspreadinbps + "," + e.getValue();
+
+							}
+						}
+
+					}
+				}
+
+				Map tempdetail = new HashMap();
+
+				templowspreadinbps = templowspreadinbps.substring(1, templowspreadinbps.length());
+				tempdetail.put(refNo, templowspreadinbps);
+				collectrefnolowquotedetails.put(refNo, tempdetail);
+				// collectrefnolowquotedetails.put(refNo, tempdetail);
+			}
+//			 for (Iterator j = collectrefnolowquotedetails.entrySet().iterator(); j.hasNext();) {
+//				    Entry e = (Entry) j.next(); 
+//				   logger.info("KEY-->"+e.getKey()+" VALUE-->"+e.getValue()); 
+//				}
+
+			List originalQuoteDetail = null;
+			Map originalquotedetail = new HashMap();
+
+			for (int i = 0; i < gtdActedConsolidatedReferenceDetailsList.size(); i++) {
+				Map gtdactedreferencenodetail = (Map) gtdActedConsolidatedReferenceDetailsList.get(i);
+				String refNo = (String) gtdactedreferencenodetail.get("REFERENCE_NO");
+//				 logger.info("querying reference no is -->");
+				String original_quote_details_sql = "SELECT (FO_USER_BRANCH  ||' | '  ||SPREAD_IN_BPS  ||' bps') ORIGINAL_PERIOD_SPREAD_DESC,other_charges FROM  (SELECT NVL(    (SELECT D.VALUE    FROM BCQI_PROPERTIES D    WHERE D.DESCRIPTION = 'Country'    AND D.CONFIG_ID     = E.FO_USER_BRANCH    ),'NOT APPLICABLE' ) FO_USER_BRANCH,    NVL(    (SELECT D.VALUE    FROM BCQI_PROPERTIES D    WHERE D.DESCRIPTION = 'QuotePeriod'     AND D.CONFIG_ID     =E.PERIOD    ),'NOT APPLICABLE') PERIOD,    NVL(    (SELECT D.VALUE    FROM BCQI_PROPERTIES D    WHERE D.DESCRIPTION = 'QuoteBasis'    AND D.CONFIG_ID     =E.BASIS    ),'NOT APPLICABLE') BASIS,    E.SPREAD_IN_BPS SPREAD_IN_BPS,e.other_charges    FROM BCQI_REQUEST A ,    BCQI_REQUEST_DETAILS C ,    BCQI_REQ_QUOTE_DETAILS E  WHERE A.REFERENCE_NO      = C.REFERENCE_NO  AND A.REFERENCE_NO        = E.REFERENCE_NO(+)  AND A.GTD_ACTION_REQUIRED ='Y'  AND A.GTD_ACTED           ='Y'  AND E.GTD_ACTED_ON_QUOTE  = 'Y'  AND E.STATUS             IN ('7','8')   AND e.reference_no        =?  ORDER BY a.creation_time DESC  )";
+//				 String original_quote_details_sql="SELECT (FO_USER_BRANCH  ||' | '  ||SPREAD_IN_BPS  ||' bps') ORIGINAL_PERIOD_SPREAD_DESC FROM  (SELECT NVL(    (SELECT D.VALUE    FROM BCQI_PROPERTIES D    WHERE D.DESCRIPTION = 'Country'    AND D.CONFIG_ID     = E.FO_USER_BRANCH    ),'NOT APPLICABLE' ) FO_USER_BRANCH,    NVL(    (SELECT D.VALUE    FROM BCQI_PROPERTIES D    WHERE D.DESCRIPTION = 'QuotePeriod'     AND D.CONFIG_ID     =E.PERIOD    ),'NOT APPLICABLE') PERIOD,    NVL(    (SELECT D.VALUE    FROM BCQI_PROPERTIES D    WHERE D.DESCRIPTION = 'QuoteBasis'    AND D.CONFIG_ID     =E.BASIS    ),'NOT APPLICABLE') BASIS,    NVL(decode(E.NEW_SPREAD, 0, NULL, E.NEW_SPREAD),E.SPREAD_IN_BPS) SPREAD_IN_BPS,e.other_charges    FROM BCQI_REQUEST A ,    BCQI_REQUEST_DETAILS C ,    BCQI_REQ_QUOTE_DETAILS E  WHERE A.REFERENCE_NO      = C.REFERENCE_NO  AND A.REFERENCE_NO        = E.REFERENCE_NO(+)  AND A.GTD_ACTION_REQUIRED ='Y'  AND A.GTD_ACTED           ='Y'  AND E.GTD_ACTED_ON_QUOTE  = 'Y'  AND E.STATUS             IN ('7','8')   AND e.reference_no        =?  ORDER BY a.creation_time DESC  )";
+//					 logger.info("query for original detail::::-->"+original_quote_details_sql);
+				Object[] par1 = { refNo };
+				originalQuoteDetail = getJdbcTemplate().queryForList(original_quote_details_sql, par1);
+//				 Map tempdetail=(HashMap)originalQuoteDetail.get(0);
+//				 logger.info("ORIGINAL_PERIOD_SPREAD_DESC for referenceNo "+refNo+" is -->"+originalQuoteDetail);
+
+//				 originalquotedetail.put(refNo, tempdetail);	
+				originalquotedetail.put(refNo, originalQuoteDetail);
+			}
+//			 for (Iterator j = originalquotedetail.entrySet().iterator(); j.hasNext();) {
+//				    Entry e = (Entry) j.next(); 
+//				   logger.info("KEY-->"+e.getKey()+" VALUE-->"+e.getValue()); 
+//				}
+
+			List gtdModifiedQuoteDetail = null;
+			Map modifiedquotedetail = new HashMap();
+
+			logger.info("query for original detail::::-->");
+			for (int i = 0; i < gtdActedConsolidatedReferenceDetailsList.size(); i++) {
+				Map gtdactedreferencenodetail = (Map) gtdActedConsolidatedReferenceDetailsList.get(i);
+				String refNo = (String) gtdactedreferencenodetail.get("REFERENCE_NO");
+//				 logger.info("querying reference no is -->"+refNo);
+				String original_quote_details_sql = "SELECT (FO_USER_BRANCH  ||' | '  ||SPREAD_IN_BPS  ||' bps') MODIFIED_PERIOD_SPREAD_DESC FROM  (SELECT NVL(    (SELECT D.VALUE    FROM BCQI_PROPERTIES D    WHERE D.DESCRIPTION = 'Country'    AND D.CONFIG_ID     = E.FO_USER_BRANCH    ),'NOT APPLICABLE' ) FO_USER_BRANCH,    NVL(    (SELECT D.VALUE    FROM BCQI_PROPERTIES D    WHERE D.DESCRIPTION = 'QuotePeriod'    AND D.CONFIG_ID     =E.PERIOD    ),'NOT APPLICABLE') PERIOD,    NVL(    (SELECT D.VALUE    FROM BCQI_PROPERTIES D    WHERE D.DESCRIPTION = 'QuoteBasis'    AND D.CONFIG_ID     =E.BASIS    ),'NOT APPLICABLE') BASIS,    E.TEMP_SPREAD_IN_BPS SPREAD_IN_BPS,    TO_CHAR(A.QUOTE_ACCEPTED_DATE)QUOTE_ACCEPTED_DATE  FROM BCQI_REQUEST A ,    BCQI_REQUEST_DETAILS C ,    BCQI_REQ_QUOTE_DETAILS E  WHERE A.REFERENCE_NO      = C.REFERENCE_NO  AND A.REFERENCE_NO        = E.REFERENCE_NO(+)  AND A.GTD_ACTION_REQUIRED ='Y'  AND A.GTD_ACTED           ='Y'  AND E.GTD_ACTED_ON_QUOTE  = 'Y'  AND E.STATUS             IN ('7','8')  AND e.reference_no        =? ORDER BY a.creation_time DESC  )";
+				Object[] par1 = { refNo };
+				gtdModifiedQuoteDetail = getJdbcTemplate().queryForList(original_quote_details_sql, par1);
+				Map tempdetail = (Map) gtdModifiedQuoteDetail.get(0);
+//				 logger.info("MODIFIED_PERIOD_SPREAD_DESC for referenceNo "+refNo+" is -->"+tempdetail.get("MODIFIED_PERIOD_SPREAD_DESC"));
+
+				modifiedquotedetail.put(refNo, tempdetail);
+			}
+//			 for (Iterator j = modifiedquotedetail.entrySet().iterator(); j.hasNext();) {
+//				    Entry e = (Entry) j.next(); 
+//				   logger.info("KEY-->"+e.getKey()+" VALUE-->"+e.getValue()); 
+//				}	
+
+			List finalDetailsListToExcel = new ArrayList();
+
+			for (int i = 0; i < gtdActedConsolidatedReferenceDetailsList.size(); i++) {
+				Map gtdactedreferencenodetail = (Map) gtdActedConsolidatedReferenceDetailsList.get(i);
+				String refNo = (String) gtdactedreferencenodetail.get("REFERENCE_NO");
+
+				Map finaldetailtoexcel = new HashMap();
+				finaldetailtoexcel.put("REFERENCE_NO", refNo);
+				finaldetailtoexcel.put("BRANCH_NAME", (String) gtdactedreferencenodetail.get("BRANCH_NAME"));
+				finaldetailtoexcel.put("NAME_OF_IMPORTER", (String) gtdactedreferencenodetail.get("NAME_OF_IMPORTER"));
+				finaldetailtoexcel.put("CURRENCY", (String) gtdactedreferencenodetail.get("CURRENCY"));
+				finaldetailtoexcel.put("AMOUNT", gtdactedreferencenodetail.get("AMOUNT"));
+				finaldetailtoexcel.put("PERIOD_TENOR_DAYS", gtdactedreferencenodetail.get("PERIOD_TENOR_DAYS"));
+				finaldetailtoexcel.put("quote_accepted_date", gtdactedreferencenodetail.get("quote_accepted_date"));
+
+				Map tempcollectrefnolowquotedetails = (Map) collectrefnolowquotedetails.get(refNo);
+				String LOWEST_PERIOD_SPREAD_DESCstr = (String) tempcollectrefnolowquotedetails.get(refNo);
+				finaldetailtoexcel.put("LOWEST_PERIOD_SPREAD_DESC", LOWEST_PERIOD_SPREAD_DESCstr);
+
+//			 Map temporiginalquotedetail=(HashMap)originalquotedetail.get(refNo);
+				List temporiginalquotedetail = (List) originalquotedetail.get(refNo);
+				Map originalquoteMap = (Map) temporiginalquotedetail.get(0);
+//			 Map otherChargesMap=(HashMap)originalquotedetail.get(1);
+				String ORIGINAL_PERIOD_SPREAD_DESCstr = (String) originalquoteMap.get("ORIGINAL_PERIOD_SPREAD_DESC");
+				String OTHER_CHARGES = (String) originalquoteMap.get("OTHER_CHARGES");
+				finaldetailtoexcel.put("ORIGINAL_PERIOD_SPREAD_DESC", ORIGINAL_PERIOD_SPREAD_DESCstr);
+				finaldetailtoexcel.put("OTHER_CHARGES", OTHER_CHARGES);
+
+				Map tempmodifiedquotedetail = (Map) modifiedquotedetail.get(refNo);
+				String MODIFIED_PERIOD_SPREAD_DESCstr = (String) tempmodifiedquotedetail
+						.get("MODIFIED_PERIOD_SPREAD_DESC");
+				finaldetailtoexcel.put("MODIFIED_PERIOD_SPREAD_DESC", MODIFIED_PERIOD_SPREAD_DESCstr);
+
+				/*
+				 * String temporspr =
+				 * ORIGINAL_PERIOD_SPREAD_DESCstr.substring((ORIGINAL_PERIOD_SPREAD_DESCstr.
+				 * indexOf("|")+2),ORIGINAL_PERIOD_SPREAD_DESCstr.length()).substring(0,(
+				 * ORIGINAL_PERIOD_SPREAD_DESCstr.substring((ORIGINAL_PERIOD_SPREAD_DESCstr.
+				 * indexOf("|")+2),ORIGINAL_PERIOD_SPREAD_DESCstr.length()).indexOf(" "))); int
+				 * x= Integer.parseInt(temporspr); logger.info("original spr int val-->"+x);
+				 */
+
+				String temporspr = LOWEST_PERIOD_SPREAD_DESCstr
+						.substring((LOWEST_PERIOD_SPREAD_DESCstr.indexOf("|") + 2),
+								LOWEST_PERIOD_SPREAD_DESCstr.length())
+						.substring(0,
+								(LOWEST_PERIOD_SPREAD_DESCstr.substring((LOWEST_PERIOD_SPREAD_DESCstr.indexOf("|") + 2),
+										LOWEST_PERIOD_SPREAD_DESCstr.length()).indexOf(" ")));
+				int x = Integer.parseInt(temporspr);
+//			 logger.info("lowest spr int val-->"+x);
+
+				String tempmodspr = MODIFIED_PERIOD_SPREAD_DESCstr
+						.substring(
+								(MODIFIED_PERIOD_SPREAD_DESCstr.indexOf("|")
+										+ 2),
+								MODIFIED_PERIOD_SPREAD_DESCstr.length())
+						.substring(0,
+								(MODIFIED_PERIOD_SPREAD_DESCstr
+										.substring((MODIFIED_PERIOD_SPREAD_DESCstr.indexOf("|") + 2),
+												MODIFIED_PERIOD_SPREAD_DESCstr.length())
+										.indexOf(" ")));
+				int y = Integer.parseInt(tempmodspr);
+//			 logger.info("modified spr int val-->"+y);
+
+				int dif = y - x;
+//			 logger.info("difference spr int val-->"+dif);
+
+				if (dif < 0) {
+					finaldetailtoexcel.put("GAIN_IN_BPS", 0);
+					finaldetailtoexcel.put("GAIN_IN_BPS_IN_STR", Integer.toString(0));
+				} else {
+					finaldetailtoexcel.put("GAIN_IN_BPS", dif);
+					finaldetailtoexcel.put("GAIN_IN_BPS_IN_STR", Integer.toString(dif));
+				}
+
+//			 BigDecimal amount=(BigDecimal) gtdactedreferencenodetail.get("AMOUNT");
+				String amtstr = (String) gtdactedreferencenodetail.get("AMOUNT");
+				;
+				finaldetailtoexcel.put("AMOUNT_IN_STR", amtstr);
+
+				BigDecimal pertnrdays = (BigDecimal) gtdactedreferencenodetail.get("PERIOD_TENOR_DAYS");
+				String pertnrdaysstr = pertnrdays.toString();
+				finaldetailtoexcel.put("PERIOD_TENOR_DAYS_IN_STR", pertnrdaysstr);
+
+				finaldetailtoexcel.put("ACTUAL_GAIN_IN_AMOUNT", "");
+				finaldetailtoexcel.put("REMARKS", "");
+
+				finalDetailsListToExcel.add(i, finaldetailtoexcel);
+			}
+
+			/*
+			 * for(int i =0;i<finalDetailsListToExcel.size();i++){ Map
+			 * finalDetailsListToExceltmp=(HashMap)finalDetailsListToExcel.get(i);
+			 * logger.info("<------------------------------------------------------->"); for
+			 * (Iterator j = finalDetailsListToExceltmp.entrySet().iterator(); j.hasNext();)
+			 * { Entry e = (Entry) j.next();
+			 * logger.info("KEY-->"+e.getKey()+" VALUE-->"+e.getValue()); }
+			 * logger.info("<------------------------------------------------------->"); }
+			 */
+
+			if (finalDetailsListToExcel.size() > 0) {
+				outMap.put("finalDetailsListToExcel", finalDetailsListToExcel);
+			}
+
+			outMap.put("finalDetailsListToExcelsize", finalDetailsListToExcel.size());
+
+		} catch (DataAccessException exp) {
+			logger.info("Exception occured:: " + exp.getMessage());
+		}
+
+//		outMap.put("startDate", inParams.get("startDate"));
+//		outMap.put("endDate", inParams.get("endDate"));
+		outMap.put("startDate", startDate);
+		outMap.put("endDate", endDate);
+		outMap.put("referenceNo", inParams.get("referenceNo"));
+
+		logger.info("gtdQuoteReportConsolidatedDetails  method ends");
+		return outMap;
+
+	}
+
+	@Override
+	public Map gtdActedQuotesListFromRefNo(Map inParams) throws DAOException {
+		logger.info("gtdActedQuotesListFromRefNo(Map inParams)   method begins");
+		Map outMap = new HashMap();
+		List quoteDetail = null;
+		List foQuotesList = null;
+		List originalQuoteDetail = null;
+		List gtdModifiedQuoteDetail = null;
+
+		/*
+		 * List docommentList = null; List focommentList = null; List gtdcommentList =
+		 * null;
+		 */
+
+		int count = 0;
+		try {
+			String quoteId = (String) inParams.get("quoteID");
+			String refNo = (String) inParams.get("referenceNo");
+			User user = (User) inParams.get("user");
+
+			Object[] params1 = { refNo, quoteId };
+			Object[] params2 = { refNo };
+
+			String gtd_acted_accepted_quote_details_sql = "SELECT A.QUOTE_GIVEN,  A.REFERENCE_NO ,  NVL( E.QUOTE_ID ,'NOT APPLICABLE') QUOTE_ID,  TO_CHAR(A.QUOTE_ACCEPTED_DATE)QUOTE_ACCEPTED_DATE,  C.BRANCH_NAME,  C.NAME_OF_IMPORTER,  (SELECT VALUE  FROM BCQI_PROPERTIES  WHERE CONFIG_ID=C.CURRENCY  ) CURRENCY, TO_CHAR( C.AMOUNT,'999,999,999,999.99') amount,  C.PERIOD_TENOR_DAYS,  TO_CHAR(A.CREATION_TIME) REQ_CREATED_DATE,  TO_CHAR(a.REQ_APPROVED_DATE)REQ_APPROVED_DATE,  NVL(  (SELECT D.VALUE  FROM BCQI_PROPERTIES D  WHERE D.DESCRIPTION = 'QuotePeriod'  AND D.CONFIG_ID     =E.PERIOD  ),'NOT APPLICABLE') PERIOD,  NVL( TO_CHAR(NVL(E.NEW_SPREAD,E.SPREAD_IN_BPS)) ,'NOT APPLICABLE') SPREAD_IN_BPS,  NVL( TO_CHAR(NVL(E.NEW_RATE_OF_INTEREST,E.RATE_OF_INTEREST)) ,'NOT APPLICABLE') RATE_OF_INTEREST,  (SELECT VALUE  FROM BCQI_PROPERTIES  WHERE DESCRIPTION = 'Status'  AND CONFIG_ID     =E.STATUS  ) STATUS_DESC ,  e.other_charges OTHER_CHARGES ,  A.STATUS REQ_STATUS,  C.BRANCH_CODE ,  NVL(  (SELECT D.VALUE  FROM BCQI_PROPERTIES D  WHERE D.DESCRIPTION = 'Country'  AND D.CONFIG_ID     = E.FO_USER_BRANCH  ),'NOT APPLICABLE' ) FO_USER_BRANCH,  E.FO_USER_BRANCH E_FO_USER_BRANCH,  NVL(  (SELECT D.VALUE  FROM BCQI_PROPERTIES D  WHERE D.DESCRIPTION = 'QuoteBasis'  AND D.CONFIG_ID     =E.BASIS  ),'NOT APPLICABLE') BASIS,  E.STATUS FROM BCQI_REQUEST A ,  BCQI_REQUEST_DETAILS C ,  BCQI_REQ_QUOTE_DETAILS E WHERE A.REFERENCE_NO = C.REFERENCE_NO  AND A.REFERENCE_NO        = E.REFERENCE_NO(+) AND A.GTD_ACTION_REQUIRED ='Y' AND A.GTD_ACTED           ='Y' AND E.GTD_ACTED_ON_QUOTE  = 'Y' AND E.STATUS             IN ('7','8')  and e.reference_no=? and e.quote_id=? ";
+			logger.info("query for quote detail::::-->");
+			quoteDetail = getJdbcTemplate().queryForList(gtd_acted_accepted_quote_details_sql, params1);
+
+			String fo_given_quotes_sql = "select FO_USER_BRANCH, (period||' '||basis||' + '||SPREAD_IN_BPS||' bps') PERIOD_SPREAD_DESC from (SELECT  NVL(  (SELECT D.VALUE  FROM BCQI_PROPERTIES D  WHERE D.DESCRIPTION = 'Country'  AND D.CONFIG_ID     = E.FO_USER_BRANCH  ),'NOT APPLICABLE' ) FO_USER_BRANCH,NVL(  (SELECT D.VALUE  FROM BCQI_PROPERTIES D  WHERE D.DESCRIPTION = 'QuotePeriod'  AND D.CONFIG_ID     =E.PERIOD  ),'NOT APPLICABLE') PERIOD,   NVL(  (SELECT D.VALUE  FROM BCQI_PROPERTIES D  WHERE D.DESCRIPTION = 'QuoteBasis'  AND D.CONFIG_ID     =E.BASIS  ),'NOT APPLICABLE') BASIS, NVL(decode(E.NEW_SPREAD, 0, NULL, E.NEW_SPREAD),E.SPREAD_IN_BPS) SPREAD_IN_BPS FROM BCQI_REQUEST A ,  BCQI_REQUEST_DETAILS C ,  BCQI_REQ_QUOTE_DETAILS E WHERE A.REFERENCE_NO = C.REFERENCE_NO  AND A.REFERENCE_NO        = E.REFERENCE_NO(+) AND A.GTD_ACTION_REQUIRED ='Y'   and e.reference_no=? order by a.creation_time desc )";
+			logger.info("query for quotes list given by FO::::-->");
+			foQuotesList = getJdbcTemplate().queryForList(fo_given_quotes_sql, params2);
+
+			// String original_quote_detail_gtd_acted_sql="SELECT FO_USER_BRANCH,(period ||'
+			// ' ||basis ||' + ' ||SPREAD_IN_BPS ||' bps') PERIOD_SPREAD_DESC FROM (SELECT
+			// NVL( (SELECT D.VALUE FROM BCQI_PROPERTIES D WHERE D.DESCRIPTION = 'Country'
+			// AND D.CONFIG_ID = E.FO_USER_BRANCH ),'NOT APPLICABLE' ) FO_USER_BRANCH, NVL(
+			// (SELECT D.VALUE FROM BCQI_PROPERTIES D WHERE D.DESCRIPTION = 'QuotePeriod'
+			// AND D.CONFIG_ID =E.PERIOD ),'NOT APPLICABLE') PERIOD, NVL( (SELECT D.VALUE
+			// FROM BCQI_PROPERTIES D WHERE D.DESCRIPTION = 'QuoteBasis' AND D.CONFIG_ID
+			// =E.BASIS ),'NOT APPLICABLE') BASIS, NVL(decode(E.NEW_SPREAD, 0, NULL,
+			// E.NEW_SPREAD),E.SPREAD_IN_BPS) SPREAD_IN_BPS FROM BCQI_REQUEST A ,
+			// BCQI_REQUEST_DETAILS C , BCQI_REQ_QUOTE_DETAILS E WHERE A.REFERENCE_NO =
+			// C.REFERENCE_NO AND A.REFERENCE_NO = E.REFERENCE_NO(+) AND
+			// A.GTD_ACTION_REQUIRED ='Y' AND A.GTD_ACTED ='Y' AND E.GTD_ACTED_ON_QUOTE =
+			// 'Y' AND E.STATUS IN ('7','8') AND e.reference_no =? ORDER BY a.creation_time
+			// DESC )";
+			String original_quote_detail_gtd_acted_sql = "SELECT FO_USER_BRANCH,(period ||' '  ||basis  ||' + '  ||SPREAD_IN_BPS  ||' bps') PERIOD_SPREAD_DESC FROM  (SELECT NVL(    (SELECT D.VALUE    FROM BCQI_PROPERTIES D    WHERE D.DESCRIPTION = 'Country'    AND D.CONFIG_ID     = E.FO_USER_BRANCH    ),'NOT APPLICABLE' ) FO_USER_BRANCH,    NVL(    (SELECT D.VALUE    FROM BCQI_PROPERTIES D    WHERE D.DESCRIPTION = 'QuotePeriod'    AND D.CONFIG_ID     =E.PERIOD    ),'NOT APPLICABLE') PERIOD,    NVL(    (SELECT D.VALUE    FROM BCQI_PROPERTIES D    WHERE D.DESCRIPTION = 'QuoteBasis'    AND D.CONFIG_ID     =E.BASIS    ),'NOT APPLICABLE') BASIS,   E.SPREAD_IN_BPS FROM BCQI_REQUEST A ,    BCQI_REQUEST_DETAILS C ,    BCQI_REQ_QUOTE_DETAILS E  WHERE A.REFERENCE_NO = C.REFERENCE_NO AND A.REFERENCE_NO        = E.REFERENCE_NO(+) AND A.GTD_ACTION_REQUIRED ='Y' AND A.GTD_ACTED           ='Y' AND E.GTD_ACTED_ON_QUOTE  = 'Y' AND E.STATUS             IN ('7','8')  AND e.reference_no        =?  ORDER BY a.creation_time DESC  )";
+			logger.info("query for original quote detail acted by GTD::::-->");
+			originalQuoteDetail = getJdbcTemplate().queryForList(original_quote_detail_gtd_acted_sql, params2);
+
+			String modified_quote_detail_gtd_acted_sql = "SELECT FO_USER_BRANCH,(period ||' '  ||basis  ||' + '  ||SPREAD_IN_BPS  ||' bps') PERIOD_SPREAD_DESC,QUOTE_ACCEPTED_DATE,other_charges FROM  (SELECT NVL(    (SELECT D.VALUE    FROM BCQI_PROPERTIES D    WHERE D.DESCRIPTION = 'Country'    AND D.CONFIG_ID     = E.FO_USER_BRANCH    ),'NOT APPLICABLE' ) FO_USER_BRANCH,    NVL(    (SELECT D.VALUE    FROM BCQI_PROPERTIES D    WHERE D.DESCRIPTION = 'QuotePeriod'    AND D.CONFIG_ID     =E.PERIOD    ),'NOT APPLICABLE') PERIOD,    NVL(    (SELECT D.VALUE    FROM BCQI_PROPERTIES D    WHERE D.DESCRIPTION = 'QuoteBasis'    AND D.CONFIG_ID     =E.BASIS    ),'NOT APPLICABLE') BASIS,    E.TEMP_SPREAD_IN_BPS SPREAD_IN_BPS,TO_CHAR(A.QUOTE_ACCEPTED_DATE)QUOTE_ACCEPTED_DATE,e.other_charges  FROM BCQI_REQUEST A ,    BCQI_REQUEST_DETAILS C ,    BCQI_REQ_QUOTE_DETAILS E  WHERE A.REFERENCE_NO = C.REFERENCE_NO AND A.REFERENCE_NO        = E.REFERENCE_NO(+) AND A.GTD_ACTION_REQUIRED ='Y' AND A.GTD_ACTED           ='Y' AND E.GTD_ACTED_ON_QUOTE  = 'Y' AND E.STATUS             IN ('7','8')  AND e.reference_no        =?  ORDER BY a.creation_time DESC  )";
+			logger.info("query for modified quote detail acted by GTD::::-->");
+			gtdModifiedQuoteDetail = getJdbcTemplate().queryForList(modified_quote_detail_gtd_acted_sql, params2);
+
+			if (quoteDetail.size() > 0) {
+				outMap.put("quoteDetail", quoteDetail);
+			}
+
+			if (foQuotesList.size() > 0) {
+				outMap.put("foQuotesList", foQuotesList);
+			}
+
+			if (originalQuoteDetail.size() > 0) {
+				outMap.put("originalQuoteDetail", originalQuoteDetail);
+			}
+
+			if (gtdModifiedQuoteDetail.size() > 0) {
+				outMap.put("gtdModifiedQuoteDetail", gtdModifiedQuoteDetail);
+			}
+
+			outMap.put("hidFileType", (String) inParams.get("hidFileType"));
+
+		} catch (DataAccessException exp) {
+			logger.info("Exception occured:: " + exp.getMessage());
+		}
+		logger.info("gtdActedQuotesListFromRefNo(Map inParams)  method ends");
+		return outMap;
+	}
+
+	@Override
+	public Map gtdActedQuotesStatusListFromRefNo(Map inParams) throws DAOException {
+		logger.info("gtdActedQuotesStatusListFromRefNo(Map inParams)   method begins");
+		Map outMap = new HashMap();
+		List quoteDetail = null;
+		List foQuotesList = null;
+		List originalQuoteDetail = null;
+		List gtdModifiedQuoteDetail = null;
+
+		/*
+		 * List docommentList = null; List focommentList = null; List gtdcommentList =
+		 * null;
+		 */
+
+		int count = 0;
+		try {
+			String quoteId = (String) inParams.get("quoteID");
+			String refNo = (String) inParams.get("referenceNo");
+			User user = (User) inParams.get("user");
+
+			Object[] params1 = { refNo, refNo };
+			Object[] params2 = { refNo };
+
+			/*
+			 * String
+			 * gtd_acted_accepted_quote_details_sql="SELECT A.REFERENCE_NO ,  C.BRANCH_NAME,  C.NAME_OF_IMPORTER,  (SELECT VALUE FROM BCQI_PROPERTIES WHERE CONFIG_ID=C.CURRENCY  ) CURRENCY,  C.AMOUNT,  C.PERIOD_TENOR_DAYS,  (SELECT VALUE  FROM BCQI_PROPERTIES  WHERE DESCRIPTION = 'Status'  AND CONFIG_ID     =A.STATUS  ) STATUS_DESC , (SELECT D.VALUE  FROM BCQI_PROPERTIES D  WHERE D.DESCRIPTION = 'Country'  AND D.CONFIG_ID     =    (SELECT branch_code FROM bcqi_user_profile WHERE user_id=A.FO_USER_ID   )  ) FO_USER_BRANCH,  (SELECT (period    ||' '    ||basis    ||' + '    ||SPREAD_IN_BPS    ||' bps') PERIOD_SPREAD_DESC    FROM    (SELECT NVL(      (SELECT D.VALUE      FROM BCQI_PROPERTIES D      WHERE D.DESCRIPTION = 'QuotePeriod'      AND D.CONFIG_ID     =E.PERIOD      ),'NOT APPLICABLE') PERIOD,      NVL(      (SELECT D.VALUE      FROM BCQI_PROPERTIES D      WHERE D.DESCRIPTION = 'QuoteBasis'      AND D.CONFIG_ID     =E.BASIS      ),'NOT APPLICABLE') BASIS,      E.TEMP_SPREAD_IN_BPS SPREAD_IN_BPS    FROM BCQI_REQUEST A ,      BCQI_REQUEST_DETAILS C ,      BCQI_REQ_QUOTE_DETAILS E    WHERE A.REFERENCE_NO      = C.REFERENCE_NO    AND A.REFERENCE_NO        = E.REFERENCE_NO(+)    AND A.GTD_ACTION_REQUIRED ='Y'    AND A.GTD_ACTED           ='Y'    AND E.GTD_ACTED_ON_QUOTE  = 'Y'    AND E.QUOTE_ID            =A.ACCEPTED_QUOTE_ID AND A.REFERENCE_NO=?   )  ) ACCEPTED_QUOTE_SPREAD_DESC         FROM BCQI_REQUEST A ,  BCQI_REQUEST_DETAILS C ,  BCQI_REQ_QUOTE_DETAILS E WHERE A.REFERENCE_NO      = C.REFERENCE_NO AND A.REFERENCE_NO        = E.REFERENCE_NO(+) AND A.GTD_ACTION_REQUIRED ='Y' AND e.reference_no        =? AND e.QUOTE_ID        =A.ACCEPTED_QUOTE_ID"
+			 * ; logger.info("query for quote detail::::-->"
+			 * +gtd_acted_accepted_quote_details_sql); quoteDetail =
+			 * getJdbcTemplate().queryForList(gtd_acted_accepted_quote_details_sql,params1);
+			 */
+
+			String gtd_acted_accepted_quote_details_sql = "SELECT A.REFERENCE_NO ,  C.BRANCH_NAME,  C.NAME_OF_IMPORTER,  (SELECT VALUE FROM BCQI_PROPERTIES WHERE CONFIG_ID=C.CURRENCY  ) CURRENCY, TO_CHAR(C.AMOUNT,'999,999,999,999.99') amount,  C.PERIOD_TENOR_DAYS,  (SELECT VALUE  FROM BCQI_PROPERTIES  WHERE DESCRIPTION = 'Status'  AND CONFIG_ID     =A.STATUS  ) STATUS_DESC,A.STATUS        FROM BCQI_REQUEST A ,      BCQI_REQUEST_DETAILS C     WHERE A.REFERENCE_NO      = C.REFERENCE_NO    AND A.GTD_ACTION_REQUIRED ='Y'   AND A.REFERENCE_NO =?";
+			logger.info("query for quote detail::::-->");
+			quoteDetail = getJdbcTemplate().queryForList(gtd_acted_accepted_quote_details_sql, params2);
+
+			String status = "";
+			try {
+				Object[] param = new Object[] { refNo };
+
+				status = getJdbcTemplate().queryForObject("select status from bcqi_request where reference_no=?", param,
+						String.class);
+
+				logger.info("status--->");
+			} catch (DataAccessException exception) {
+				logger.error("Exception Occured : " + exception.getMessage(), exception);
+				DAOException.throwException("BC000");
+			}
+
+			List accQuoteDetails = new ArrayList();
+			if (status.trim().equals("7") || status.trim().equals("8")) {
+				String accquotedetailssql = "SELECT (SELECT D.VALUE  FROM BCQI_PROPERTIES D  WHERE D.DESCRIPTION = 'Country'  AND D.CONFIG_ID     =    (SELECT branch_code FROM bcqi_user_profile WHERE user_id=E.FO_USER_ID )  ) FO_USER_BRANCH,  (SELECT (period    ||' '    ||basis    ||' + '    ||SPREAD_IN_BPS    ||' bps') PERIOD_SPREAD_DESC  FROM    (SELECT NVL((SELECT D.VALUE   FROM BCQI_PROPERTIES D   WHERE D.DESCRIPTION = 'QuotePeriod'     AND D.CONFIG_ID     =E.PERIOD      ),'NOT APPLICABLE') PERIOD,      NVL(      (SELECT D.VALUE      FROM BCQI_PROPERTIES D      WHERE D.DESCRIPTION = 'QuoteBasis'      AND D.CONFIG_ID     =E.BASIS      ),'NOT APPLICABLE') BASIS,      E.TEMP_SPREAD_IN_BPS SPREAD_IN_BPS    FROM BCQI_REQUEST A ,      BCQI_REQUEST_DETAILS C ,      BCQI_REQ_QUOTE_DETAILS E    WHERE A.REFERENCE_NO      = C.REFERENCE_NO    AND A.REFERENCE_NO        = E.REFERENCE_NO(+)    AND A.GTD_ACTION_REQUIRED ='Y'    AND A.GTD_ACTED           ='Y'    AND E.GTD_ACTED_ON_QUOTE  = 'Y'    AND E.QUOTE_ID            =A.ACCEPTED_QUOTE_ID    AND A.REFERENCE_NO        =?    )  ) ACCEPTED_QUOTE_SPREAD_DESC FROM BCQI_REQUEST A ,  BCQI_REQUEST_DETAILS C ,  BCQI_REQ_QUOTE_DETAILS E WHERE A.REFERENCE_NO      = C.REFERENCE_NO AND A.REFERENCE_NO        = E.REFERENCE_NO(+) AND A.GTD_ACTION_REQUIRED ='Y' AND e.reference_no        =? AND e.QUOTE_ID            =A.ACCEPTED_QUOTE_ID";
+				logger.info("query for accepted quote detail::::-->" + accquotedetailssql);
+				accQuoteDetails = getJdbcTemplate().queryForList(accquotedetailssql, params1);
+
+			}
+			logger.info("accQuoteDetails size-->");
+			String gaininbps = calcualteGainInBps(refNo);
+//			logger.info("gaininbps-->"+gaininbps);
+
+			/*
+			 * String
+			 * fo_given_quotes_sql="SELECT a.quote_id,a.spread_in_bps FROM BCQI_REQ_QUOTE_DETAILS A ,  BCQI_REQUEST B,  BCQI_REQUEST_DETAILS C WHERE A.REFERENCE_NO=? AND A.REFERENCE_NO=B.REFERENCE_NO AND B.REFERENCE_NO=C.REFERENCE_NO  order by a.creation_time asc"
+			 * ;
+			 * logger.info("query for quotes list given by FO::::-->"+fo_given_quotes_sql);
+			 * foQuotesList = getJdbcTemplate().query(fo_given_quotes_sql,params2,new
+			 * QuotesStoreMapper());
+			 * logger.info("foQuotesList size-->"+foQuotesList.size());
+			 * 
+			 * 
+			 * List tempquoteslist = new ArrayList(); for(int
+			 * f=0;f<foQuotesList.size();f++){
+			 * tempquoteslist.add(((QuotesStoreUtil)foQuotesList.get(f)).getQuote_id().
+			 * toString()); } logger.info("tempquoteslist size-->"+tempquoteslist.size());
+			 */
+
+			// String complete_quote_details_list_for_sel_refno="SELECT
+			// a.quote_id,TO_CHAR(a.creation_time) QUOTE_DATE, (SELECT value FROM
+			// bcqi_properties WHERE config_id =a.fo_user_branch ) fo_branch_name, (SELECT
+			// VALUE FROM BCQI_PROPERTIES WHERE DESCRIPTION='QuotePeriod' AND CONFIG_ID
+			// =A.PERIOD ) REFERENCE_RATE, (SELECT VALUE FROM BCQI_PROPERTIES WHERE
+			// DESCRIPTION='QuoteBasis' AND CONFIG_ID =A.BASIS ) QUOTE_BASIS,
+			// A.SPREAD_IN_BPS ORIGINAL_SPREAD_IN_BPS, NVL(decode(A.TEMP_SPREAD_IN_BPS, 0,
+			// NULL, A.TEMP_SPREAD_IN_BPS),A.NEW_SPREAD) FINAL_SPREAD_IN_BPS,
+			// A.GTD_SPREAD_IN_BPS, A.TEMP_SPREAD_IN_BPS DEAL_CONCLUDED_SPREAD, (SELECT
+			// VALUE FROM BCQI_PROPERTIES WHERE DESCRIPTION = 'Status' AND
+			// CONFIG_ID=A.STATUS ) QUOTE_STATUS , ( SELECT LISTAGG (M.USER_GROUP ||' :
+			// '||M.COMMENTS,'##TOREPCOMMENT##') WITHIN GROUP (ORDER BY M.comments) comments
+			// FROM BCQI_QUOTE_COMMENTS M WHERE M.quote_id =A.QUOTE_ID AND COMMENT_FOR_USER
+			// ='ALL_GTD' GROUP BY quote_id) QUOTE_COMMENTS FROM BCQI_REQ_QUOTE_DETAILS A ,
+			// BCQI_REQUEST B, BCQI_REQUEST_DETAILS C WHERE a.reference_no=? AND
+			// A.REFERENCE_NO=B.REFERENCE_NO AND B.REFERENCE_NO=C.REFERENCE_NO";
+			// String complete_quote_details_list_for_sel_refno="SELECT
+			// a.quote_id,TO_CHAR(a.creation_time) QUOTE_DATE, (SELECT value FROM
+			// bcqi_properties WHERE config_id =a.fo_user_branch ) fo_branch_name, (SELECT
+			// VALUE FROM BCQI_PROPERTIES WHERE DESCRIPTION='QuotePeriod' AND CONFIG_ID
+			// =A.PERIOD ) REFERENCE_RATE, (SELECT VALUE FROM BCQI_PROPERTIES WHERE
+			// DESCRIPTION='QuoteBasis' AND CONFIG_ID =A.BASIS ) QUOTE_BASIS,
+			// A.SPREAD_IN_BPS ORIGINAL_SPREAD_IN_BPS, NVL(decode(A.TEMP_SPREAD_IN_BPS, 0,
+			// NULL, A.TEMP_SPREAD_IN_BPS),A.NEW_SPREAD) FINAL_SPREAD_IN_BPS,
+			// A.GTD_SPREAD_IN_BPS, A.TEMP_SPREAD_IN_BPS DEAL_CONCLUDED_SPREAD, (SELECT
+			// VALUE FROM BCQI_PROPERTIES WHERE DESCRIPTION = 'Status' AND
+			// CONFIG_ID=A.STATUS ) QUOTE_STATUS , ( SELECT LISTAGG (M.USER_GROUP ||' :
+			// '||M.COMMENTS,'##TOREPCOMMENT##') WITHIN GROUP (ORDER BY M.comments) comments
+			// FROM BCQI_QUOTE_COMMENTS M WHERE M.quote_id =A.QUOTE_ID GROUP BY quote_id)
+			// QUOTE_COMMENTS FROM BCQI_REQ_QUOTE_DETAILS A , BCQI_REQUEST B,
+			// BCQI_REQUEST_DETAILS C WHERE a.reference_no=? AND
+			// A.REFERENCE_NO=B.REFERENCE_NO AND B.REFERENCE_NO=C.REFERENCE_NO";
+			String complete_quote_details_list_for_sel_refno = "SELECT a.other_charges,a.status,a.quote_id,TO_CHAR(a.creation_time)  QUOTE_DATE,  (SELECT value FROM bcqi_properties WHERE config_id =a.fo_user_branch  ) fo_branch_name,  (SELECT VALUE  FROM BCQI_PROPERTIES  WHERE DESCRIPTION='QuotePeriod'  AND CONFIG_ID    =A.PERIOD  ) REFERENCE_RATE,  (SELECT VALUE  FROM BCQI_PROPERTIES  WHERE DESCRIPTION='QuoteBasis'  AND CONFIG_ID    =A.BASIS  ) QUOTE_BASIS,  A.SPREAD_IN_BPS ORIGINAL_SPREAD_IN_BPS,   A.NEW_SPREAD FINAL_SPREAD_IN_BPS,   A.GTD_SPREAD_IN_BPS,  A.TEMP_SPREAD_IN_BPS DEAL_CONCLUDED_SPREAD,  (SELECT VALUE FROM  BCQI_PROPERTIES WHERE DESCRIPTION = 'Status' AND  CONFIG_ID=A.STATUS )  QUOTE_STATUS , ( SELECT LISTAGG (M.USER_GROUP   ||' : '||M.COMMENTS,'##TOREPCOMMENT##') WITHIN GROUP (ORDER BY M.comments) comments FROM BCQI_QUOTE_COMMENTS M WHERE M.quote_id       =A.QUOTE_ID  GROUP BY quote_id) QUOTE_COMMENTS FROM BCQI_REQ_QUOTE_DETAILS A ,  BCQI_REQUEST B,  BCQI_REQUEST_DETAILS C WHERE a.reference_no=? AND A.REFERENCE_NO=B.REFERENCE_NO AND B.REFERENCE_NO=C.REFERENCE_NO";
+			logger.info("query for complete quote detail acted by GTD for selected refno::::-->");
+			List completeQuoteDetailsList = new ArrayList();
+			completeQuoteDetailsList = getJdbcTemplate().query(complete_quote_details_list_for_sel_refno, params2,
+					new BeanPropertyRowMapper(GTDModel.class));
+			logger.info("completeQuoteDetailsList size-->");
+
+			/*
+			 * String
+			 * fo_given_quotes_sql="SELECT a.quote_id,a.spread_in_bps FROM BCQI_REQ_QUOTE_DETAILS A ,  BCQI_REQUEST B,  BCQI_REQUEST_DETAILS C WHERE A.REFERENCE_NO=? AND A.REFERENCE_NO=B.REFERENCE_NO AND B.REFERENCE_NO=C.REFERENCE_NO  order by a.creation_time asc"
+			 * ;
+			 * logger.info("query for quotes list given by FO::::-->"+fo_given_quotes_sql);
+			 * foQuotesList = getJdbcTemplate().query(fo_given_quotes_sql,params2,new
+			 * QuotesStoreMapper());
+			 * logger.info("foQuotesList size-->"+foQuotesList.size());
+			 * 
+			 * 
+			 * List tempquoteslist = new ArrayList(); for(int
+			 * f=0;f<foQuotesList.size();f++){
+			 * tempquoteslist.add(((QuotesStoreUtil)foQuotesList.get(f)).getQuote_id().
+			 * toString()); } logger.info("tempquoteslist size-->"+tempquoteslist.size());
+			 */
+
+			if (accQuoteDetails.size() > 0) {
+				outMap.put("accQuoteDetails", accQuoteDetails);
+			}
+			outMap.put("accQuoteDetailssize", accQuoteDetails.size());
+			if (quoteDetail.size() > 0) {
+				outMap.put("quoteDetail", quoteDetail);
+				outMap.put("gaininbps", gaininbps);
+			}
+
+			if (completeQuoteDetailsList.size() > 0) {
+				outMap.put("completeQuoteDetailsList", completeQuoteDetailsList);
+			}
+
+		} catch (DataAccessException exp) {
+			logger.info("Exception occured:: " + exp.getMessage());
+		}
+		logger.info("gtdActedQuotesStatusListFromRefNo(Map inParams)  method ends");
+		return outMap;
+	}
+
+	public String calcualteGainInBps(String refNo) {
+		String quotesstore_sql = "select quote_id,SPREAD_IN_BPS from (SELECT quote_id,NVL(decode(NEW_SPREAD, 0, NULL, NEW_SPREAD),SPREAD_IN_BPS) AS SPREAD_IN_BPS  FROM BCQI_REQUEST A ,    BCQI_REQ_QUOTE_DETAILS E  WHERE A.REFERENCE_NO        = E.REFERENCE_NO(+)  AND A.GTD_ACTION_REQUIRED ='Y'  and a.REFERENCE_NO=?)";
+
+		logger.info("query for quote detail::::-->");
+		Object[] partmp = { refNo };
+		List quotesstorelist = getJdbcTemplate().query(quotesstore_sql, partmp, new QuotesStoreMapper());
+
+		Collections.sort(quotesstorelist, new SpreadInBpsComparator());
+		logger.info(quotesstorelist);
+
+		String quotetocheck = ((QuotesStoreUtil) quotesstorelist.get(0)).getQuote_id().toString();
+		logger.info("LOWEST VALUE QUOTE -->");
+		String spbps = ((QuotesStoreUtil) quotesstorelist.get(0)).getSPREAD_IN_BPS().toString();
+		logger.info("LOWEST VALUE QUOTE BPS-->");
+
+		List sortedquoteslist = new ArrayList();
+		for (int f = 0; f < quotesstorelist.size(); f++) {
+			if (((QuotesStoreUtil) quotesstorelist.get(f)).getSPREAD_IN_BPS().toString().equals(spbps)) {
+				sortedquoteslist.add(((QuotesStoreUtil) quotesstorelist.get(f)).getQuote_id().toString());
+			}
+		}
+		List lowestquotedetail = null;
+		Map lowestquotedetailmap = null;
+		Map collectrefnolowquotedetails = new HashMap();
+		List gtdModifiedQuoteDetail = null;
+		Map modifiedquotedetail = new HashMap();
+
+		String templowspreadinbps = "";
+		if (sortedquoteslist.size() > 0) {
+			for (int h = 0; h < sortedquoteslist.size(); h++) {
+				// String lowest_quote_details_sql="SELECT (FO_USER_BRANCH ||' | '
+				// ||SPREAD_IN_BPS ||' bps') LOWEST_PERIOD_SPREAD_DESC FROM (SELECT NVL( (SELECT
+				// D.VALUE FROM BCQI_PROPERTIES D WHERE D.DESCRIPTION = 'Country' AND
+				// D.CONFIG_ID = E.FO_USER_BRANCH ),'NOT APPLICABLE' ) FO_USER_BRANCH, NVL(
+				// (SELECT D.VALUE FROM BCQI_PROPERTIES D WHERE D.DESCRIPTION = 'QuotePeriod'
+				// AND D.CONFIG_ID =E.PERIOD ),'NOT APPLICABLE') PERIOD, NVL( (SELECT D.VALUE
+				// FROM BCQI_PROPERTIES D WHERE D.DESCRIPTION = 'QuoteBasis' AND D.CONFIG_ID
+				// =E.BASIS ),'NOT APPLICABLE') BASIS, NVL(decode(E.NEW_SPREAD, 0, NULL,
+				// E.NEW_SPREAD),E.SPREAD_IN_BPS) SPREAD_IN_BPS FROM BCQI_REQUEST A ,
+				// BCQI_REQUEST_DETAILS C , BCQI_REQ_QUOTE_DETAILS E WHERE A.REFERENCE_NO =
+				// C.REFERENCE_NO AND A.REFERENCE_NO = E.REFERENCE_NO(+) AND
+				// A.GTD_ACTION_REQUIRED ='Y' AND e.QUOTE_ID in (SELECT QUOTE_ID FROM (SELECT
+				// b.* FROM (SELECT MIN(NVL(decode(NEW_SPREAD, 0, NULL,
+				// NEW_SPREAD),SPREAD_IN_BPS)) AS SPREAD_IN_BPS FROM BCQI_REQ_QUOTE_DETAILS
+				// WHERE reference_no=? )A JOIN (SELECT MIN(NVL(decode(NEW_SPREAD, 0, NULL,
+				// NEW_SPREAD),SPREAD_IN_BPS)) AS SPREAD_IN_BPS, QUOTE_ID FROM
+				// BCQI_REQ_QUOTE_DETAILS WHERE reference_no=? GROUP BY QUOTE_ID )B ON
+				// A.spread_in_bps=B.spread_in_bps ) ) )";
+				String lowest_quote_details_sql = "SELECT (FO_USER_BRANCH  ||' | '  ||SPREAD_IN_BPS  ||' bps') LOWEST_PERIOD_SPREAD_DESC FROM  (SELECT NVL(    (SELECT D.VALUE    FROM BCQI_PROPERTIES D    WHERE D.DESCRIPTION = 'Country'    AND D.CONFIG_ID     = E.FO_USER_BRANCH    ),'NOT APPLICABLE' ) FO_USER_BRANCH,    NVL(    (SELECT D.VALUE    FROM BCQI_PROPERTIES D    WHERE D.DESCRIPTION = 'QuotePeriod'    AND D.CONFIG_ID     =E.PERIOD    ),'NOT APPLICABLE') PERIOD,    NVL(    (SELECT D.VALUE    FROM BCQI_PROPERTIES D    WHERE D.DESCRIPTION = 'QuoteBasis'    AND D.CONFIG_ID     =E.BASIS   ),'NOT APPLICABLE') BASIS,    NVL(decode(E.NEW_SPREAD, 0, NULL, E.NEW_SPREAD),E.SPREAD_IN_BPS) SPREAD_IN_BPS  FROM BCQI_REQUEST A ,    BCQI_REQUEST_DETAILS C ,    BCQI_REQ_QUOTE_DETAILS E  WHERE A.REFERENCE_NO      = C.REFERENCE_NO  AND A.REFERENCE_NO        = E.REFERENCE_NO(+)  AND A.GTD_ACTION_REQUIRED ='Y'  AND e.QUOTE_ID            =?)";
+				logger.info("query for quote detail::::-->");
+				// Object [] par1={refNo,refNo};
+
+				Object[] par1 = { ((QuotesStoreUtil) quotesstorelist.get(h)).getQuote_id().toString() };
+
+				lowestquotedetail = getJdbcTemplate().queryForList(lowest_quote_details_sql, par1);
+
+				for (int k = 0; k < lowestquotedetail.size(); k++) {
+					lowestquotedetailmap = (Map) lowestquotedetail.get(k);
+					for (Iterator j = lowestquotedetailmap.entrySet().iterator(); j.hasNext();) {
+						Entry e = (Entry) j.next();
+						logger.info("KEY-->" + e.getKey() + " VALUE-->" + e.getValue());
+						templowspreadinbps = templowspreadinbps + "," + e.getValue();
+
+						logger.info("templowspreadinbps-->");
+					}
+				}
+
+			}
+		}
+
+		Map tempdetail = new HashMap();
+
+		templowspreadinbps = templowspreadinbps.substring(1, templowspreadinbps.length());
+		tempdetail.put(refNo, templowspreadinbps);
+		collectrefnolowquotedetails.put(refNo, tempdetail);
+
+		logger.info("querying reference no is -->");
+		String original_quote_details_sql = "SELECT (FO_USER_BRANCH  ||' | '  ||SPREAD_IN_BPS  ||' bps') MODIFIED_PERIOD_SPREAD_DESC FROM  (SELECT NVL(    (SELECT D.VALUE    FROM BCQI_PROPERTIES D    WHERE D.DESCRIPTION = 'Country'    AND D.CONFIG_ID     = E.FO_USER_BRANCH    ),'NOT APPLICABLE' ) FO_USER_BRANCH,    NVL(    (SELECT D.VALUE    FROM BCQI_PROPERTIES D    WHERE D.DESCRIPTION = 'QuotePeriod'    AND D.CONFIG_ID     =E.PERIOD    ),'NOT APPLICABLE') PERIOD,    NVL(    (SELECT D.VALUE    FROM BCQI_PROPERTIES D    WHERE D.DESCRIPTION = 'QuoteBasis'    AND D.CONFIG_ID     =E.BASIS    ),'NOT APPLICABLE') BASIS,    E.TEMP_SPREAD_IN_BPS SPREAD_IN_BPS,    TO_CHAR(A.QUOTE_ACCEPTED_DATE)QUOTE_ACCEPTED_DATE  FROM BCQI_REQUEST A ,    BCQI_REQUEST_DETAILS C ,    BCQI_REQ_QUOTE_DETAILS E  WHERE A.REFERENCE_NO      = C.REFERENCE_NO  AND A.REFERENCE_NO        = E.REFERENCE_NO(+)  AND A.GTD_ACTION_REQUIRED ='Y'  AND A.GTD_ACTED           ='Y'  AND E.GTD_ACTED_ON_QUOTE  = 'Y'  AND E.STATUS             IN ('5','7','8','9','11','20','25','26','27','28')  AND e.reference_no        =? ORDER BY a.creation_time DESC  )";
+		logger.info("query for original detail::::-->" + original_quote_details_sql);
+		Object[] par1 = { refNo };
+		gtdModifiedQuoteDetail = getJdbcTemplate().queryForList(original_quote_details_sql, par1);
+		Map modtempdetail = (Map) gtdModifiedQuoteDetail.get(0);
+//		 logger.info("MODIFIED_PERIOD_SPREAD_DESC for referenceNo "+refNo+" is -->"+modtempdetail.get("MODIFIED_PERIOD_SPREAD_DESC"));
+
+		modifiedquotedetail.put(refNo, modtempdetail);
+
+		Map tempcollectrefnolowquotedetails = (Map) collectrefnolowquotedetails.get(refNo);
+		String LOWEST_PERIOD_SPREAD_DESCstr = (String) tempcollectrefnolowquotedetails.get(refNo);
+		logger.info("LOWEST_PERIOD_SPREAD_DESCstr-->");
+
+		Map tempmodifiedquotedetail = (Map) modifiedquotedetail.get(refNo);
+		String MODIFIED_PERIOD_SPREAD_DESCstr = (String) tempmodifiedquotedetail.get("MODIFIED_PERIOD_SPREAD_DESC");
+		logger.info("MODIFIED_PERIOD_SPREAD_DESCstr-->");
+
+		String temporspr = LOWEST_PERIOD_SPREAD_DESCstr
+				.substring((LOWEST_PERIOD_SPREAD_DESCstr.indexOf("|") + 2), LOWEST_PERIOD_SPREAD_DESCstr.length())
+				.substring(0, (LOWEST_PERIOD_SPREAD_DESCstr.substring((LOWEST_PERIOD_SPREAD_DESCstr.indexOf("|") + 2),
+						LOWEST_PERIOD_SPREAD_DESCstr.length()).indexOf(" ")));
+		int x = Integer.parseInt(temporspr);
+//		 logger.info("lowest spr int val-->"+x);
+
+		String tempmodspr = MODIFIED_PERIOD_SPREAD_DESCstr
+				.substring((MODIFIED_PERIOD_SPREAD_DESCstr.indexOf("|") + 2), MODIFIED_PERIOD_SPREAD_DESCstr.length())
+				.substring(0,
+						(MODIFIED_PERIOD_SPREAD_DESCstr.substring((MODIFIED_PERIOD_SPREAD_DESCstr.indexOf("|") + 2),
+								MODIFIED_PERIOD_SPREAD_DESCstr.length()).indexOf(" ")));
+		int y = Integer.parseInt(tempmodspr);
+//		 logger.info("modified spr int val-->"+y);
+
+		int dif = y - x;
+//		 logger.info("difference spr int val-->"+dif);
+
+		if (dif < 0) {
+			return Integer.toString(0);
+		} else {
+			return Integer.toString(dif);
+		}
+
+	}
+
+	public String getUserGroupForID(String userGroupID) {
+		String userGroup = "";
+
+		try {
+			Object[] param = new Object[] { userGroupID };
+
+			userGroup = getJdbcTemplate().queryForObject(
+					"SELECT VALUE  FROM BCQI_PROPERTIES  WHERE DESCRIPTION = 'UserGroup'  AND CONFIG_ID   =?", param,
+					String.class);
+
+//			logger.info("userGroup--->" + userGroup + " for user group id-->"+userGroupID);
+		} catch (DataAccessException exception) {
+			logger.error("Exception Occured : " + exception.getMessage(), exception);
+			DAOException.throwException("BC000");
+		}
+
+		return userGroup;
+
+	}
+
+	public void setGtdmodel(GTDModel gtdmodel) {
+		this.gtdmodel = gtdmodel;
+	}
+
+	@Override
+	public boolean isBulkEmailEnabled() {
+
+		String emailEnabledFlag = "N";
+		final String bulkEmailEnabled = "select value from BCQI_PROPERTIES where description='BULK_EMAIL_ENABLED' order by value asc";
+
+		try {
+			emailEnabledFlag = getJdbcTemplate().queryForObject(bulkEmailEnabled, String.class);
+			logger.info("BULK_EMAIL_ENABLED DAO");
+		} catch (DAOException ex) {
+			logger.error("Exception occured: " + ex.getMessage());
+			DAOException.throwException("BC000", ex);
+		}
+		return "Y".equals(emailEnabledFlag) ? true : false;
+	}
+
+	@Override
+	public boolean saveAccessAudit(String userName, String pageAccessed, String action, String dataString) {
+		logger.info("saveAccessAudit method begins");
+
+		int count = 0;
+		final String auditAccess = "insert into BCQI_APP_ACCESS_AUDIT_TRAIL(ACCESS_AUDIT_ID,PAGE_ACCESSED,USER_ACCESSED,ACCESSED_TIME,ACTION,DATA_STRING) values (APP_ACCESS_AUDIT_SEQ.nextval, ?, ?,sysdate,?,?)";
+
+		try {
+			Object[] par1 = { pageAccessed, userName, action, dataString };
+			count = getJdbcTemplate().update(auditAccess, par1);
+			logger.info("Successfull :: saveAccessAudit method end");
+		} catch (DAOException ex) {
+			logger.error("Exception occured: " + ex.getMessage());
+			DAOException.throwException("BC000", ex);
+		}
+		return count > 0;
+	}
+
+}
