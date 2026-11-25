@@ -1,0 +1,102 @@
+/*
+ * CommonDAO.java
+ * Created on May 2, 2007
+ *
+ * Copyright (c) 2005 by SBI All Rights Reserved.
+ * $Header: $
+ */
+//History
+//May 2, 2007 JD37715 - Initial Creation
+
+package com.sbi.dao;
+
+import java.util.List;
+import java.util.Map;
+import com.sbi.exception.DAOException;
+import com.sbi.model.User;
+public interface CommonDAO {
+
+	User findUser(String userName) throws DAOException;
+    //added for alerts
+    void insertSMSAlertHistoryDetails(String mobileNo, String message,String senderId,String receiverId) throws DAOException;
+    //ended for alerts
+   
+    int updateTable(String userName, String newPassword) throws DAOException;
+  
+	 public Map getLoginUserRole(String userName)throws DAOException;
+	 
+	 public void insertLoggidenUser(Map inParams) throws DAOException;
+	 
+	 public void updateLoginCount(int loginCount,String user) throws DAOException;
+	 
+	 public int getLoggedinCount(Map inParams) throws DAOException;
+	 
+	 public void removeLoggdinUser(String userName) throws DAOException;
+	 
+	 
+//BCQI start
+	 
+	 public List getStatus(String status)throws DAOException;
+	 
+	 public List reportDetails(Map inParams) throws DAOException;
+	 
+	 public List doReportDetails(Map inParams) throws DAOException;
+	 
+	 public List doSellerReportDetails(Map inParams) throws DAOException;
+	 
+	 public List foReportDetails(Map inParams) throws DAOException;
+	 
+	 public List getDOList() throws DAOException;
+	 
+	 public List getFOList() throws DAOException;
+	 
+	 public List doReportTabDetails(Map inParams) throws DAOException;
+	 
+	 public List excelDowload(Map inParams) throws DAOException;
+	  
+	 public String getIpAddr(Map inParams) throws DAOException;
+	 
+	 public void updateUser(Map inParams) throws DAOException;
+	 
+	 //Added by Dhanunjay 
+	 
+	 public Map resetPasswordUserDetails(String userId) throws DAOException;
+	 
+	 public int insertBCQIMail(String userId,String mailsubject,String mailID) throws DAOException;
+	 
+	//BCQI end
+	 
+	 
+	 
+	 
+	 
+	 
+	 
+	 
+	 public List reportDetails1(Map inParams) throws DAOException;
+	 
+	 public List reportDetails1Seller(Map inParams) throws DAOException;
+	 
+	 
+	String getNewDBDetails(String userName);
+	int updateLoggedinResetFlag(String userId);
+	User findUser1(String userName);
+	public List getHVPCStatus(String userRole);
+	public List hvpcdoReportDetails(Map inParams);
+	
+	
+	
+	  public Map gtdActedQuoteDetails(Map inParams) throws DAOException;
+	public Map gtdActedQuotesListFromRefNo(Map inParams) throws DAOException;
+	
+	
+	  public Map gtdQuoteReportConsolidatedDetails(Map inParams) throws DAOException;
+	
+	  
+	  public Map gtdActedQuotesStatusRefDetails(Map inParams) throws DAOException;
+	  public Map gtdActedQuotesStatusListFromRefNo(Map inParams) throws DAOException;
+	  
+	  public String getUserGroupForID(String userGroupID);
+	  public boolean isBulkEmailEnabled();
+	  public boolean saveAccessAudit(String userName, String pageAccessed, String action, String dataString);
+}
