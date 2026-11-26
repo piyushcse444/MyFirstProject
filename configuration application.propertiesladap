@@ -1,0 +1,52 @@
+import org.springframework.beans.factory.annotation.Value;
+
+@Value("${ldap.url}")
+private String ldapUrl;
+
+@Value("${ldap.searchUrl}")
+private String ldapSearchUrl;
+
+@Value("${ldap.bindUrl}")
+private String ldapBindUrl;
+
+@Value("${ldap.baseDn}")
+private String ldapBaseDn;
+
+@Value("${ldap.userSearchFilter}")
+private String ldapUserSearchFilter;
+
+@Value("${ldap.serviceAccountDn}")
+private String ldapServiceAccountDn;
+
+
+@Bean
+public LdapProperties ldapProperties() {
+
+    LdapProperties properties = new LdapProperties();
+
+    properties.setAuthenticationEnabled(true);
+
+    properties.setUrl(ldapUrl);
+    properties.setSearchUrl(ldapSearchUrl);
+    properties.setBindUrl(ldapBindUrl);
+    properties.setBaseDn(ldapBaseDn);
+    properties.setUserSearchFilter(ldapUserSearchFilter);
+
+    properties.setServiceAccountDn(ldapServiceAccountDn);
+    properties.setServiceAccountPassword(ldapServiceAccountPassword);
+
+    properties.setConnectTimeout(5000);
+    properties.setReadTimeout(5000);
+
+    return properties;
+}
+
+@Bean(initMethod = "initialize")
+public LdapAuthService ldapAuthService() {
+
+    return new LdapAuthService(ldapProperties());
+}
+
+
+@Value("${ldap.serviceAccountPassword}")
+private String ldapServiceAccountPassword;
