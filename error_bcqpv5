@@ -1,35 +1,49 @@
-Caused by: org.springframework.beans.factory.NoSuchBeanDefinitionException: No qualifying bean of type 'com.sbi.ldap.LdapAuthService' available: expected at least 1 bean which qualifies as autowire candidate. Dependency annotations: {@org.springframework.beans.factory.annotation.Autowired(required=true)}
-        at org.springframework.beans.factory.support.DefaultListableBeanFactory.raiseNoMatchingBeanFound(DefaultListableBeanFactory.java:1801)
-        at org.springframework.beans.factory.support.DefaultListableBeanFactory.doResolveDependency(DefaultListableBeanFactory.java:1357)
-        at org.springframework.beans.factory.support.DefaultListableBeanFactory.resolveDependency(DefaultListableBeanFactory.java:1311)
-        at org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor$AutowiredFieldElement.resolveFieldValue(AutowiredAnnotationBeanPostProcessor.java:710)
+package com.sbi.ldap;
 
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 
+@Component
+public class LdapProperties {
 
-i have added
-<bean id="ldapProperties"
-   class="com.sbi.bcqi.ldap.LdapProperties">
+    @Value("${ldap.authenticationEnabled:true}")
+    private boolean authenticationEnabled;
 
-  <property name="authenticationEnabled" value="true"/>
-  <property name="url" value="${ldap.url}"/>
-  <property name="searchUrl" value="${ldap.searchUrl}"/>
-  <property name="bindUrl" value="${ldap.bindUrl}"/>
-  <property name="baseDn" value="${ldap.baseDn}"/>
-  <property name="userSearchFilter" value="${ldap.userSearchFilter}"/>
-  <property name="serviceAccountDn" value="${ldap.serviceAccountDn}"/>
-  <property name="serviceAccountPassword" value="${ldap.serviceAccountPassword}"/>
+    @Value("${ldap.url}")
+    private String url;
 
-  <property name="connectTimeout" value="5000"/>
-  <property name="readTimeout" value="5000"/>
-</bean>
+    @Value("${ldap.searchUrl:}")
+    private String searchUrl;
 
-<bean id="ldapAuthService"
-   class="com.sbi.bcqi.ldap.LdapAuthService"
-   init-method="initialize">
+    @Value("${ldap.bindUrl:}")
+    private String bindUrl;
 
-  <constructor-arg ref="ldapProperties"/>
-</bean>  
+    @Value("${ldap.baseDn}")
+    private String baseDn;
 
-in bcqi-util.xml
+    @Value("${ldap.userSearchFilter}")
+    private String userSearchFilter;
 
-should i reload it as i have rebuild teh project
+    @Value("${ldap.serviceAccountDn}")
+    private String serviceAccountDn;
+
+    @Value("${ldap.serviceAccountPassword}")
+    private String serviceAccountPassword;
+
+    @Value("${ldap.connectTimeout:5000}")
+    private int connectTimeout;
+
+    @Value("${ldap.readTimeout:5000}")
+    private int readTimeout;
+
+    @Value("${ldap.truststorePath:}")
+    private String truststorePath;
+
+    @Value("${ldap.truststorePassword:}")
+    private String truststorePassword;
+
+    @Value("${ldap.truststoreType:JKS}")
+    private String truststoreType;
+
+    // Keep your existing getters and setters
+}
